@@ -317,6 +317,15 @@ document.addEventListener("DOMContentLoaded", () => {
     input.addEventListener("change", () => {
       gcashDetails.classList.toggle("hidden", input.value !== "Gcash");
       onsiteDetails.classList.toggle("hidden", input.value !== "Onsite");
+
+      // Enable pay now button and update styling based on payment method
+      const payNowBtn = document.querySelector(".pay-now-btn");
+      payNowBtn.classList.remove("bg-gray-500");
+      if (input.value === "Gcash") {
+        payNowBtn.classList.add("bg-blue-600", "hover:bg-blue-800");
+      } else {
+        payNowBtn.classList.add("bg-green-600", "hover:bg-green-800");
+      }
     });
   });
 
@@ -390,8 +399,6 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    updateAvailableTimeSlots();
-    renderCalendar();
     paymentModal.classList.add("hidden");
 
     alert(

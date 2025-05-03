@@ -36,30 +36,23 @@ function setupLogout() {
 
 // Update admin name in UI if available
 function updateAdminUI() {
-  const adminElements = document.querySelectorAll(".admin-name, .font-medium");
-  adminElements.forEach((element) => {
-    if (element.textContent.includes("Admin")) {
-      const adminName = localStorage.getItem("adminName") || "Admin";
-      element.textContent = adminName;
+  const adminName = localStorage.getItem("adminName");
+  if (adminName) {
+    const nameElement = document.querySelector(".font-medium");
+    if (nameElement) {
+      nameElement.textContent = adminName;
     }
-  });
+  }
 }
 
 // Update real-time date
 function updateRealTimeDate(elementSelector = "header span.text-gray-600") {
-  const options = {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  };
-  const today = new Date().toLocaleDateString("en-US", options);
-
-  const dateElements = document.querySelectorAll(elementSelector);
-  dateElements.forEach((element) => {
-    if (!element.textContent.includes("Last updated")) {
-      element.textContent = today;
-    }
-  });
+  const dateElement = document.querySelector(elementSelector);
+  if (dateElement) {
+    const now = new Date();
+    const options = { month: "long", day: "numeric", year: "numeric" };
+    dateElement.textContent = now.toLocaleDateString("en-US", options);
+  }
 }
 
 // Initialize on page load

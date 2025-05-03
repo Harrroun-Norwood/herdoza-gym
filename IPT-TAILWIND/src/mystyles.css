@@ -729,3 +729,17 @@ body.dark-mode input[type="number"] {
 body.dark-mode input[type="number"]::placeholder {
   color: rgba(255, 255, 255, 0.5);
 }
+
+/* Payment Modal Transitions */
+.payment-modal {
+  transition: opacity 0.3s ease-in-out;
+}
+
+.payment-modal:not(.opacity-0) {
+  opacity: 1 !important;
+}
+
+/* Ensure modal is above other content */
+.payment-modal {
+  z-index: 9999;
+}

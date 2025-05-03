@@ -29,8 +29,12 @@ document.addEventListener("DOMContentLoaded", function () {
     .addEventListener("click", () => showTab("dance"));
 });
 
-// Make showTab available globally for onclick handlers
+// Add to window object for onclick handlers
 window.showTab = showTab;
+window.approveRegistration = approveRegistration;
+window.rejectRegistration = rejectRegistration;
+window.approvePayment = approvePayment;
+window.rejectPayment = rejectPayment;
 
 function setupSidebar() {
   document.querySelectorAll(".sidebar-link").forEach((link) => {
@@ -80,17 +84,26 @@ async function approveRegistration(registrationId) {
       email: registration.email,
       contact: registration.contact,
       type: registration.type,
+      membershipType: registration.type.toLowerCase().includes("gym")
+        ? "gym"
+        : registration.type.toLowerCase().includes("mma")
+        ? "mma"
+        : "dance",
       dateOfMembership: new Date().toISOString(),
       dateOfExpiration: calculateExpirationDate(
         registration.membershipDuration
       ),
       status: "active",
+      paymentStatus: "paid",
+      paymentMethod: registration.paymentMethod,
+      membershipDuration: registration.membershipDuration,
     };
 
+    // Add to members database
     members.push(newMember);
     localStorage.setItem("members", JSON.stringify(members));
 
-    // Remove from pending registrations
+    // Remove from registrations completely
     const updatedRegistrations = registrations.filter(
       (r) => r.id !== registrationId
     );
@@ -108,8 +121,23 @@ async function approveRegistration(registrationId) {
     ).length;
     localStorage.setItem("stats", JSON.stringify(stats));
 
-    showToast("Registration approved successfully", "success");
-    loadRegistrations(); // Refresh the list
+    // Send welcome email (mock)
+    console.log(`Welcome email sent to ${registration.email}`);
+
+    showToast("Registration approved and member added successfully", "success");
+
+    // Remove the registration card from UI immediately
+    const registrationCard = document.querySelector(
+      `[data-registration-id="${registrationId}"]`
+    );
+    if (registrationCard) {
+      registrationCard.remove();
+    }
+
+    // Refresh the current tab to update the display
+    const currentTab =
+      document.querySelector(".tab-active")?.id.replace("Tab", "") || "gym";
+    loadRegistrations(currentTab);
   } catch (error) {
     console.error("Error approving registration:", error);
     showToast("Failed to approve registration", "error");
@@ -121,8 +149,27 @@ async function rejectRegistration(registrationId) {
     const registrations = JSON.parse(
       localStorage.getItem("registrations") || "[]"
     );
+    const registration = registrations.find((r) => r.id === registrationId);
 
-    // Remove registration completely
+    if (!registration) {
+      throw new Error("Registration not found");
+    }
+
+    // Store rejection reason in rejected registrations history (for audit purposes)
+    const rejectedRegistrations = JSON.parse(
+      localStorage.getItem("rejectedRegistrations") || "[]"
+    );
+    rejectedRegistrations.push({
+      ...registration,
+      rejectionDate: new Date().toISOString(),
+      status: "rejected",
+    });
+    localStorage.setItem(
+      "rejectedRegistrations",
+      JSON.stringify(rejectedRegistrations)
+    );
+
+    // Remove from registrations completely
     const updatedRegistrations = registrations.filter(
       (r) => r.id !== registrationId
     );
@@ -138,6 +185,8 @@ async function rejectRegistration(registrationId) {
     ).length;
     localStorage.setItem("stats", JSON.stringify(stats));
 
+    showToast("Registration rejected and removed successfully", "success");
+
     // Remove the registration card from UI immediately
     const registrationCard = document.querySelector(
       `[data-registration-id="${registrationId}"]`
@@ -146,12 +195,9 @@ async function rejectRegistration(registrationId) {
       registrationCard.remove();
     }
 
-    showToast("Registration rejected and removed successfully", "success");
-
-    // Refresh the display
-    const currentTab = document
-      .querySelector(".tab-active")
-      .id.replace("Tab", "");
+    // Refresh the current tab to update the display
+    const currentTab =
+      document.querySelector(".tab-active")?.id.replace("Tab", "") || "gym";
     loadRegistrations(currentTab);
   } catch (error) {
     console.error("Error rejecting registration:", error);
@@ -206,21 +252,19 @@ async function loadRegistrations(tab = "gym") {
 }
 
 function displayRegistrations(registrations, tab) {
-  const containerId = `${tab}RegistrationList`;
-  const container = document.getElementById(containerId);
-
-  if (!container) {
-    console.error(`Container not found: ${containerId}`);
+  const list = document.getElementById(`${tab}RegistrationList`);
+  if (!list) {
+    console.error(`Container not found: ${tab}RegistrationList`);
     return;
   }
 
   if (registrations.length === 0) {
-    container.innerHTML =
+    list.innerHTML =
       '<div class="text-center text-gray-500 py-4">No registrations found</div>';
     return;
   }
 
-  container.innerHTML = registrations
+  list.innerHTML = registrations
     .map(
       (reg) => `
     <div class="bg-white p-6 rounded-lg shadow-md border-l-4 ${
@@ -236,33 +280,68 @@ function displayRegistrations(registrations, tab) {
           <p class="text-sm text-gray-600 mt-1">${reg.type}</p>
           <p class="text-sm text-gray-500 mt-1">Email: ${reg.email}</p>
           <p class="text-sm text-gray-500">Contact: ${reg.contact}</p>
+          <p class="text-sm text-gray-500">Payment Method: ${
+            reg.paymentMethod
+          }</p>
           <p class="text-xs text-gray-400 mt-2">Registration Date: ${new Date(
             reg.timestamp
           ).toLocaleDateString()}</p>
         </div>
-        <span class="px-3 py-1 text-xs rounded-full ${
-          reg.status === "pending"
-            ? "bg-yellow-100 text-yellow-800"
-            : reg.status === "approved"
-            ? "bg-green-100 text-green-800"
-            : "bg-red-100 text-red-800"
-        }">
-          ${reg.status.charAt(0).toUpperCase() + reg.status.slice(1)}
-        </span>
+        <div class="flex flex-col gap-2">
+          <span class="px-3 py-1 text-xs rounded-full ${
+            reg.status === "pending"
+              ? "bg-yellow-100 text-yellow-800"
+              : reg.status === "approved"
+              ? "bg-green-100 text-green-800"
+              : "bg-red-100 text-red-800"
+          }">
+            ${reg.status.charAt(0).toUpperCase() + reg.status.slice(1)}
+          </span>
+          <span class="px-3 py-1 text-xs rounded-full ${
+            reg.paymentStatus === "pending" ||
+            reg.paymentStatus === "pending_verification" ||
+            reg.paymentStatus === "pending_payment"
+              ? "bg-yellow-100 text-yellow-800"
+              : reg.paymentStatus === "verified"
+              ? "bg-green-100 text-green-800"
+              : "bg-red-100 text-red-800"
+          }">
+            Payment: ${
+              (reg.paymentStatus || "Pending").charAt(0).toUpperCase() +
+              (reg.paymentStatus || "Pending").slice(1).replace("_", " ")
+            }
+          </span>
+        </div>
       </div>
       
       ${
         reg.status === "pending"
           ? `
         <div class="flex gap-2 mt-4">
-          <button onclick="approveRegistration('${reg.id}')"
-            class="flex-1 bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded text-sm transition-colors">
-            <i class="ri-check-line mr-1"></i> Approve
-          </button>
-          <button onclick="rejectRegistration('${reg.id}')"
-            class="flex-1 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded text-sm transition-colors">
-            <i class="ri-close-line mr-1"></i> Reject
-          </button>
+          ${
+            reg.paymentMethod === "Gcash" ||
+            reg.paymentStatus === "pending_verification"
+              ? `
+            <button onclick="approvePayment('${reg.id}')"
+              class="flex-1 bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded text-sm transition-colors">
+              <i class="ri-check-line mr-1"></i> Verify Payment
+            </button>
+            <button onclick="rejectPayment('${reg.id}')"
+              class="flex-1 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded text-sm transition-colors">
+              <i class="ri-close-line mr-1"></i> Reject Payment
+            </button>
+            `
+              : `
+            <button onclick="approvePayment('${reg.id}')"
+              class="flex-1 bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded text-sm transition-colors">
+              <i class="ri-check-line mr-1"></i> Confirm Payment Received
+            </button>
+            <button onclick="rejectRegistration('${reg.id}')"
+              class="flex-1 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded text-sm transition-colors">
+              <i class="ri-close-line mr-1"></i> Cancel Registration
+            </button>
+            `
+          }
         </div>
       `
           : ""
@@ -271,6 +350,15 @@ function displayRegistrations(registrations, tab) {
   `
     )
     .join("");
+
+  // Update payment status section
+  const paymentStatus = document.getElementById("paymentStatus");
+  const paymentActions = document.getElementById("paymentActions");
+
+  // Hide payment actions section since we're now showing buttons inline
+  if (paymentActions) {
+    paymentActions.classList.add("hidden");
+  }
 }
 
 function showToast(message, type = "info") {
@@ -303,4 +391,50 @@ function showToast(message, type = "info") {
     toast.style.transform = "translate(-50%, -20px)";
     setTimeout(() => toast.remove(), 300);
   }, 3000);
+}
+
+async function approvePayment(registrationId) {
+  try {
+    const registrations = JSON.parse(
+      localStorage.getItem("registrations") || "[]"
+    );
+    const registration = registrations.find((r) => r.id === registrationId);
+
+    if (!registration) {
+      throw new Error("Registration not found");
+    }
+
+    registration.paymentStatus = "verified";
+    localStorage.setItem("registrations", JSON.stringify(registrations));
+    showToast("Payment approved successfully", "success");
+
+    // After approving payment, automatically approve registration
+    await approveRegistration(registrationId);
+  } catch (error) {
+    console.error("Error approving payment:", error);
+    showToast("Failed to approve payment", "error");
+  }
+}
+
+async function rejectPayment(registrationId) {
+  try {
+    const registrations = JSON.parse(
+      localStorage.getItem("registrations") || "[]"
+    );
+    const registration = registrations.find((r) => r.id === registrationId);
+
+    if (!registration) {
+      throw new Error("Registration not found");
+    }
+
+    registration.paymentStatus = "rejected";
+    localStorage.setItem("registrations", JSON.stringify(registrations));
+    showToast("Payment rejected", "success");
+
+    // After rejecting payment, automatically reject registration
+    await rejectRegistration(registrationId);
+  } catch (error) {
+    console.error("Error rejecting payment:", error);
+    showToast("Failed to reject payment", "error");
+  }
 }

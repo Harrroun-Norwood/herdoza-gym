@@ -282,7 +282,7 @@ document.addEventListener("DOMContentLoaded", () => {
   popupCancelButton.addEventListener("click", closePaymentPopup);
 
   // Pay Now button - Confirm booking
-  payNowButton.addEventListener("click", (e) => {
+  payNowButton?.addEventListener("click", (e) => {
     e.preventDefault();
 
     selectedPayment = document.querySelector(

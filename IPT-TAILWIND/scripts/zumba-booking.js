@@ -1,112 +1,154 @@
 document.addEventListener("DOMContentLoaded", () => {
-  const zumbaButtons = document.querySelectorAll(
-    '.zumba-card button[type="button"]'
-  );
+  const desktopSelect = document.getElementById("selected_time_date_zumba");
+  const mobileSelect = document.getElementById("mobile_time_date_zumba");
+  const zumbaButtons = document.querySelectorAll(".zumba-card button");
   const paymentModal = document.querySelector(".payment-modal");
+  const cancelPaymentBtn = document.querySelector(".cancel-payment-btn");
+  const confirmPaymentBtn = document.querySelector(".confirm-payment-btn");
   const paymentMethodInputs = document.querySelectorAll(
     'input[name="payment-method"]'
   );
   const gcashDetails = document.getElementById("gcash-details");
   const onsiteDetails = document.getElementById("onsite-details");
-  const cancelPaymentBtn = document.querySelector(".cancel-payment-btn");
-  const confirmPaymentBtn = document.querySelector(".confirm-payment-btn");
 
   // Initialize from localStorage
   let bookedSessions = JSON.parse(
     localStorage.getItem("zumbaBookings") || "[]"
   );
 
+  function showModal() {
+    paymentModal.classList.remove("opacity-0", "pointer-events-none");
+  }
+
+  function hideModal() {
+    paymentModal.classList.add("opacity-0", "pointer-events-none");
+  }
+
   // Payment method selection handlers
   paymentMethodInputs.forEach((input) => {
     input.addEventListener("change", () => {
       gcashDetails.classList.toggle("hidden", input.value !== "Gcash");
       onsiteDetails.classList.toggle("hidden", input.value !== "Onsite");
+
+      // Enable pay now button and update styling based on payment method
+      confirmPaymentBtn.classList.remove("bg-gray-500");
+      if (input.value === "Gcash") {
+        confirmPaymentBtn.classList.add("bg-blue-600", "hover:bg-blue-800");
+      } else {
+        confirmPaymentBtn.classList.add("bg-green-600", "hover:bg-green-800");
+      }
     });
   });
 
-  function showPaymentModal(selectedSession) {
-    document.querySelector(".booking-details").textContent = selectedSession;
-    paymentModal.classList.remove("hidden");
-  }
+  // Handle booking button clicks
+  zumbaButtons.forEach((btn) => {
+    btn.addEventListener("click", (e) => {
+      e.preventDefault();
+      const selectedDay = e.target
+        .closest(".zumba-card")
+        .querySelector("select").value;
 
-  cancelPaymentBtn?.addEventListener("click", () => {
-    paymentModal.classList.add("hidden");
+      if (!selectedDay) {
+        alert("Please select a day and time first");
+        return;
+      }
+
+      // Check if session is already booked
+      if (bookedSessions.includes(selectedDay)) {
+        alert("This session is already booked. Please select another session.");
+        return;
+      }
+
+      // Update booking details in payment modal
+      document.querySelector(
+        ".booking-details"
+      ).textContent = `${selectedDay} at 7:00 AM - 8:00 AM`;
+      showModal();
+    });
   });
 
+  // Cancel payment
+  cancelPaymentBtn?.addEventListener("click", hideModal);
+
+  // Confirm payment and booking
   confirmPaymentBtn?.addEventListener("click", () => {
     const selectedPayment = document.querySelector(
       'input[name="payment-method"]:checked'
     );
-    const selectedSession = document.querySelector(".zumba-card select").value;
+    const selectedDay = desktopSelect.value || mobileSelect.value;
 
     if (!selectedPayment) {
       alert("Please select a payment method");
       return;
     }
 
-    if (!selectedSession) {
-      alert("Please select a Zumba session first");
-      return;
-    }
-
     const bookingDetails = {
-      session: selectedSession,
+      day: selectedDay,
+      time: "7:00 AM - 8:00 AM",
       paymentMethod: selectedPayment.value,
-      price: 80, // Fixed price for Zumba sessions
+      price: 150,
     };
 
     if (
-      confirm(
-        `Confirm Zumba Session?\n\n⏰ Session: ${bookingDetails.session}\n💳 Payment: ${bookingDetails.paymentMethod}\n\nPrice: ₱80.00`
+      !confirm(
+        `Confirm Zumba Session?\n\n` +
+          `📅 Day: ${bookingDetails.day}\n` +
+          `⏰ Time: ${bookingDetails.time}\n` +
+          `💳 Payment: ${bookingDetails.paymentMethod}\n\n` +
+          `Price: ₱150.00`
       )
     ) {
-      // Save booking
-      bookedSessions.push(bookingDetails.session);
-      localStorage.setItem("zumbaBookings", JSON.stringify(bookedSessions));
-
-      // If connected to backend, send booking to server
-      if (window.bookingApi) {
-        const backendBookingData = {
-          sessionType: "zumba",
-          date: new Date().toISOString().split("T")[0],
-          time: bookingDetails.session,
-          price: bookingDetails.price,
-          paymentMethod: bookingDetails.paymentMethod,
-        };
-
-        window.bookingApi
-          .bookZumbaSession(backendBookingData)
-          .then((response) => {
-            console.log("Booking saved to database:", response);
-          })
-          .catch((error) => {
-            console.error("Failed to save booking to database:", error);
-          });
-      }
-
-      // Update UI and show confirmation
-      updateBookedSessionsUI();
-      paymentModal.classList.add("hidden");
-      alert(
-        `✅ Zumba Session Confirmed!\n\n⏰ Session: ${bookingDetails.session}\n💳 Payment: ${bookingDetails.paymentMethod}\n\nYou can view your booking in your schedule.`
-      );
-
-      // Redirect to schedule page
-      setTimeout(() => {
-        window.location.href = "user-schedule-zumba.html";
-      }, 1500);
+      return;
     }
+
+    // Save booking
+    bookedSessions.push(selectedDay);
+    localStorage.setItem("zumbaBookings", JSON.stringify(bookedSessions));
+
+    // If connected to backend, send booking to server
+    if (window.bookingApi) {
+      const backendBookingData = {
+        sessionType: "zumba",
+        day: bookingDetails.day,
+        time: bookingDetails.time,
+        price: bookingDetails.price,
+        paymentMethod: bookingDetails.paymentMethod,
+      };
+
+      window.bookingApi
+        .bookZumbaSession(backendBookingData)
+        .then((response) => {
+          console.log("Booking saved to database:", response);
+        })
+        .catch((error) => {
+          console.error("Failed to save booking to database:", error);
+        });
+    }
+
+    hideModal();
+
+    alert(
+      `✅ Zumba Session Confirmed!\n\n` +
+        `📅 Day: ${bookingDetails.day}\n` +
+        `⏰ Time: ${bookingDetails.time}\n` +
+        `💳 Payment: ${bookingDetails.paymentMethod}\n\n` +
+        `You can view your bookings in your schedule.`
+    );
+
+    // Redirect to schedule page after a short delay
+    setTimeout(() => {
+      window.location.href = "user-schedule-zumba.html";
+    }, 1500);
   });
 
-  // Update the interface to reflect booked sessions
+  // Update select options to show booked sessions
   function updateBookedSessionsUI() {
-    const selects = document.querySelectorAll(".zumba-card select");
-    selects.forEach((select) => {
+    [desktopSelect, mobileSelect].forEach((select) => {
+      if (!select) return;
+
       const options = select.querySelectorAll("option");
       options.forEach((option) => {
-        const isBooked = bookedSessions.some(
-          (session) => session === option.value
-        );
+        const isBooked = bookedSessions.includes(option.value);
         if (isBooked && option.value) {
           option.disabled = true;
           option.textContent = option.textContent + " (Already Booked)";
@@ -114,29 +156,6 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     });
   }
-
-  // Event listener for all Zumba booking buttons
-  zumbaButtons.forEach((button) => {
-    button.addEventListener("click", (e) => {
-      const card = e.target.closest(".zumba-card");
-      const select = card.querySelector("select");
-      const selectedSession = select?.value;
-
-      if (!selectedSession) {
-        alert("Please select a day and time first.");
-        return;
-      }
-
-      // Check if session is already booked
-      if (bookedSessions.includes(selectedSession)) {
-        alert("This session is already booked. Please select another session.");
-        return;
-      }
-
-      // Show payment modal
-      showPaymentModal(selectedSession);
-    });
-  });
 
   // Initialize UI
   updateBookedSessionsUI();

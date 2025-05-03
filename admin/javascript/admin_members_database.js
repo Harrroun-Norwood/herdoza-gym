@@ -6,8 +6,20 @@ let isEditing = false; // Track editing state
 
 // Load members when page loads
 document.addEventListener("DOMContentLoaded", async function () {
-  // Load initial data
-  await loadMembers();
+  // Get filter from URL parameters if present
+  const urlParams = new URLSearchParams(window.location.search);
+  const filterParam = urlParams.get("filter");
+
+  // Set the filter dropdown to match URL parameter if present
+  if (filterParam) {
+    const filterSelect = document.getElementById("statusFilter");
+    if (filterSelect) {
+      filterSelect.value = filterParam;
+    }
+  }
+
+  // Load initial data with filter from URL or default
+  await loadMembers(filterParam || "all");
   setupStatusFilter();
   setupAutoRefresh();
 

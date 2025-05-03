@@ -39,6 +39,9 @@ document.addEventListener("DOMContentLoaded", function () {
     updateDashboardStats();
     displayRecentRegistrations();
   }, 2000); // Update every 2 seconds
+
+  // Add click handlers to stats cards
+  setupStatsCardClickHandlers();
 });
 
 async function initializeDashboard() {
@@ -302,4 +305,33 @@ function showNotification(message, isError = false) {
   setTimeout(() => {
     notification.remove();
   }, 3000);
+}
+
+function setupStatsCardClickHandlers() {
+  const statsCards = document.querySelectorAll(".stats-card");
+
+  // New Members card
+  statsCards[0].addEventListener("click", () => {
+    window.location.href = "admin_members_database.html?filter=active";
+  });
+
+  // Pending Approval card
+  statsCards[1].addEventListener("click", () => {
+    window.location.href = "admin_registration.html";
+  });
+
+  // Active Members card
+  statsCards[2].addEventListener("click", () => {
+    window.location.href = "admin_members_database.html?filter=active";
+  });
+
+  // Expired Members card
+  statsCards[3].addEventListener("click", () => {
+    window.location.href = "admin_members_database.html?filter=expired";
+  });
+
+  // Add cursor pointer to cards
+  statsCards.forEach((card) => {
+    card.style.cursor = "pointer";
+  });
 }

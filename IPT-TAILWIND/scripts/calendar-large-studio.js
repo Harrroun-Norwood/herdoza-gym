@@ -5,9 +5,16 @@ document.addEventListener("DOMContentLoaded", () => {
   const okButton = document.querySelector(".ok-btn");
   const cancelButton = document.querySelector(".cancel-btn");
   const timeSlots = document.querySelectorAll('input[name="time-slot"]');
-  const peopleQuantity = document.getElementById("people-quantity");
-  const paymentPopup = document.getElementById("studio-pop-up");
-  const popupContainer = document.querySelector(".pop-up-con");
+  const peopleInput = document.querySelector('input[name="number-of-people"]');
+  const paymentModal = document.querySelector(".payment-modal");
+  const paymentMethodInputs = document.querySelectorAll(
+    'input[name="payment-method"]'
+  );
+  const confirmPaymentBtn = document.querySelector(".confirm-payment-btn");
+  const cancelPaymentBtn = document.querySelector(".cancel-payment-btn");
+  const gcashDetails = document.getElementById("gcash-details");
+  const onsiteDetails = document.getElementById("onsite-details");
+  const priceDisplay = document.querySelector(".price-display");
 
   const months = [
     "January",
@@ -24,7 +31,7 @@ document.addEventListener("DOMContentLoaded", () => {
     "December",
   ];
 
-  // Initialize bookedSlots from localStorage or empty array if nothing stored
+  // Initialize state
   let bookedSlots = JSON.parse(
     localStorage.getItem("largeStudioBookings") || "[]"
   );
@@ -33,9 +40,60 @@ document.addEventListener("DOMContentLoaded", () => {
   let year = date.getFullYear();
   let selectedDate = null;
   let selectedTime = null;
-  let selectedPeople = null;
 
-  // Function to save bookings to localStorage
+  function updatePriceDisplay() {
+    const numberOfPeople = parseInt(peopleInput.value) || 0;
+    const totalPrice = numberOfPeople * 25; // ₱25 per person
+    
+    // Update main price display
+    const priceDisplay = document.querySelector('.price-display');
+    if (priceDisplay) {
+      priceDisplay.textContent = `₱${totalPrice.toFixed(2)}`;
+    }
+
+    // Update GCash amount
+    const gcashAmount = document.querySelector('.gcash-amount');
+    if (gcashAmount) {
+      gcashAmount.textContent = `₱${totalPrice.toFixed(2)}`;
+    }
+
+    // Update Onsite amount
+    const onsiteAmount = document.querySelector('.onsite-amount');
+    if (onsiteAmount) {
+      onsiteAmount.textContent = `₱${totalPrice.toFixed(2)}`;
+    }
+  }
+
+  // Payment method selection handlers
+  paymentMethodInputs.forEach((input) => {
+    input.addEventListener("change", () => {
+      gcashDetails.classList.toggle("hidden", input.value !== "Gcash");
+      onsiteDetails.classList.toggle("hidden", input.value !== "Onsite");
+
+      // Enable confirm button and update styling based on payment method
+      confirmPaymentBtn.classList.remove("bg-gray-500");
+      if (input.value === "Gcash") {
+        confirmPaymentBtn.classList.add("bg-blue-600", "hover:bg-blue-800");
+      } else {
+        confirmPaymentBtn.classList.add("bg-green-600", "hover:bg-green-800");
+      }
+    });
+  });
+
+  peopleInput?.addEventListener("input", (e) => {
+    const value = parseInt(e.target.value) || 0;
+    if (value < 4) {
+      e.target.setCustomValidity(
+        "Minimum 4 people required for large studio booking"
+      );
+    } else if (value > 30) {
+      e.target.setCustomValidity("Maximum 30 people allowed");
+    } else {
+      e.target.setCustomValidity("");
+    }
+    updatePriceDisplay();
+  });
+
   function saveBookings() {
     localStorage.setItem("largeStudioBookings", JSON.stringify(bookedSlots));
 
@@ -202,7 +260,7 @@ document.addEventListener("DOMContentLoaded", () => {
   okButton.addEventListener("click", () => {
     // Get current selections
     selectedTime = document.querySelector('input[name="time-slot"]:checked');
-    selectedPeople = peopleQuantity.value;
+    const selectedPeople = peopleInput.value;
 
     // Validate all fields
     let errorMessage = "";
@@ -239,7 +297,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const time = selectedTime.nextElementSibling.textContent
       .replace(" (Already Booked)", "")
       .trim();
-    const price = parseInt(selectedPeople) * 25;
+    const price = parseInt(peopleInput.value) * 25;
 
     const popupHTML = `
         <div class="payment-summary text-white bg-black-1 open-payment-summary" id="studio-pop-up">
@@ -261,7 +319,7 @@ document.addEventListener("DOMContentLoaded", () => {
                             ${formattedDate}
                         </div>
                         <div class="booking-details">
-                            ${selectedPeople} person(s) at ${time}
+                            ${peopleInput.value} person(s) at ${time}
                         </div>
                         <div class="text-sm mt-2 sm:hidden">
                             Price: ₱${price}.00 (₱25 per person)
@@ -381,7 +439,7 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    const price = parseInt(selectedPeople) * 25;
+    const price = parseInt(peopleInput.value) * 25;
 
     const bookingDetails = {
       date: `${months[selectedDate.month]} ${selectedDate.day}, ${
@@ -390,7 +448,7 @@ document.addEventListener("DOMContentLoaded", () => {
       time: selectedTime.nextElementSibling.textContent
         .replace(" (Already Booked)", "")
         .trim(),
-      people: selectedPeople,
+      people: peopleInput.value,
       paymentMethod: selectedPayment.value,
       price: price,
       type: "large", // Indicates this is a large studio booking
@@ -447,8 +505,7 @@ document.addEventListener("DOMContentLoaded", () => {
   cancelButton.addEventListener("click", () => {
     selectedDate = null;
     selectedTime = null;
-    selectedPeople = null;
-    peopleQuantity.value = "";
+    peopleInput.value = "";
 
     timeSlots.forEach((slot) => {
       slot.checked = false;
@@ -465,174 +522,4 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Initial render
   renderCalendar();
-
-  const peopleInput = document.getElementById("people-quantity");
-  const paymentModal = document.querySelector(".payment-modal");
-  const paymentMethodInputs = document.querySelectorAll(
-    'input[name="payment-method"]'
-  );
-  const priceDisplay = document.querySelector(".price-display");
-  const gcashAmount = document.querySelector(".gcash-amount");
-  const onsiteAmount = document.querySelector(".onsite-amount");
-  const confirmPaymentBtn = document.querySelector(".confirm-payment-btn");
-  const cancelPaymentBtn = document.querySelector(".cancel-payment-btn");
-  const gcashDetails = document.getElementById("gcash-details");
-  const onsiteDetails = document.getElementById("onsite-details");
-
-  function updatePriceDisplay(numberOfPeople) {
-    const price = numberOfPeople * 25; // ₱25 per person
-    const formattedPrice = `₱${price.toFixed(2)}`;
-    priceDisplay.textContent = formattedPrice;
-    gcashAmount.textContent = formattedPrice;
-    onsiteAmount.textContent = formattedPrice;
-  }
-
-  peopleInput?.addEventListener("input", (e) => {
-    const value = parseInt(e.target.value) || 0;
-    if (value < 4) {
-      e.target.setCustomValidity(
-        "Minimum 4 people required for large studio booking"
-      );
-    } else if (value > 30) {
-      e.target.setCustomValidity("Maximum 30 people allowed");
-    } else {
-      e.target.setCustomValidity("");
-    }
-    updatePriceDisplay(value);
-  });
-
-  // Payment method selection handlers
-  paymentMethodInputs.forEach((input) => {
-    input.addEventListener("change", () => {
-      gcashDetails.classList.toggle("hidden", input.value !== "Gcash");
-      onsiteDetails.classList.toggle("hidden", input.value !== "Onsite");
-    });
-  });
-
-  document.querySelector(".ok-btn")?.addEventListener("click", () => {
-    const selectedTimeInput = document.querySelector(
-      'input[name="time-slot"]:checked'
-    );
-    const numberOfPeople = parseInt(peopleInput.value);
-
-    if (
-      !selectedDate ||
-      !selectedTimeInput ||
-      !numberOfPeople ||
-      numberOfPeople < 4
-    ) {
-      let errorMessage = "Please complete the following:\n";
-      if (!selectedDate) errorMessage += "• Select a date\n";
-      if (!selectedTimeInput) errorMessage += "• Select a time slot\n";
-      if (!numberOfPeople || numberOfPeople < 4)
-        errorMessage += "• Enter number of people (minimum 4)\n";
-      alert(errorMessage);
-      return;
-    }
-
-    selectedTime = selectedTimeInput.value;
-    const dateStr = `${months[selectedDate.month]} ${selectedDate.day}, ${
-      selectedDate.year
-    }`;
-
-    document.querySelector(".booking-details").innerHTML = `
-      Date: ${dateStr}<br>
-      Time: ${selectedTime}<br>
-      Group Size: ${numberOfPeople} people
-    `;
-
-    paymentModal.classList.remove("hidden");
-  });
-
-  document.querySelector(".cancel-btn")?.addEventListener("click", () => {
-    window.location.href = "dance-studio.html";
-  });
-
-  cancelPaymentBtn?.addEventListener("click", () => {
-    paymentModal.classList.add("hidden");
-  });
-
-  confirmPaymentBtn?.addEventListener("click", () => {
-    const selectedPayment = document.querySelector(
-      'input[name="payment-method"]:checked'
-    );
-
-    if (!selectedPayment) {
-      alert("Please select a payment method");
-      return;
-    }
-
-    const dateStr = `${months[selectedDate.month]} ${selectedDate.day}, ${
-      selectedDate.year
-    }`;
-    const numberOfPeople = parseInt(peopleInput.value);
-    const totalPrice = numberOfPeople * 25;
-
-    const bookingDetails = {
-      date: dateStr,
-      time: selectedTime,
-      numberOfPeople: numberOfPeople,
-      paymentMethod: selectedPayment.value,
-      pricePerPerson: 25,
-      totalPrice: totalPrice,
-    };
-
-    if (
-      confirm(
-        `Confirm Large Studio Booking?\n\n📅 Date: ${
-          bookingDetails.date
-        }\n⏰ Time: ${bookingDetails.time}\n👥 Group Size: ${
-          bookingDetails.numberOfPeople
-        } people\n💳 Payment: ${
-          bookingDetails.paymentMethod
-        }\n\nPrice: ₱${totalPrice.toFixed(2)} (₱25 per person)`
-      )
-    ) {
-      // Save booking
-      const bookedSlots = JSON.parse(
-        localStorage.getItem("largeStudioBookings") || "[]"
-      );
-      bookedSlots.push(bookingDetails);
-      localStorage.setItem("largeStudioBookings", JSON.stringify(bookedSlots));
-
-      // Send to backend if available
-      if (window.bookingApi) {
-        window.bookingApi
-          .bookStudio({
-            studioType: "large",
-            date: bookingDetails.date,
-            time: bookingDetails.time,
-            numberOfPeople: bookingDetails.numberOfPeople,
-            paymentMethod: bookingDetails.paymentMethod,
-            totalPrice: bookingDetails.totalPrice,
-          })
-          .then((response) => {
-            console.log("Booking saved to database:", response);
-          })
-          .catch((error) => {
-            console.error("Failed to save booking to database:", error);
-          });
-      }
-
-      paymentModal.classList.add("hidden");
-      alert(
-        `✅ Large Studio Booking Confirmed!\n\n📅 Date: ${
-          bookingDetails.date
-        }\n⏰ Time: ${bookingDetails.time}\n👥 Group Size: ${
-          bookingDetails.numberOfPeople
-        } people\n💳 Payment: ${
-          bookingDetails.paymentMethod
-        }\n\nTotal Price: ₱${totalPrice.toFixed(
-          2
-        )}\n\nYou can view your booking in your schedule.`
-      );
-
-      setTimeout(() => {
-        window.location.href = "user-schedule-studio.html";
-      }, 1500);
-    }
-  });
-
-  // Calendar navigation and date selection code remains the same
-  // ...
 });

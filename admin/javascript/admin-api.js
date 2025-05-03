@@ -155,8 +155,11 @@ function getAdminToken() {
 
 // Enhanced admin login check
 function isAdminLoggedIn() {
-  const token = getAdminToken();
-  return !!token;
+  if (!localStorage.getItem("adminLoggedIn")) {
+    window.location.href = "admin_login_interface.html";
+    return false;
+  }
+  return true;
 }
 
 // Mock data for demo/presentation mode

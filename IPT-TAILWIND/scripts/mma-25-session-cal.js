@@ -799,26 +799,16 @@ document.addEventListener("DOMContentLoaded", () => {
     input.addEventListener("change", () => {
       gcashDetails.classList.toggle("hidden", input.value !== "Gcash");
       onsiteDetails.classList.toggle("hidden", input.value !== "Onsite");
+
+      // Enable pay now button and update styling based on payment method
+      const payNowBtn = document.querySelector(".pay-now-btn");
+      payNowBtn.classList.remove("bg-gray-500");
+      if (input.value === "Gcash") {
+        payNowBtn.classList.add("bg-blue-600", "hover:bg-blue-800");
+      } else {
+        payNowBtn.classList.add("bg-green-600", "hover:bg-green-800");
+      }
     });
-  });
-
-  // Button handlers
-  okButton?.addEventListener("click", () => {
-    selectedTime = document.querySelector('input[name="time-slot"]:checked');
-
-    if (!selectedDate || !selectedTime) {
-      let errorMessage = "Please complete the following:\n";
-      if (!selectedDate) errorMessage += "• Select a start date\n";
-      if (!selectedTime) errorMessage += "• Select a time slot\n";
-      alert(errorMessage);
-      return;
-    }
-
-    showPaymentModal();
-  });
-
-  cancelButton?.addEventListener("click", () => {
-    window.location.href = "mixed-martial-arts.html";
   });
 
   cancelPaymentBtn?.addEventListener("click", () => {
@@ -850,41 +840,62 @@ document.addEventListener("DOMContentLoaded", () => {
     };
 
     if (
-      confirm(
+      !confirm(
         `Confirm MMA 25-Session Package?\n\n📅 Start Date: ${bookingDetails.startDate}\n⏰ Time Slot: ${bookingDetails.time}\n💳 Payment: ${bookingDetails.paymentMethod}\n\nPrice: ₱2,500.00`
       )
     ) {
-      // Save booking
-      bookedSlots.push(bookingDetails);
-      localStorage.setItem("mma25SessionBookings", JSON.stringify(bookedSlots));
-
-      // Send to backend if available
-      if (window.bookingApi) {
-        window.bookingApi
-          .bookMMASession({
-            sessionType: "25-session",
-            startDate: bookingDetails.startDate,
-            time: bookingDetails.time,
-            price: bookingDetails.price,
-            paymentMethod: bookingDetails.paymentMethod,
-          })
-          .then((response) => {
-            console.log("Booking saved to database:", response);
-          })
-          .catch((error) => {
-            console.error("Failed to save booking to database:", error);
-          });
-      }
-
-      paymentModal.classList.add("hidden");
-      alert(
-        `✅ MMA 25-Session Package Confirmed!\n\n📅 Start Date: ${bookingDetails.startDate}\n⏰ Time Slot: ${bookingDetails.time}\n💳 Payment: ${bookingDetails.paymentMethod}\n\nYou can view your schedule in the user dashboard.`
-      );
-
-      setTimeout(() => {
-        window.location.href = "user-schedule-mma.html";
-      }, 1500);
+      return;
     }
+
+    // Save booking
+    bookedSlots.push(bookingDetails);
+    localStorage.setItem("mma25SessionBookings", JSON.stringify(bookedSlots));
+
+    // Send to backend if available
+    if (window.bookingApi) {
+      window.bookingApi
+        .bookMMASession({
+          sessionType: "25-session",
+          startDate: bookingDetails.startDate,
+          time: bookingDetails.time,
+          price: bookingDetails.price,
+          paymentMethod: bookingDetails.paymentMethod,
+        })
+        .then((response) => {
+          console.log("Booking saved to database:", response);
+        })
+        .catch((error) => {
+          console.error("Failed to save booking to database:", error);
+        });
+    }
+
+    paymentModal.classList.add("hidden");
+    alert(
+      `✅ MMA 25-Session Package Confirmed!\n\n📅 Start Date: ${bookingDetails.startDate}\n⏰ Time Slot: ${bookingDetails.time}\n💳 Payment: ${bookingDetails.paymentMethod}\n\nYou can view your schedule in the user dashboard.`
+    );
+
+    setTimeout(() => {
+      window.location.href = "user-schedule-mma.html";
+    }, 1500);
+  });
+
+  // Button handlers
+  okButton?.addEventListener("click", () => {
+    selectedTime = document.querySelector('input[name="time-slot"]:checked');
+
+    if (!selectedDate || !selectedTime) {
+      let errorMessage = "Please complete the following:\n";
+      if (!selectedDate) errorMessage += "• Select a start date\n";
+      if (!selectedTime) errorMessage += "• Select a time slot\n";
+      alert(errorMessage);
+      return;
+    }
+
+    showPaymentModal();
+  });
+
+  cancelButton?.addEventListener("click", () => {
+    window.location.href = "mixed-martial-arts.html";
   });
 
   // Calendar navigation

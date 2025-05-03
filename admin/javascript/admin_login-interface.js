@@ -14,7 +14,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // Check if already logged in
   if (localStorage.getItem("adminLoggedIn")) {
-    window.location.href = "admin_dashboard.html";
+    window.location.href = "dashboard.html";
     return;
   }
 
