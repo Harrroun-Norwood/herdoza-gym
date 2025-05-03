@@ -743,3 +743,28 @@ body.dark-mode input[type="number"]::placeholder {
 .payment-modal {
   z-index: 9999;
 }
+
+/* Dance Studio Card Styles */
+.text-white.bg-black-3,
+.text-white.bg-red-800,
+.text-white.bg-black-3 {
+  display: flex;
+  flex-direction: column;
+  min-height: 550px; /* Increased height to ensure content fits */
+}
+
+.text-white.bg-black-3 > a,
+.text-white.bg-red-800 > a,
+.zumba-card {
+  margin-top: auto;
+  width: 100%;
+}
+
+/* Ensure all buttons in dance studio cards have the same spacing */
+.text-white.bg-black-3 button,
+.text-white.bg-red-800 button,
+.zumba-card button {
+  margin-top: 2.5rem; /* mt-10 equivalent */
+  width: 100%;
+  padding: 0.75rem 2rem; /* px-8 py-3 equivalent */
+}

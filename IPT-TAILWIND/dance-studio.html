@@ -148,30 +148,24 @@
               </div>
             </div>
 
-            <div class="mt-4">
-              <div class="zumba-card">
-                <select
-                  id="selected_time_date_zumba"
-                  class="w-full px-2 py-2 mt-1 bg-black-4 border rounded-lg focus:outline-none"
-                  required
-                >
-                  <option value="" disabled selected>
-                    Select day and time
-                  </option>
-                  <option value="Monday">Monday - 7:00 AM - 8:00 AM</option>
-                  <option value="Tuesday">Tuesday - 7:00 AM - 8:00 AM</option>
-                  <option value="Wednesday">
-                    Wednesday - 7:00 AM - 8:00 AM
-                  </option>
-                  <option value="Thursday">Thursday - 7:00 AM - 8:00 AM</option>
-                  <option value="Friday">Friday - 7:00 AM - 8:00 AM</option>
-                </select>
-                <button
-                  class="bg-red-600 px-8 py-3 mt-4 rounded-lg hover:bg-red-700 transition text-white w-full font-bold"
-                >
-                  ₱150.00
-                </button>
-              </div>
+            <div class="zumba-card">
+              <select
+                id="selected_time_date_zumba"
+                class="w-full px-2 py-2 bg-black-4 border rounded-lg focus:outline-none"
+                required
+              >
+                <option value="" disabled selected>Select day and time</option>
+                <option value="Monday">Monday - 7:00 AM - 8:00 AM</option>
+                <option value="Tuesday">Tuesday - 7:00 AM - 8:00 AM</option>
+                <option value="Wednesday">Wednesday - 7:00 AM - 8:00 AM</option>
+                <option value="Thursday">Thursday - 7:00 AM - 8:00 AM</option>
+                <option value="Friday">Friday - 7:00 AM - 8:00 AM</option>
+              </select>
+              <button
+                class="bg-red-600 px-8 py-3 mt-13 rounded-lg hover:bg-red-700 transition text-white w-full font-bold cursor-pointer"
+              >
+                ₱150.00
+              </button>
             </div>
           </div>
         </div>
@@ -211,7 +205,7 @@
 
                   <a href="small-studio-calendar.html">
                     <button
-                      class="bg-red-600 px-8 py-3 mt-10 lg:mt-13 rounded-lg hover:bg-red-800 transition text-white w-full font-bold cursor-pointer"
+                      class="bg-red-600 px-8 py-3 mt-13 rounded-lg hover:bg-red-800 transition text-white w-full font-bold cursor-pointer"
                     >
                       ₱100.00
                     </button>
@@ -248,7 +242,7 @@
 
                   <a href="large-studio-calendar.html">
                     <button
-                      class="bg-white py-3 mt-10 lg:mt-13 rounded-lg hover:bg-gray-400 transition text-black w-full font-bold cursor-pointer"
+                      class="bg-white py-3 mt-13 rounded-lg hover:bg-gray-400 transition text-black w-full font-bold cursor-pointer"
                     >
                       ₱25/person
                     </button>
@@ -283,7 +277,7 @@
                     </div>
                   </div>
 
-                  <div class="mt-4">
+                  <div class="zumba-card">
                     <select
                       id="mobile_time_date_zumba"
                       class="w-full px-2 py-2 bg-black-4 border rounded-lg focus:outline-none"
@@ -394,28 +388,46 @@
             </div>
 
             <!-- GCash Details -->
-            <div id="gcash-details" class="hidden mt-6 bg-blue-900 p-4 rounded-lg">
+            <div
+              id="gcash-details"
+              class="hidden mt-6 bg-blue-900 p-4 rounded-lg"
+            >
               <div class="text-center">
                 <p class="font-bold mb-2">GCash Payment Details</p>
                 <div class="flex justify-center mb-4">
-                  <img src="./assets/instapay-qr.jpg" alt="GCash QR Code" class="w-48 h-48 rounded-lg shadow">
+                  <img
+                    src="./assets/instapay-qr.jpg"
+                    alt="GCash QR Code"
+                    class="w-48 h-48 rounded-lg shadow"
+                  />
                 </div>
-                <p>Send payment via InstaPay to: <span class="font-bold">HA****N N.</span></p>
-                <p>Mobile No.: <span class="font-bold">093• ••••163</span></p>
-                <p>User ID: ••••••••••4VZCY6</p>
-                <p class="mt-2">Amount: ₱150.00</p>
-                <p class="text-xs mt-2 text-blue-200">After scanning and sending payment:</p>
-                <p class="text-xs text-blue-200">Note: Registration will be pending until proof of payment is verified</p>
+                <p>
+                  Send payment to: <span class="font-bold">09307561163</span>
+                </p>
+                <p>Amount: ₱150.00</p>
+                <p class="text-xs mt-2 text-blue-200">
+                  After scanning and sending payment:
+                </p>
+                <p class="text-xs text-blue-200">
+                  Note: Registration will be pending until proof of payment is
+                  verified
+                </p>
               </div>
             </div>
 
             <!-- Onsite Payment Details -->
-            <div id="onsite-details" class="hidden mt-6 bg-yellow-900 p-4 rounded-lg">
+            <div
+              id="onsite-details"
+              class="hidden mt-6 bg-yellow-900 p-4 rounded-lg"
+            >
               <div class="text-center">
                 <p class="font-bold mb-2">Cash Payment (Onsite)</p>
                 <p class="mb-2">Please pay at the gym reception counter</p>
                 <p class="mb-2">Amount: ₱150.00</p>
-                <p class="text-xs">Your booking will be pending until payment is received at the gym</p>
+                <p class="text-xs">
+                  Your booking will be pending until payment is received at the
+                  gym
+                </p>
               </div>
             </div>
           </div>
@@ -443,7 +455,6 @@
     <script type="module" src="./scripts/menu.js"></script>
     <script type="module" src="./scripts/footer.js"></script>
     <script type="module" src="./scripts/swiper.js"></script>
-    <script type="module" src="./scripts/zumba-booking.js"></script>
     <script src="./scripts/auth-check.js"></script>
   </body>
 </html>

@@ -670,7 +670,7 @@ paymentDetails.forEach((mma_payment) => {
                     <div class="bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-100 p-4 rounded-lg text-center">
                         <p class="font-bold mb-3">GCash Payment Details</p>
                         <div class="flex justify-center mb-4">
-                            <img src="./assets/GCash-QR-Code.jpg" alt="GCash QR Code" class="w-48 h-48 rounded-lg shadow-lg">
+                            <img src="./assets/instapay-qr.jpg" alt="GCash QR Code" class="w-48 h-48 rounded-lg shadow-lg">
                         </div>
                         <p class="mb-1">Send payment to: <span class="font-bold">09307561163</span></p>
                         <p class="mb-3">Amount: ₱2500.00</p>

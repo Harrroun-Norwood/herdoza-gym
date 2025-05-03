@@ -41,26 +41,11 @@ document.addEventListener("DOMContentLoaded", () => {
   let selectedDate = null;
   let selectedTime = null;
 
-  function updatePriceDisplay() {
-    const numberOfPeople = parseInt(peopleInput.value) || 0;
-    const totalPrice = numberOfPeople * 25; // ₱25 per person
-    
-    // Update main price display
-    const priceDisplay = document.querySelector('.price-display');
+  function updatePriceDisplay(numberOfPeople) {
+    const price = numberOfPeople * 25; // ₱25 per person
+    const formattedPrice = `₱${price.toFixed(2)}`;
     if (priceDisplay) {
-      priceDisplay.textContent = `₱${totalPrice.toFixed(2)}`;
-    }
-
-    // Update GCash amount
-    const gcashAmount = document.querySelector('.gcash-amount');
-    if (gcashAmount) {
-      gcashAmount.textContent = `₱${totalPrice.toFixed(2)}`;
-    }
-
-    // Update Onsite amount
-    const onsiteAmount = document.querySelector('.onsite-amount');
-    if (onsiteAmount) {
-      onsiteAmount.textContent = `₱${totalPrice.toFixed(2)}`;
+      priceDisplay.textContent = formattedPrice;
     }
   }
 
@@ -91,7 +76,7 @@ document.addEventListener("DOMContentLoaded", () => {
     } else {
       e.target.setCustomValidity("");
     }
-    updatePriceDisplay();
+    updatePriceDisplay(value);
   });
 
   function saveBookings() {
@@ -360,7 +345,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         <div class="bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-100 p-3 rounded-md text-center">
                             <p class="font-bold mb-2">GCash Payment Details</p>
                             <div class="flex justify-center mb-4">
-                                <img src="./assets/GCash-QR-Code.jpg" alt="GCash QR Code" class="w-48 h-48 rounded-lg shadow-lg">
+                                <img src="./assets/instapay-qr.jpg" alt="GCash QR Code" class="w-48 h-48 rounded-lg shadow-lg">
                             </div>
                             <p>Send payment to: <span class="font-bold">09307561163</span></p>
                             <p>Amount: ₱${price}.00</p>
