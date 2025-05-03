@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Herdoza Fitness Center - Sign Up</title>
+    <link rel="icon" type="image" href="./assets/herdoza-logo-trans.png" />
+    <link rel="stylesheet" href="./src/output.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css"
+    />
+    <link rel="stylesheet" href="./src/mystyles.css" />
+    <script type="module" src="./scripts/auth-api.js"></script>
+    <style>
+      .checkbox-error {
+        border: 2px solid red;
+        border-radius: 4px;
+        animation: pulse 1s infinite;
+      }
+
+      @keyframes pulse {
+        0% {
+          box-shadow: 0 0 0 0 rgba(255, 0, 0, 0.4);
+        }
+        70% {
+          box-shadow: 0 0 0 5px rgba(255, 0, 0, 0);
+        }
+        100% {
+          box-shadow: 0 0 0 0 rgba(255, 0, 0, 0);
+        }
+      }
+
+      /* OTP Modal Styles */
+      .modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100vh;
+        background-color: rgba(0, 0, 0, 0.7);
+        z-index: 9999;
+      }
+
+      .modal.show {
+        display: flex !important;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .modal-content {
+        background-color: #1a1a1a;
+        padding: 2rem;
+        border-radius: 0.5rem;
+        width: 90%;
+        max-width: 400px;
+        border: 1px solid #333;
+        animation: modalFadeIn 0.3s;
+      }
+
+      @keyframes modalFadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(-20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .otp-input {
+        letter-spacing: 0.5em;
+        text-align: center;
+        font-family: monospace;
+        font-size: 1.5em;
+      }
+
+      /* Background styles */
+      body {
+        background-image: linear-gradient(
+            to bottom,
+            rgba(255, 255, 255, 0.1),
+            rgba(0, 0, 0, 0.7)
+          ),
+          url("./assets/Herdoza-background.jpg");
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+      }
+
+      /* Add lighter semi-transparent overlay */
+      .bg-overlay {
+        background: linear-gradient(
+          135deg,
+          rgba(255, 255, 255, 0.1) 0%,
+          rgba(0, 0, 0, 0.6) 100%
+        );
+        backdrop-filter: blur(2px);
+        min-height: 100vh;
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 1rem;
+      }
+    </style>
+  </head>
+  <body class="flex items-center justify-center min-h-screen p-4">
+    <div
+      class="flex flex-col md:flex-row text-white bg-black shadow-lg rounded-lg overflow-hidden w-full max-w-4xl js-create-acc"
+    >
+      <div
+        class="flex flex-col items-center justify-center p-8 w-full md:w-1/2"
+      >
+        <div class="flex items-center mb-5">
+          <img src="./assets/herdoza-logo-trans.png" alt="Logo" class="h-12" />
+          <div class="orbitron font-bold text-sm ms-2">
+            HERDOZA FITNESS CENTER
+          </div>
+        </div>
+
+        <form id="signupForm" class="flex flex-col w-full">
+          <div class="text-3xl font-bold mb-6 text-center">Sign Up</div>
+
+          <div class="grid grid-cols-2 gap-4 mb-4">
+            <div>
+              <label for="firstName" class="text-sm">First Name</label>
+              <input
+                type="text"
+                id="firstName"
+                placeholder="first name"
+                class="border rounded-md w-full bg-black p-2 text-sm mt-1 focus:outline-none focus:ring-2 focus:ring-red-600"
+                required
+              />
+            </div>
+
+            <div>
+              <label for="lastName" class="text-sm">Last Name</label>
+              <input
+                type="text"
+                id="lastName"
+                placeholder="last name"
+                class="border rounded-md w-full bg-black p-2 text-sm mt-1 focus:outline-none focus:ring-2 focus:ring-red-600"
+                required
+              />
+            </div>
+          </div>
+
+          <div class="mb-4">
+            <label for="email" class="block text-sm font-medium text-white"
+              >Email</label
+            >
+            <input
+              type="email"
+              id="email"
+              name="email"
+              placeholder="example@gmail.com"
+              required
+              class="mt-1 block w-full px-3 py-2 bg-black border border-gray-300 rounded-md shadow-sm text-white text-sm overflow-hidden text-ellipsis"
+              style="max-width: 100%; overflow: hidden; text-overflow: ellipsis"
+            />
+          </div>
+
+          <div class="mb-4">
+            <label for="contactNumber" class="text-sm">Contact Number</label>
+            <input
+              type="tel"
+              id="contactNumber"
+              placeholder="+63 912 345 6789"
+              class="border rounded-md w-full bg-black p-2 text-sm mt-1 focus:outline-none focus:ring-2 focus:ring-red-600"
+            />
+          </div>
+
+          <div class="mb-4">
+            <label for="password" class="text-sm">Password</label>
+            <div class="relative">
+              <input
+                type="password"
+                id="password"
+                placeholder="Enter your password"
+                class="border rounded-md w-full bg-black p-2 pr-10 text-sm mt-1 focus:outline-none focus:ring-2 focus:ring-red-600"
+                required
+                minlength="7"
+              />
+              <button
+                type="button"
+                onclick="togglePasswordVisibility('password')"
+                class="absolute right-0 top-0 h-full px-3 mt-1 text-gray-400 hover:text-gray-200"
+              >
+                <i id="password-toggle-icon" class="bi bi-eye-slash"></i>
+              </button>
+            </div>
+            <p class="text-gray-400 text-xs mt-1">
+              Password must be at least 7 characters long
+            </p>
+          </div>
+
+          <div class="mb-4">
+            <label for="confirm-password" class="text-sm"
+              >Confirm Password</label
+            >
+            <div class="relative">
+              <input
+                type="password"
+                id="confirm-password"
+                placeholder="Re-enter your password"
+                class="border rounded-md w-full bg-black p-2 pr-10 text-sm mt-1 focus:outline-none focus:ring-2 focus:ring-red-600"
+                required
+              />
+              <button
+                type="button"
+                onclick="togglePasswordVisibility('confirm-password')"
+                class="absolute right-0 top-0 h-full px-3 mt-1 text-gray-400 hover:text-gray-200"
+              >
+                <i
+                  id="confirm-password-toggle-icon"
+                  class="bi bi-eye-slash"
+                ></i>
+              </button>
+            </div>
+            <p class="text-gray-400 text-xs mt-1">
+              Please enter your password again to confirm
+            </p>
+          </div>
+
+          <div class="flex items-center text-xs mb-2">
+            <div class="flex items-center" id="terms-checkbox-container">
+              <input type="checkbox" id="agreeTerms" class="mr-2" required />
+              <label for="agreeTerms">I Agree With Herdoza's Gym Fitness</label>
+            </div>
+            <a href="privacy-policy.html" class="text-red-500 ms-auto"
+              ><u>Privacy Policy</u></a
+            >
+          </div>
+          <div id="checkbox-error" class="text-red-500 text-xs mb-3 hidden">
+            You must agree to the terms and privacy policy.
+          </div>
+
+          <div id="signup-error" class="text-red-500 text-sm mb-4 hidden"></div>
+
+          <button
+            type="submit"
+            class="bg-red-600 px-6 py-2 rounded-lg hover:bg-red-700 transition text-white w-full text-lg js-signup-btn"
+          >
+            Create Account
+          </button>
+        </form>
+      </div>
+
+      <div
+        class="bg-red-600 text-center flex flex-col justify-center items-center p-8 w-full md:w-1/2 lg:rounded-l-4xl"
+      >
+        <div class="mb-5 text-2xl font-bold">Welcome to Our Gym!</div>
+        <div class="text-sm mb-4">Already have an account?</div>
+        <a
+          href="login.html"
+          class="border border-white text-lg font-bold px-6 py-2 rounded-lg hover:bg-white hover:text-black transition"
+        >
+          Login
+        </a>
+      </div>
+    </div>
+
+    <!-- OTP Modal -->
+    <div id="otpModal" class="modal">
+      <div class="modal-content text-white">
+        <h2 class="text-2xl font-bold mb-4 text-center">OTP Verification</h2>
+        <p class="text-sm text-gray-400 mb-4 text-center">
+          Enter the OTP code to verify your account
+        </p>
+        <input
+          type="text"
+          id="otpInput"
+          class="otp-input border rounded-md w-full bg-black p-2 text-sm mb-4 focus:outline-none focus:ring-2 focus:ring-red-600"
+          placeholder="0000"
+          maxlength="4"
+        />
+        <p class="text-xs text-gray-400 mb-4 text-center">
+          For testing purposes, use OTP: 0000
+        </p>
+        <div
+          id="otpError"
+          class="text-red-500 text-sm mb-4 hidden text-center"
+        ></div>
+        <button
+          id="verifyOtpBtn"
+          class="bg-red-600 px-6 py-2 rounded-lg hover:bg-red-700 transition text-white w-full text-lg"
+        >
+          Verify OTP
+        </button>
+      </div>
+    </div>
+
+    <!-- Import scripts -->
+    <script type="module" src="./scripts/config.js"></script>
+    <script type="module" src="./scripts/api-client.js"></script>
+    <script type="module" src="./scripts/auth-api.js"></script>
+
+    <script type="module">
+      document.addEventListener("DOMContentLoaded", function () {
+        const form = document.getElementById("signupForm");
+        const modal = document.getElementById("otpModal");
+        const otpInput = document.getElementById("otpInput");
+        const verifyOtpBtn = document.getElementById("verifyOtpBtn");
+        const otpError = document.getElementById("otpError");
+        let formData = {};
+
+        if (form) {
+          form.addEventListener("submit", async function (e) {
+            e.preventDefault();
+
+            const errorElement = document.getElementById("signup-error");
+            errorElement.classList.add("hidden");
+
+            // Validate form fields first
+            const password = document.getElementById("password").value;
+            const confirmPassword =
+              document.getElementById("confirm-password").value;
+
+            // Validate passwords match
+            if (password !== confirmPassword) {
+              errorElement.textContent = "Passwords do not match";
+              errorElement.classList.remove("hidden");
+              return;
+            }
+
+            // Validate terms agreement
+            const agreeTerms = document.getElementById("agreeTerms");
+            if (!agreeTerms.checked) {
+              document
+                .getElementById("checkbox-error")
+                .classList.remove("hidden");
+              return;
+            }
+
+            // Store form data temporarily
+            formData = {
+              firstName: document.getElementById("firstName").value,
+              lastName: document.getElementById("lastName").value,
+              email: document.getElementById("email").value,
+              contactNumber: document.getElementById("contactNumber").value,
+              password: password,
+            };
+
+            // Show OTP modal
+            modal.classList.add("show");
+            otpInput.focus();
+          });
+        }
+
+        // Handle OTP verification
+        verifyOtpBtn.addEventListener("click", function () {
+          otpError.classList.add("hidden");
+
+          if (otpInput.value !== "0000") {
+            otpError.textContent = "Invalid OTP. Please try again (use 0000)";
+            otpError.classList.remove("hidden");
+            return;
+          }
+
+          // Create user data
+          const userData = {
+            id: Date.now().toString(),
+            name: `${formData.firstName} ${formData.lastName}`,
+            email: formData.email,
+            contact: formData.contactNumber,
+            password: formData.password,
+            type: "Gym Fitness",
+            membershipDuration: "", // Empty since they haven't picked yet
+            paymentMethod: "", // Empty since they haven't paid yet
+            status: "pending",
+            timestamp: new Date().toISOString(),
+            members: 0, // Initialize with zero members
+            schedules: [], // Initialize with empty schedules
+            membershipStart: null, // Will be set when membership is approved
+            membershipEnd: null, // Will be set when membership is approved
+          };
+
+          // Store in registrations
+          const registrations = JSON.parse(
+            localStorage.getItem("registrations") || "[]"
+          );
+          registrations.push(userData);
+          localStorage.setItem("registrations", JSON.stringify(registrations));
+
+          // Store minimal user data
+          localStorage.setItem("userEmail", userData.email);
+          localStorage.setItem("userName", userData.name);
+          localStorage.setItem("userToken", "demo-token");
+          localStorage.setItem("userPicture", "./assets/profile-icon.png");
+
+          // Clear all booking-related localStorage
+          localStorage.removeItem("membershipData");
+          localStorage.removeItem("smallStudioBookings");
+          localStorage.removeItem("largeStudioBookings");
+          localStorage.removeItem("mmaPerSessionBookings");
+          localStorage.removeItem("mma25SessionUserBookings");
+          localStorage.removeItem("mma25SessionBookedSlots");
+          localStorage.removeItem("mmaZumbaBookings");
+          localStorage.removeItem("zumbaBookings");
+
+          // Show success message and redirect
+          alert(
+            "Registration submitted successfully! Please wait for admin approval."
+          );
+          window.location.href = "index.html";
+        });
+
+        // Close modal if clicking outside
+        modal.addEventListener("click", function (e) {
+          if (e.target === modal) {
+            modal.classList.remove("show");
+          }
+        });
+
+        // Reset checkbox error on checkbox change
+        document
+          .getElementById("agreeTerms")
+          .addEventListener("change", function () {
+            document.getElementById("checkbox-error").classList.add("hidden");
+          });
+
+        // Make password toggle function globally accessible
+        window.togglePasswordVisibility = function (fieldId) {
+          const passwordField = document.getElementById(fieldId);
+          const toggleIcon = document.getElementById(`${fieldId}-toggle-icon`);
+          if (passwordField.type === "password") {
+            passwordField.type = "text";
+            toggleIcon.classList.remove("bi-eye-slash");
+            toggleIcon.classList.add("bi-eye");
+          } else {
+            passwordField.type = "password";
+            toggleIcon.classList.remove("bi-eye");
+            toggleIcon.classList.add("bi-eye-slash");
+          }
+        };
+      });
+    </script>
+  </body>
+</html>

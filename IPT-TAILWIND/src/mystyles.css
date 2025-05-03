@@ -1,0 +1,731 @@
+@import url("https://fonts.googleapis.com/css2?family=Orbitron:wght@400..900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Orbitron:wght@400..900&display=swap");
+
+/*custom general ni kwan*/
+* {
+  scroll-behavior: smooth;
+  font-family: "Poppins", sans-serif;
+}
+.orbitron {
+  font-family: "Orbitron", sans-serif;
+}
+
+section {
+  padding: 60px 0;
+}
+/*nav style*/
+.nav-links {
+  position: relative;
+}
+.nav-links::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -6px;
+  width: 100%;
+  height: 3px;
+  background: #ef4444;
+  border-radius: 5px;
+  transform-origin: right;
+  transform: scaleX(0);
+  transition: transform 0.5s;
+}
+.nav-links:hover::after {
+  transform: scaleX(1);
+  transform-origin: left;
+}
+
+/*vector*/
+.footer-container {
+  background-color: rgb(27, 27, 27);
+  clip-path: polygon(0 0, 1850px 14%, 100% 100%, 0 100%);
+}
+/*custom bg ni kwan*/
+.bg-black-1 {
+  background-color: rgb(33, 33, 33);
+}
+.bg-black-2 {
+  background-color: rgb(27, 27, 27);
+}
+.bg-black-3 {
+  background-color: rgb(29, 27, 32);
+}
+.bg-black-4 {
+  background-color: rgb(29, 28, 28);
+}
+
+/* Dark mode variables */
+:root {
+  --background-color: #ffffff;
+  --text-color: #000000;
+  --card-bg: rgb(27, 27, 27);
+  --secondary-bg: rgb(33, 33, 33);
+}
+
+.dark-mode {
+  --background-color: #121212;
+  --text-color: #ffffff;
+  --card-bg: rgb(33, 33, 33);
+  --secondary-bg: rgb(45, 45, 45);
+}
+
+/* Dark mode transition */
+body {
+  transition: background-color 0.3s, color 0.3s;
+}
+
+body.dark-mode {
+  background-color: var(--background-color);
+  color: var(--text-color);
+}
+
+body.dark-mode section:not([class*="bg-"]) {
+  background-color: var(--background-color);
+  color: var(--text-color);
+}
+
+/* Ensure text elements change color in dark mode */
+body.dark-mode .text-black,
+body.dark-mode [class*="text-center"],
+body.dark-mode [class*="text-justify"],
+body.dark-mode [class*="text-start"],
+body.dark-mode [class*="text-end"],
+body.dark-mode [class*="text-left"],
+body.dark-mode div:not([class*="text-white"]):not([class*="text-red"]),
+body.dark-mode section:not([class*="text-white"]):not([class*="text-red"]) {
+  color: var(--text-color);
+}
+
+/* Fix for user membership and schedule pages */
+body.dark-mode .bg-white {
+  background-color: var(--card-bg);
+}
+
+body.dark-mode .bg-white.text-black,
+body.dark-mode .bg-white .text-black,
+body.dark-mode .text-gray-500,
+body.dark-mode .text-gray-600,
+body.dark-mode .font-semibold {
+  color: var(--text-color) !important;
+}
+
+/* Special exception for user-membership page elements */
+body.dark-mode .bg-red-700 .bg-white {
+  background-color: #ffffff !important;
+}
+
+body.dark-mode .bg-red-700 .text-red-700,
+body.dark-mode .bg-red-700 .text-red-600 {
+  color: currentColor !important;
+}
+
+/* Specific rule for the '30' days counter */
+body.dark-mode .bg-red-700 .bg-white.text-red-700 {
+  color: #b91c1c !important; /* text-red-700 color */
+}
+
+body.dark-mode .bg-red-700 .bg-white.text-black,
+body.dark-mode .bg-red-700 .bg-white .text-black,
+body.dark-mode .bg-red-700 .bg-white .text-base,
+body.dark-mode .bg-red-700 .bg-white .text-sm {
+  color: #000000 !important;
+}
+
+body.dark-mode .bg-red-700 button.bg-white.text-red-600 {
+  background-color: #ffffff !important;
+  color: #dc2626 !important;
+}
+
+/* Ensure logout buttons stay red in dark mode */
+body.dark-mode #logout-btn,
+body.dark-mode #sidebar-logout-btn {
+  color: #dc2626 !important; /* text-red-500 color */
+}
+
+/* Preserve red color text in dark mode */
+body.dark-mode [class*="text-red"],
+body.dark-mode .text-red-400,
+body.dark-mode .text-red-500,
+body.dark-mode .text-red-600,
+body.dark-mode .text-red-700,
+body.dark-mode .text-red-800 {
+  color: currentColor !important;
+}
+
+/* Remove the !important overrides for hover effects */
+body.dark-mode .text-red-500,
+body.dark-mode .text-red-600,
+body.dark-mode .text-red-700,
+body.dark-mode .text-red-800,
+body.dark-mode .hover\:text-red-500:hover {
+  color: currentColor;
+}
+
+/* Allow hover effects to work */
+body.dark-mode .hover\:text-red-500:hover {
+  color: rgb(239 68 68) !important;
+}
+
+/* Keep "Learn More" button text black in dark mode */
+body.dark-mode .bg-white a,
+body.dark-mode button.bg-white,
+body.dark-mode .bg-gray-300 a,
+body.dark-mode button.bg-gray-300 {
+  color: black !important;
+}
+
+/* Preserve white background for Learn More button in dark mode */
+body.dark-mode a[href="learn-more.html"] button.bg-white,
+body.dark-mode button.bg-white:has(a[href="learn-more.html"]),
+body.dark-mode .home button.bg-white {
+  background-color: #ffffff !important;
+}
+
+/* Dark card background in dark mode to maintain contrast */
+body.dark-mode .bg-black-1,
+body.dark-mode .bg-black-2,
+body.dark-mode .bg-black-3,
+body.dark-mode .bg-black-4 {
+  background-color: var(--card-bg);
+}
+
+/* Dark mode toggle switch */
+.dark-mode-toggle {
+  position: relative;
+  display: inline-block;
+  width: 46px;
+  height: 24px;
+}
+
+.dark-mode-toggle input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.dark-mode-slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  transition: 0.4s;
+  border-radius: 24px;
+}
+
+.dark-mode-slider:before {
+  position: absolute;
+  content: "";
+  height: 18px;
+  width: 18px;
+  left: 3px;
+  bottom: 3px;
+  background-color: white;
+  transition: 0.4s;
+  border-radius: 50%;
+}
+
+input:checked + .dark-mode-slider {
+  background-color: #cc0000;
+}
+
+input:checked + .dark-mode-slider:before {
+  transform: translateX(22px);
+}
+
+.bullet {
+  list-style-type: disc;
+}
+
+/*cards-swiper*/
+.card {
+  width: 380px;
+  overflow: hidden;
+}
+.card img {
+  height: 250px;
+  width: 100%;
+  object-fit: cover;
+}
+.card .content button {
+  transition: ease 0.3s;
+}
+
+.swiper-container {
+  max-width: 1200px;
+  margin: auto;
+  position: relative;
+  overflow: hidden;
+}
+
+.dance-studio-card {
+  width: 380px !important;
+  margin-bottom: 35px;
+}
+.service-card {
+  width: 360px !important;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+.team-card {
+  width: 360px !important;
+}
+.hiring-card {
+  width: 425px !important;
+}
+.about-us-slide {
+  width: 340px !important;
+  overflow: hidden;
+}
+.card-img {
+  width: 100%;
+  height: 250px;
+  object-fit: cover;
+}
+
+.swiper-button-next,
+.swiper-button-prev {
+  width: 60px;
+  height: 60px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  transition: 0.3s;
+}
+
+.swiper-button-next:hover,
+.swiper-button-prev:hover {
+  background: rgba(255, 255, 255, 0.5);
+}
+
+.swiper-pagination {
+  position: relative;
+  margin-top: 20px;
+}
+
+.event-img {
+  width: 420px;
+}
+/* backgrounds */
+.home {
+  background-image: url("../assets/Herdoza-background.jpg");
+  background-size: cover;
+  background-position: center;
+}
+
+.membership-bg {
+  background-image: url("../assets/membership-bg.jpg");
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+}
+
+.mma-bg {
+  background-image: url("../assets/mixed-martial-arts-bg.png");
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+}
+.dance-studio-bg {
+  background-image: url("../assets/dance-studio-bg.png");
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+}
+.learn-more-body {
+  background-image: url("../assets/Herdoza-background.jpg");
+  background-size: cover;
+  background-position: center;
+}
+
+/* custom borders ni kwan */
+.border-custom {
+  border-radius: 0 120px 120px 0;
+}
+.border-custom2 {
+  border-radius: 120px 0 0 120px;
+}
+
+/* payment pop-ups */
+.payment-summary {
+  max-width: 650px;
+  min-width: 350px;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0.1);
+  visibility: hidden;
+  opacity: 0;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+  transition: transform 0.2s ease-out, top 0.2s ease-out, opacity 0.3s ease-out;
+  z-index: 10000;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.payment-summary::-webkit-scrollbar {
+  width: 6px;
+}
+
+.payment-summary::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+}
+
+.payment-summary::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+}
+
+.payment-summary::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.open-payment-summary {
+  top: 50%;
+  visibility: visible;
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+}
+
+.amount {
+  border-radius: 50%;
+}
+
+/* Overlay for modals */
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7);
+  z-index: 9999;
+}
+
+.overlay.hidden {
+  display: none;
+}
+
+/* Success Modal */
+.success-modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 10001;
+  width: 90%;
+  max-width: 500px;
+}
+
+.success-modal.hidden {
+  display: none;
+}
+
+/* GCash Payment Details */
+.gcash-details {
+  transition: all 0.3s ease;
+}
+
+.gcash-details.hidden {
+  display: none;
+}
+
+/* menu service-collapsible */
+.collapsible {
+  overflow: hidden;
+  position: relative;
+}
+
+.collapsible-list {
+  max-height: 0;
+  transition: max-height 0.3s ease-out;
+}
+
+#collapsible-toggle:checked ~ .collapsible-list {
+  max-height: 150px;
+}
+
+#collapsible-toggle:checked + label i {
+  transform: rotate(180deg);
+}
+
+/*user membership and sched collapsible */
+
+.collapsible-2 {
+  overflow: hidden;
+  position: relative;
+}
+
+.collapsible-list-2 {
+  max-height: 0;
+  transition: max-height 0.3s ease-out;
+}
+
+#collapsible-toggle-2:checked ~ .collapsible-list-2 {
+  max-height: 150px;
+}
+
+#collapsible-toggle-2:checked + label i {
+  transform: rotate(180deg);
+}
+.active-link {
+  color: #dc2626;
+  font-weight: bold;
+}
+
+/*calendar*/
+.calendar {
+  width: 380px;
+  margin: 0 auto; /* Center the calendar */
+}
+.calendar ul li {
+  width: calc(100% / 7);
+  margin-top: 25px;
+  position: relative;
+  z-index: 2;
+}
+
+.zumba-day.highlight {
+  background-color: #f87171; /* Tailwind red-400 for example */
+  color: white;
+  font-weight: bold;
+  border-radius: 0.5rem;
+  padding: 0.25rem 0.5rem;
+}
+
+.nav-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+#prev,
+#next {
+  width: 20px;
+  height: 20px;
+  position: relative;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+}
+#prev::before,
+#next::before {
+  content: "";
+  width: 50%;
+  height: 50%;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  border-style: solid;
+  border-width: 0.25em 0.25em 0 0;
+  border-color: rgb(255, 255, 255);
+}
+#next::before {
+  transform: translate(-50%, -50%) rotate(45deg);
+}
+#prev::before {
+  transform: translate(-50%, -50%) rotate(-135deg);
+}
+#prev:hover::before,
+#next:hover::before {
+  border-color: red;
+}
+
+.dates {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px; /* Reduce spacing between numbers */
+  text-align: center;
+  padding: 5px;
+}
+
+.dates li {
+  text-align: center;
+  padding: 0 14px 0 14px; /* Reduce padding */
+  font-size: 14px;
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+.dates li.today {
+  position: relative;
+}
+
+.dates li.today::before {
+  content: "";
+  width: 32px;
+  height: 32px;
+  position: absolute;
+  top: 50%;
+  left: 75%;
+  transform: translate(-50%, -50%);
+  background-color: rgb(192, 66, 66);
+  z-index: -1;
+  border-radius: 50%;
+}
+
+/* Inactive dates (previous/next month) */
+.dates li.inactive {
+  color: rgba(255, 255, 255, 0.5);
+  cursor: default;
+}
+
+.days {
+  font-size: 14px;
+}
+
+.dates li.selected {
+  position: relative;
+}
+
+.dates li.selected::before {
+  content: "";
+  width: 32px;
+  height: 32px;
+  position: absolute;
+  top: 50%;
+  left: 75%;
+  transform: translate(-50%, -50%);
+  background-color: rgb(0, 68, 255);
+  z-index: -1;
+  border-radius: 50%;
+}
+.time-label {
+  display: inline-block;
+  min-width: 150px;
+}
+
+.booked-text {
+  color: red;
+  font-weight: bold;
+}
+
+@media (max-width: 640px) {
+  .mobile-touch-target {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  .button-text-mobile {
+    font-size: 16px; /* Minimum readable text size */
+  }
+}
+
+/* Remove any dark mode overrides that might interfere */
+body.dark-mode .text-red-500,
+body.dark-mode .text-red-600,
+body.dark-mode .text-red-700,
+body.dark-mode .text-red-800,
+body.dark-mode .hover\:text-red-500:hover {
+  color: currentColor;
+}
+
+/* Add stronger hover styles that work in both light and dark modes */
+.nav-links:hover,
+.hover\:text-red-500:hover,
+a.hover\:text-red-500:hover,
+button.hover\:text-red-500:hover,
+span.hover\:text-red-500:hover {
+  color: #ef4444 !important; /* Using Tailwind's red-500 color */
+  transition: color 0.3s ease;
+}
+
+/* Ensure footer links hover effect works in dark mode */
+.footer-container a:hover,
+.footer-container span:hover {
+  color: #ef4444 !important;
+  transition: color 0.3s ease;
+}
+
+/* Ensure number links hover effect works */
+a[href^="tel:"]:hover,
+a:has(> span):hover,
+a:has(> span) span:hover {
+  color: #ef4444 !important;
+  transition: color 0.3s ease;
+}
+
+/* Ensure footer links hover effect works in dark mode */
+.footer-container a:hover {
+  color: #ef4444 !important;
+  transition: color 0.3s ease;
+}
+
+/* Add to dark mode section */
+body.dark-mode .payment-summary {
+  background-color: var(--card-bg);
+  color: var(--text-color);
+}
+
+body.dark-mode .onsite-details {
+  background-color: rgba(254, 243, 199, 0.1);
+}
+
+body.dark-mode .bg-amber-100 {
+  background-color: rgba(254, 243, 199, 0.1);
+}
+
+body.dark-mode .text-amber-800 {
+  color: #fde68a;
+}
+
+body.dark-mode .gcash-details .bg-blue-100 {
+  background-color: rgba(219, 234, 254, 0.1);
+}
+
+body.dark-mode .gcash-details .text-blue-800 {
+  color: #93c5fd;
+}
+
+body.dark-mode .payment-summary .amount {
+  background-color: var(--secondary-bg);
+}
+
+body.dark-mode .payment-summary .bg-red-600 {
+  background-color: #dc2626;
+}
+
+body.dark-mode .payment-summary hr {
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Add these styles to handle payment method buttons in dark mode */
+body.dark-mode .payment-summary input[type="radio"] + div {
+  background-color: #dc2626;
+}
+
+body.dark-mode .payment-summary input[type="radio"]:checked + div {
+  background-color: #1d4ed8;
+}
+
+body.dark-mode .payment-summary input[value="Onsite"]:checked + div {
+  background-color: #15803d;
+}
+
+body.dark-mode .payment-summary .pay-now-btn.bg-blue-600 {
+  background-color: #1d4ed8;
+}
+
+body.dark-mode .payment-summary .pay-now-btn.bg-green-600 {
+  background-color: #15803d;
+}
+
+body.dark-mode .payment-summary .border-red-600 {
+  border-color: #dc2626;
+}
+
+body.dark-mode .payment-summary .text-gray-300 {
+  color: #d1d5db;
+}
+
+/* Dark mode styles for number inputs */
+body.dark-mode input[type="number"] {
+  background-color: var(--card-bg);
+  color: var(--text-color);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+body.dark-mode input[type="number"]::placeholder {
+  color: rgba(255, 255, 255, 0.5);
+}

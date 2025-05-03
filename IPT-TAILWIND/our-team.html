@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Herdoza Fitness Center</title>
+    <link rel="icon" type="image" href="./assets/herdoza-logo-trans.png" />
+    <link rel="stylesheet" href="./src/output.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css"
+    />
+    <link rel="stylesheet" href="./src/mystyles.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"
+    />
+  </head>
+  <body>
+    <nav
+      class="w-full fixed bg-black-2 p-4 text-white flex justify-between items-center px-8 md:px-12 lg:px-48 z-50"
+    ></nav>
+
+    <section class="px-8 md:px-12 lg:px-48 text-white">
+      <div class="text-center pt-24 mb-6 text-black">
+        <div class="text-3xl lg:text-4xl font-bold">Our Team</div>
+        <div>Meet our dedicated trainer and staff</div>
+      </div>
+
+      <div class="hidden flex-wrap justify-center gap-6 p-6 md:flex">
+        <div
+          class="bg-black p-6 flex flex-col items-center rounded-lg shadow-lg w-90"
+        >
+          <img
+            src="./assets/profile-icon.png"
+            alt="Profile Image"
+            class="h-24 w-24 rounded-full mb-3"
+          />
+          <div class="text-lg font-bold">Janice Mercado</div>
+          <div class="text-gray-400">Secretary</div>
+        </div>
+
+        <div
+          class="bg-black p-6 flex flex-col items-center rounded-lg shadow-lg w-90"
+        >
+          <img
+            src="./assets/profile-icon.png"
+            alt="Profile Image"
+            class="h-24 w-24 rounded-full mb-3"
+          />
+          <div class="text-lg font-bold">Emelita Ramos</div>
+          <div class="text-gray-400">Owner</div>
+        </div>
+
+        <div
+          class="bg-black p-6 flex flex-col items-center rounded-lg shadow-lg w-90"
+        >
+          <img
+            src="./assets/profile-icon.png"
+            alt="Profile Image"
+            class="h-24 w-24 rounded-full mb-3"
+          />
+          <div class="text-lg font-bold">Jey Gallego</div>
+          <div class="text-gray-400">Coach</div>
+        </div>
+      </div>
+      <div class="swiper-container lg:hidden">
+        <div class="swiper mySwiper">
+          <div class="swiper-wrapper">
+            <div class="swiper-slide team-card mb-10">
+              <div
+                class="bg-black p-6 flex flex-col items-center rounded-lg shadow-lg w-90"
+              >
+                <img
+                  src="./assets/profile-icon.png"
+                  alt="Profile Image"
+                  class="h-24 w-24 rounded-full mb-3"
+                />
+                <div class="text-lg font-bold">Emy Ramos</div>
+                <div class="text-gray-400">Secretary</div>
+              </div>
+            </div>
+
+            <div class="swiper-slide team-card mb-10">
+              <div
+                class="bg-black p-6 flex flex-col items-center rounded-lg shadow-lg w-90"
+              >
+                <img
+                  src="./assets/profile-icon.png"
+                  alt="Profile Image"
+                  class="h-24 w-24 rounded-full mb-3"
+                />
+                <div class="text-lg font-bold">Janice Mercado</div>
+                <div class="text-gray-400">Owner</div>
+              </div>
+            </div>
+
+            <div class="swiper-slide team-card mb-10">
+              <div
+                class="bg-black p-6 flex flex-col items-center rounded-lg shadow-lg w-90"
+              >
+                <img
+                  src="./assets/profile-icon.png"
+                  alt="Profile Image"
+                  class="h-24 w-24 rounded-full mb-3"
+                />
+                <div class="text-lg font-bold">Jey Gallego</div>
+                <div class="text-gray-400">Coach</div>
+              </div>
+            </div>
+          </div>
+          <div class="swiper-pagination pt-10"></div>
+          <!-- baka alisin ko
+                <div class="swiper-button-prev"></div>
+                <div class="swiper-button-next"></div>
+                -->
+        </div>
+      </div>
+    </section>
+
+    <footer class="hidden md:block"></footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+    <script type="module" src="./scripts/navbar.js"></script>
+    <script type="module" src="./scripts/footer.js"></script>
+    <script type="module" src="./scripts/menu.js"></script>
+    <script type="module" src="./scripts/swiper.js"></script>
+  </body>
+</html>

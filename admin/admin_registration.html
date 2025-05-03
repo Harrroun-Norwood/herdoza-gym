@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Registration - Fitness Center</title>
+    <!-- Favicon -->
+    <link rel="icon" type="image" href="./assets/HFC_Logo.png">
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="./style/admin.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon@4.5.0/fonts/remixicon.css"/>
+    <!-- Scripts -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script type="module" src="./javascript/admin-api.js"></script>
+    <script type="module" src="./javascript/general.js"></script>
+    <script type="module" src="./javascript/admin_registration.js"></script>
+
+  </head>
+  <body class="bg-gray-50">
+    <div class="flex h-screen">
+      <aside class="w-64 bg-black text-white flex flex-col">
+        <div class="p-6 border-b border-gray-700">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-full bg-gray-600 flex items-center justify-center">
+              <i class="ri-user-line text-xl"></i>
+            </div>
+            <div>
+              <div class="font-medium">Admin</div>
+              <div class="text-sm text-gray-400">Administrator</div>
+            </div>
+          </div>
+        </div>
+
+        <nav class="flex-1 p-4">
+          <a href="admin_dashboard.html"
+            class="sidebar-link flex items-center gap-3 px-4 py-3 rounded text-gray-300 hover:text-white transition-colors">
+            <i class="ri-dashboard-line"></i>
+            <span>Dashboard</span>
+          </a>
+
+          <a href="admin_registration.html"
+            class="sidebar-link active flex items-center gap-3 px-4 py-3 rounded text-white transition-colors bg-primary bg-opacity-20">
+            <i class="ri-user-add-line"></i>
+            <span>Registration</span>
+          </a>
+
+          <a href="admin_members_database.html"
+            class="sidebar-link flex items-center gap-3 px-4 py-3 rounded text-gray-300 hover:text-white transition-colors">
+            <i class="ri-database-2-line"></i>
+            <span>Member Database</span>
+          </a>
+        </nav>
+
+        <div class="p-4">
+          <button
+            class="w-full flex items-center gap-2 px-4 py-2 text-gray-300 hover:text-white transition-colors logout-button"
+          >
+            <i class="ri-logout-box-line"></i>
+            <span>Logout</span>
+          </button>
+        </div>
+      </aside>
+
+      <main class="flex-1 flex flex-col overflow-hidden">
+        <header class="h-16 bg-white border-b flex items-center justify-between px-6 sticky top-0 z-10">
+          <div class="flex items-center gap-4">
+            <span class="text-gray-600">April 6, 2025</span>
+          </div>
+
+          <div class="flex items-center gap-2">
+            <h1 class="text-xl font-semibold">HERDOZA FITNESS CENTER</h1>
+            <div class="w-8 h-8 flex items-center justify-center">
+              <a href="#">
+                <img src="./assets/HFC_Logo.png" alt="Herdoza Fitness Center Logo" class="h-10 w-auto">
+              </a>
+            </div>
+          </div>
+
+        </header>
+        <div class="flex-1 overflow-y-auto p-6">
+          <div class="bg-white rounded-lg shadow">
+            <div class="p-6 border-b">
+              <h2 class="text-xl font-semibold">Registration</h2>
+              <p class="text-gray-600 mt-1">
+                Manage new member registrations
+              </p>
+            </div>
+
+            <div class="p-6">
+              <div class="border-b mb-6">
+                <div class="flex gap-8">
+                  <button id="gymTab" class="px-4 py-2 text-gray-600 hover:text-red-600 tab-active" onclick="showTab('gym')">Gym Fitness</button>
+                  <button id="mmaTab" class="px-4 py-2 text-gray-600 hover:text-red-600" onclick="showTab('mma')">Mixed Martial Arts</button>
+                  <button id="danceTab" class="px-4 py-2 text-gray-600 hover:text-red-600" onclick="showTab('dance')">Dance Studio</button>
+                </div>
+              </div>
+              
+              <!-- Gym Fitness Content -->
+              <div id="gymContent" class="registration-content">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="gymRegistrationList">
+                </div>
+              </div>
+              
+              <!-- MMA Content -->
+              <div id="mmaContent" class="registration-content hidden">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="mmaRegistrationList">
+                </div>
+              </div>
+              
+              <!-- Dance Studio Content -->
+              <div id="danceContent" class="registration-content hidden">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="danceRegistrationList">
+
+                </div>
+              </div>
+
+              <div class="registration-status-section mt-6 p-4 bg-gray-50 rounded-lg">
+                <h3 class="text-lg font-semibold mb-4">Payment Status</h3>
+                <div class="flex items-center gap-4">
+                  <span class="status-badge" id="paymentStatus"></span>
+                  <div class="flex gap-2" id="paymentActions">
+                    <button class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded transition-colors" onclick="approvePayment(currentRegistrationId)">
+                      Approve Payment
+                    </button>
+                    <button class="bg-black hover:bg-gray-800 text-white px-4 py-2 rounded transition-colors" onclick="rejectPayment(currentRegistrationId)">
+                      Reject Payment
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+  </body>
+</html>

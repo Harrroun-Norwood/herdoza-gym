@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Herdoza Fitness Center</title>
+    <link rel="icon" type="image" href="./assets/herdoza-logo-trans.png" />
+    <link rel="stylesheet" href="./src/output.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css"
+    />
+    <link rel="stylesheet" href="./src/mystyles.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"
+    />
+  </head>
+  <body>
+    <nav
+      class="w-full fixed bg-black-2 p-4 text-white flex justify-between items-center px-8 md:px-12 lg:px-48 z-50"
+    ></nav>
+
+    <section>
+      <div class="bg-black-2">
+        <div class="text-white dance-studio-bg py-10 px-8 md:px-12 lg:px-48">
+          <div class="flex space-x-2 items-center">
+            <img src="./assets/herdoza-logo-trans.png" alt="" class="h-14" />
+            <div class="text-2xl lg:text-3xl font-bold">DANCE STUDIO</div>
+          </div>
+        </div>
+        <div class="text-white px-8 md:px-12 lg:px-48 py-10">
+          <div class="text-2xl lg:text-4xl font-bold">
+            <span class="text-red-600">Herdoza Fitness Center</span> - Dance
+            Studio Booking
+          </div>
+          <div
+            class="ms-10 text-sm lg:text-xl my-5 text-justify leading-6 md:leading-8"
+          >
+            Book our professional dance studio for solo or group practice
+            sessions. With spacious, well-lit rooms and quality sound systems,
+            it's perfect for dance rehearsals, choreography practice, or any
+            movement art. Choose from flexible booking options to suit your
+            needs.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="px-8 md:px-12 lg:px-48 -mt-7">
+        <div
+          class="hidden grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 md:grid"
+        >
+          <!-- Solo/Small Group Card -->
+          <div class="text-white bg-black-3 p-7 rounded-2xl">
+            <div class="text-center font-bold mb-6">
+              <div class="text-xs mb-3 text-red-600">SOLO / SMALL GROUP</div>
+              <div class="text-3xl">1-3 People</div>
+            </div>
+
+            <div class="leading-7">
+              <div class="py-2">
+                <i class="bi bi-check-circle-fill text-white"></i>
+                Perfect for individual practice or small group rehearsals
+              </div>
+              <div class="py-2">
+                <i class="bi bi-check-circle-fill text-white"></i>
+                Professional sound system included
+              </div>
+              <div class="py-2">
+                <i class="bi bi-check-circle-fill text-white"></i>
+                Full-length mirrors for technique review
+              </div>
+              <div class="py-2">
+                <i class="bi bi-check-circle-fill text-white"></i>
+                Flexible hourly booking
+              </div>
+            </div>
+
+            <a href="small-studio-calendar.html">
+              <button
+                class="bg-red-600 px-8 py-3 mt-13 rounded-lg hover:bg-red-700 transition text-white w-full font-bold"
+              >
+                ₱100.00
+              </button>
+            </a>
+          </div>
+
+          <!-- Large Group Card -->
+          <div class="text-white bg-red-800 p-7 rounded-2xl">
+            <div class="text-center font-bold mb-6">
+              <div class="text-xs mb-3">GROUP PRACTICE</div>
+              <div class="text-3xl">4+ People</div>
+            </div>
+
+            <div class="leading-7">
+              <div class="py-2">
+                <i class="bi bi-check-circle-fill text-white"></i>
+                Ideal for dance teams and larger groups
+              </div>
+              <div class="py-2">
+                <i class="bi bi-check-circle-fill text-white"></i>
+                Spacious room with optimal acoustics
+              </div>
+              <div class="py-2">
+                <i class="bi bi-check-circle-fill text-white"></i>
+                Per person pricing for affordability
+              </div>
+              <div class="py-2">
+                <i class="bi bi-check-circle-fill text-white"></i>
+                Flexible scheduling options
+              </div>
+            </div>
+
+            <a href="large-studio-calendar.html">
+              <button
+                class="bg-white px-8 py-3 mt-13 rounded-lg hover:bg-gray-300 transition text-black w-full font-bold"
+              >
+                ₱25/person
+              </button>
+            </a>
+          </div>
+
+          <!-- Zumba Card -->
+          <div class="text-white bg-black-3 p-7 rounded-2xl">
+            <div class="text-center font-bold mb-6">
+              <div class="text-xs mb-3 text-red-600">ZUMBA FITNESS</div>
+              <div class="text-3xl">Group Classes</div>
+            </div>
+
+            <div class="leading-7">
+              <div class="py-2">
+                <i class="bi bi-check-circle-fill text-white"></i>
+                Professional Zumba instructor
+              </div>
+              <div class="py-2">
+                <i class="bi bi-check-circle-fill text-white"></i>
+                High-energy workout sessions
+              </div>
+              <div class="py-2">
+                <i class="bi bi-check-circle-fill text-white"></i>
+                Multiple weekly class options
+              </div>
+              <div class="py-2">
+                <i class="bi bi-check-circle-fill text-white"></i>
+                All fitness levels welcome
+              </div>
+            </div>
+
+            <div class="mt-4">
+              <div class="zumba-card">
+                <select
+                  id="selected_time_date_zumba"
+                  class="w-full px-2 py-2 mt-1 bg-black-4 border rounded-lg focus:outline-none"
+                  required
+                >
+                  <option value="" disabled selected>
+                    Select day and time
+                  </option>
+                  <option value="Monday">Monday - 7:00 AM - 8:00 AM</option>
+                  <option value="Tuesday">Tuesday - 7:00 AM - 8:00 AM</option>
+                  <option value="Wednesday">
+                    Wednesday - 7:00 AM - 8:00 AM
+                  </option>
+                  <option value="Thursday">Thursday - 7:00 AM - 8:00 AM</option>
+                  <option value="Friday">Friday - 7:00 AM - 8:00 AM</option>
+                </select>
+                <button
+                  class="bg-red-600 px-8 py-3 mt-4 rounded-lg hover:bg-red-700 transition text-white w-full font-bold"
+                >
+                  ₱150.00
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Mobile Swiper -->
+        <div class="swiper-container lg:hidden">
+          <div class="swiper mySwiper">
+            <div class="swiper-wrapper">
+              <!-- Solo/Small Group Mobile Card -->
+              <div class="swiper-slide mb-8">
+                <div class="text-white bg-black-3 p-7 rounded-2xl">
+                  <div class="text-center font-bold mb-6">
+                    <div class="text-xs mb-3 text-red-600">
+                      SOLO / SMALL GROUP
+                    </div>
+                    <div class="text-2xl lg:text-3xl">1-3 People</div>
+                  </div>
+
+                  <div class="mt-5 text-sm lg:leading-7 lg:text-lg">
+                    <div class="py-2">
+                      <i class="bi bi-check-circle-fill text-white"></i>
+                      Perfect for individual practice or small group rehearsals
+                    </div>
+                    <div class="py-2">
+                      <i class="bi bi-check-circle-fill text-white"></i>
+                      Professional sound system included
+                    </div>
+                    <div class="py-2">
+                      <i class="bi bi-check-circle-fill text-white"></i>
+                      Full-length mirrors for technique review
+                    </div>
+                    <div class="py-2">
+                      <i class="bi bi-check-circle-fill text-white"></i>
+                      Flexible hourly booking
+                    </div>
+                  </div>
+
+                  <a href="small-studio-calendar.html">
+                    <button
+                      class="bg-red-600 px-8 py-3 mt-10 lg:mt-13 rounded-lg hover:bg-red-800 transition text-white w-full font-bold cursor-pointer"
+                    >
+                      ₱100.00
+                    </button>
+                  </a>
+                </div>
+              </div>
+
+              <!-- Large Group Mobile Card -->
+              <div class="swiper-slide mb-8">
+                <div class="text-white bg-red-800 p-7 rounded-2xl">
+                  <div class="text-center font-bold mb-6">
+                    <div class="text-xs mb-3">GROUP PRACTICE</div>
+                    <div class="text-2xl lg:text-3xl">4+ People</div>
+                  </div>
+
+                  <div class="mt-5 text-sm lg:leading-7 lg:text-lg">
+                    <div class="py-2">
+                      <i class="bi bi-check-circle-fill text-white"></i>
+                      Ideal for dance teams and larger groups
+                    </div>
+                    <div class="py-2">
+                      <i class="bi bi-check-circle-fill text-white"></i>
+                      Spacious room with optimal acoustics
+                    </div>
+                    <div class="py-2">
+                      <i class="bi bi-check-circle-fill text-white"></i>
+                      Per person pricing for affordability
+                    </div>
+                    <div class="py-2">
+                      <i class="bi bi-check-circle-fill text-white"></i>
+                      Flexible scheduling options
+                    </div>
+                  </div>
+
+                  <a href="large-studio-calendar.html">
+                    <button
+                      class="bg-white py-3 mt-10 lg:mt-13 rounded-lg hover:bg-gray-400 transition text-black w-full font-bold cursor-pointer"
+                    >
+                      ₱25/person
+                    </button>
+                  </a>
+                </div>
+              </div>
+
+              <!-- Zumba Mobile Card -->
+              <div class="swiper-slide mb-8">
+                <div class="text-white bg-black-3 p-7 rounded-2xl">
+                  <div class="text-center font-bold mb-6">
+                    <div class="text-xs mb-3 text-red-600">ZUMBA FITNESS</div>
+                    <div class="text-2xl lg:text-3xl">Group Classes</div>
+                  </div>
+
+                  <div class="mt-5 text-sm lg:leading-7 lg:text-lg">
+                    <div class="py-2">
+                      <i class="bi bi-check-circle-fill text-white"></i>
+                      Professional Zumba instructor
+                    </div>
+                    <div class="py-2">
+                      <i class="bi bi-check-circle-fill text-white"></i>
+                      High-energy workout sessions
+                    </div>
+                    <div class="py-2">
+                      <i class="bi bi-check-circle-fill text-white"></i>
+                      Multiple weekly class options
+                    </div>
+                    <div class="py-2">
+                      <i class="bi bi-check-circle-fill text-white"></i>
+                      All fitness levels welcome
+                    </div>
+                  </div>
+
+                  <div class="mt-4">
+                    <select
+                      id="mobile_time_date_zumba"
+                      class="w-full px-2 py-2 bg-black-4 border rounded-lg focus:outline-none"
+                      required
+                    >
+                      <option value="" disabled selected>
+                        Select day and time
+                      </option>
+                      <option value="Monday">Monday - 7:00 AM - 8:00 AM</option>
+                      <option value="Tuesday">
+                        Tuesday - 7:00 AM - 8:00 AM
+                      </option>
+                      <option value="Wednesday">
+                        Wednesday - 7:00 AM - 8:00 AM
+                      </option>
+                      <option value="Thursday">
+                        Thursday - 7:00 AM - 8:00 AM
+                      </option>
+                      <option value="Friday">Friday - 7:00 AM - 8:00 AM</option>
+                    </select>
+                    <button
+                      class="bg-red-600 px-8 py-3 mt-4 rounded-lg hover:bg-red-800 transition text-white w-full font-bold cursor-pointer"
+                    >
+                      ₱150.00
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="swiper-pagination pt-10"></div>
+          </div>
+        </div>
+
+        <div
+          class="text-center text-black mt-6 font-black lg:font-bold shadow-lg lg:shadow-none"
+        >
+          Book your preferred studio time slot and start practicing today. Small
+          groups enjoy a flat rate, while larger groups benefit from per-person
+          pricing.
+        </div>
+      </div>
+    </section>
+
+    <footer class="hidden md:block"></footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+    <script type="module" src="./scripts/navbar.js"></script>
+    <script type="module" src="./scripts/menu.js"></script>
+    <script type="module" src="./scripts/footer.js"></script>
+    <script type="module" src="./scripts/swiper.js"></script>
+    <script src="./scripts/auth-check.js"></script>
+  </body>
+</html>

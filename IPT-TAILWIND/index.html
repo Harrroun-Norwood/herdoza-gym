@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Herdoza Fitness Center</title>
+    <link rel="icon" type="image" href="./assets/herdoza-logo-trans.png" />
+    <link rel="stylesheet" href="./src/output.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css"
+    />
+    <link rel="stylesheet" href="./src/mystyles.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"
+    />
+    <script type="module" src="./scripts/auth-api.js"></script>
+  </head>
+  <body>
+    <nav
+      class="w-full fixed bg-black-2 p-4 text-white flex justify-between items-center px-8 md:px-12 lg:px-48 z-50"
+    ></nav>
+
+    <div id="home-section" class="home pt-60">
+      <div class="px-8 md:px-12 lg:px-48 -mt-14">
+        <div class="mb-6 font-bold">
+          <div class="text-red-600 text-4xl md:text-5xl lg:text-6xl mb-2">
+            Join the Movement
+          </div>
+          <div class="text-3xl md:text-5xl lg:text-6xl text-white">
+            Be the Best Version of You
+          </div>
+        </div>
+
+        <div class="text-1xl text-white">
+          3F Arcega Building, F. Vergel de Dios St., Concepcion, <br />
+          Baliuag, 3006 Bulacan (Near Concepcion Church)
+          <a
+            href="https://www.google.com/maps/dir//Herdoza+Fitness+Center,+3F+Arcega+Building,+F.+Vergel+De+Dios+St.,+Concepcion,+Baliwag,+3006+Bulacan/@14.9505878,120.8904675,17z/data=!4m8!4m7!1m0!1m5!1m1!1s0x33971c5a1bffffff:0xd11ce894420b2384!2m2!1d120.8904675!2d14.9505878"
+            target="_blank"
+          >
+            <i
+              class="bi bi-geo-alt-fill text-red-500 text-3xl md:text-4xl hover:text-white transition-colors duration-300 transform hover:scale-110"
+            ></i>
+          </a>
+        </div>
+        <div class="mt-8 pb-20 flex gap-4">
+          <button
+            class="bg-red-600 px-4 py-2.5 md:px-8 md:py-3 rounded-lg hover:bg-red-700 transition text-white"
+          >
+            <a href="gym-fitness.html" class="text-sm md:text-lg font-bold"
+              >Join Memberships</a
+            >
+          </button>
+          <button
+            class="bg-white px-4 py-2.5 md:px-8 md:py-3 rounded-lg hover:bg-gray-300 transition"
+          >
+            <a href="learn-more.html" class="text-sm md:text-lg font-bold"
+              >Learn More</a
+            >
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <section id="about-section" class="py-10 bg-black-2 text-white">
+      <div
+        class="container mx-auto px-4 sm:px-8 md:px-12 lg:px-16 py-10 md:py-14 lg:py-16"
+      >
+        <div class="text-center mb-10">
+          <div class="text-2xl lg:text-4xl font-bold mb-6">Why Choose Us?</div>
+          <div class="text-lg text-justify lg:text-2xl lg:text-center">
+            At Herdoza Fitness Center, we don't just build bodies —we build
+            confidence, strength, and a community of winners. Whether you're
+            here to lose weight, gain muscle, or simply stay active, our gym is
+            the perfect place to achieve your fitness goals.
+          </div>
+        </div>
+
+        <div
+          class="grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 hidden md:grid text-white"
+        >
+          <div class="flex flex-col items-center text-center">
+            <img
+              src="./assets/body-fitness-icon.png"
+              alt=""
+              class="h-20 md:h-24 md:w-24"
+            />
+            <div class="">
+              <div class="text-2xl md:text-3xl my-3 font-bold">
+                Body Fitness
+              </div>
+              <div>
+                Tailored workouts and expert trainers to help you achieve peak
+                physical performance.
+              </div>
+            </div>
+          </div>
+          <div class="flex flex-col items-center text-center">
+            <img
+              src="./assets/equipment-icon.png"
+              alt=""
+              class="h-20 w-20 md:h-24 md:w-24"
+            />
+            <div class="text-center">
+              <div class="text-2xl md:text-3xl my-3 font-bold">
+                Modern Equipment
+              </div>
+              <div>
+                A well-equipped gym designed for all fitness levels, from
+                beginners to athletes.
+              </div>
+            </div>
+          </div>
+          <div class="flex flex-col items-center text-center">
+            <img
+              src="./assets/health-icon.png"
+              alt=""
+              class="h-20 w-20 md:h-24 md:w-24"
+            />
+            <div class="text-center">
+              <div class="text-2xl md:text-3xl my-3 font-bold">
+                Health & Wellness
+              </div>
+              <div>
+                A supportive community focused on strength, discipline, and
+                overall well-being.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="swiper-container lg:hidden">
+          <div class="swiper mySwiper">
+            <div class="swiper-wrapper mt-5 text-white">
+              <div class="swiper-slide about-us-slide mb-10">
+                <div class="flex flex-col justify-center">
+                  <div class="flex justify-center">
+                    <img
+                      src="./assets/body-fitness-icon.png"
+                      alt=""
+                      class="h-28"
+                    />
+                  </div>
+                  <div class="text-center">
+                    <div class="font-bold text-3xl my-3">Body Fitness</div>
+                    <div class="text-center">
+                      Tailored workouts and expert trainers to help you achieve
+                      peak physical performance.
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="swiper-slide about-us-slide mb-10">
+                <div class="flex flex-col justify-center">
+                  <div class="flex justify-center">
+                    <img
+                      src="./assets/equipment-icon.png"
+                      alt=""
+                      class="h-28"
+                    />
+                  </div>
+                  <div class="text-center">
+                    <div class="font-bold text-3xl my-3">Modern Equipment</div>
+                    <div class="text-center">
+                      A well-equipped gym designed for all fitness levels, from
+                      beginners to athletes.
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="swiper-slide about-us-slide mb-10">
+                <div class="flex flex-col justify-center">
+                  <div class="flex justify-center">
+                    <img src="./assets/health-icon.png" alt="" class="h-28" />
+                  </div>
+                  <div class="text-center">
+                    <div class="font-bold text-3xl my-3">Health & Wellness</div>
+                    <div class="text-center">
+                      A supportive community focused on strength, discipline,
+                      and overall well-being.
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="swiper-pagination"></div>
+          </div>
+        </div>
+
+        <div class="text-center mt-8">
+          <a href="our-team.html">
+            <button
+              class="bg-red-600 px-12 py-3 text-lg rounded-lg hover:bg-red-700 transition text-white cursor-pointer font-bold"
+            >
+              Our Team
+            </button>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <section id="service-section" class="py-10">
+      <div
+        class="container mx-auto px-6 md:px-12 lg:px-16 text-white hidden md:block py-10"
+      >
+        <div class="text-5xl font-bold mb-5 text-black text-center">
+          <span class="text-red-600">Our</span> Services
+        </div>
+        <div class="flex flex-wrap justify-center gap-12">
+          <div class="card rounded-2xl bg-black-2 shadow-2xl">
+            <img
+              src="./assets/card-1.png"
+              alt="Fitness Gym"
+              class="card-img mb-3"
+            />
+            <div class="content px-5">
+              <div class="text-3xl font-bold">Fitness Gym</div>
+              <ul class="my-4 leading-7">
+                <li>Train Anytime</li>
+                <li>Personal/Trainer</li>
+                <li>No Time Limit</li>
+              </ul>
+              <a href="gym-fitness.html">
+                <button
+                  class="join-btn w-full bg-red-600 py-2 mb-5 mt-2 rounded-lg font-bold text-lg cursor-pointer hover:bg-red-800"
+                >
+                  Join Now
+                </button>
+              </a>
+            </div>
+          </div>
+          <div class="card rounded-2xl bg-black-2 shadow-2xl">
+            <img
+              src="./assets/card-2.png"
+              alt="Mixed Martial Arts"
+              class="card-img mb-3"
+            />
+            <div class="content px-5">
+              <div class="text-3xl font-bold">Mixed Martial Arts</div>
+              <ul class="my-4 leading-7">
+                <li>Train Anytime</li>
+                <li>Personal/Trainer</li>
+                <li>No Time Limit</li>
+              </ul>
+              <a href="mixed-martial-arts.html">
+                <button
+                  class="join-btn w-full bg-red-600 py-2 mb-5 mt-2 rounded-lg font-bold text-lg cursor-pointer hover:bg-red-800"
+                >
+                  Join Now
+                </button>
+              </a>
+            </div>
+          </div>
+          <div class="card rounded-2xl bg-black-2 shadow-2xl">
+            <img
+              src="./assets/card-3.png"
+              alt="Dance Studio"
+              class="card-img mb-3"
+            />
+            <div class="content px-5">
+              <div class="text-3xl font-bold">Dance Studio</div>
+              <ul class="my-4 leading-7">
+                <li>Train Anytime</li>
+                <li>Personal/Trainer</li>
+                <li>No Time Limit</li>
+              </ul>
+              <a href="dance-studio.html">
+                <button
+                  class="join-btn w-full bg-red-600 py-2 mb-5 mt-2 rounded-lg font-bold text-lg cursor-pointer hover:bg-red-800"
+                >
+                  Join Now
+                </button>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="swiper-container lg:hidden block text-white">
+        <div class="text-4xl font-bold mb-5 text-center text-black">
+          <span class="text-red-600">Our</span> Services
+        </div>
+        <div class="swiper mySwiper">
+          <div class="swiper-wrapper">
+            <div
+              class="swiper-slide service-card bg-black-2 rounded-2xl mb-10 shadow-2xl"
+            >
+              <img src="./assets/card-1.png" alt="Fitness Gym" />
+              <div class="content p-5">
+                <div class="text-3xl font-bold">Fitness Gym</div>
+                <ul class="my-4 leading-7">
+                  <li>Train Anytime</li>
+                  <li>Personal/Trainer</li>
+                  <li>No Time Limit</li>
+                </ul>
+                <a href="gym-fitness.html">
+                  <button
+                    class="join-btn w-full bg-red-600 py-2 mb-5 mt-2 rounded-lg font-bold text-lg cursor-pointer hover:bg-red-800"
+                  >
+                    Join Now
+                  </button>
+                </a>
+              </div>
+            </div>
+            <div
+              class="swiper-slide service-card bg-black-2 rounded-2xl mb-10 shadow-2xl"
+            >
+              <img src="./assets/card-2.png" alt="Mixed Martial Arts" />
+              <div class="content p-5">
+                <div class="text-3xl font-bold">Mixed Martial Arts</div>
+                <ul class="my-4 leading-7">
+                  <li>Train Anytime</li>
+                  <li>Personal/Trainer</li>
+                  <li>No Time Limit</li>
+                </ul>
+                <a href="mixed-martial-arts.html">
+                  <button
+                    class="join-btn w-full bg-red-600 py-2 mb-5 mt-2 rounded-lg font-bold text-lg cursor-pointer hover:bg-red-800"
+                  >
+                    Join Now
+                  </button>
+                </a>
+              </div>
+            </div>
+            <div
+              class="swiper-slide service-card bg-black-2 rounded-2xl mb-10 shadow-2xl"
+            >
+              <img src="./assets/card-3.png" alt="Dance Studio" />
+              <div class="content p-5">
+                <div class="text-3xl font-bold">Dance Studio</div>
+                <ul class="my-4 leading-7">
+                  <li>Train Anytime</li>
+                  <li>Personal/Trainer</li>
+                  <li>No Time Limit</li>
+                </ul>
+                <a href="dance-studio.html">
+                  <button
+                    class="join-btn w-full bg-red-600 py-2 mb-5 mt-2 rounded-lg font-bold text-lg cursor-pointer hover:bg-red-800"
+                  >
+                    Join Now
+                  </button>
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <div class="swiper-pagination pt-10"></div>
+          <!-- baka alisin ko
+                <div class="swiper-button-prev"></div>
+                <div class="swiper-button-next"></div>
+                -->
+        </div>
+      </div>
+    </section>
+
+    <section id="event-section">
+      <div class="flex flex-col items-center text-black">
+        <div class="text-4xl lg:text-5xl font-bold mb-5">
+          <span class="text-red-600">Our</span> Events
+        </div>
+        <a
+          href="https://www.facebook.com/HerdozaFitnessCenter"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="hover:opacity-90 transition-opacity w-full flex flex-col items-center"
+        >
+          <div class="flex justify-center w-full">
+            <img
+              src="./assets/event-bg.png"
+              alt="Check out our events on Facebook"
+              class="event-img shadow-2xl max-w-full"
+            />
+          </div>
+          <div class="mt-6 px-10 text-center">
+            Herdoza Fitness Center has been shaping stronger, healthier lives
+            since 2015! Join us as we mark our 10th anniversary with special
+            events, exciting challenges, and exclusive offers. Stay tuned and be
+            part of the celebration!
+          </div>
+        </a>
+      </div>
+    </section>
+
+    <footer class="hidden md:block"></footer>
+
+    <script type="module" src="./scripts/navbar.js"></script>
+    <script type="module" src="./scripts/footer.js"></script>
+    <script type="module" src="./scripts/menu.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+    <script type="module" src="./scripts/swiper.js"></script>
+    <script type="module" src="./scripts/auth-api.js"></script>
+  </body>
+</html>
