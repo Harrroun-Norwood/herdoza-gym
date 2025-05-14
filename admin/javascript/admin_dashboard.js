@@ -209,9 +209,12 @@ function setupLogout() {
   const logoutButton = document.querySelector(".logout-button");
   if (logoutButton) {
     logoutButton.addEventListener("click", () => {
-      // Clear admin token and other stored data
+      // Clear all admin-related data from localStorage
       localStorage.removeItem("adminToken");
       localStorage.removeItem("adminBookingsData");
+      localStorage.removeItem("adminLoggedIn");
+      localStorage.removeItem("adminName");
+      localStorage.removeItem("adminEmail");
 
       // Redirect to login page
       window.location.href = "admin_login_interface.html";

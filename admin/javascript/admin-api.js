@@ -147,7 +147,7 @@ function getAdminToken() {
   const token = localStorage.getItem("adminToken");
   if (!token) {
     console.warn("No admin token found");
-    window.location.href = "admin_login_interface.html";
+    window.location.href = "./admin_login_interface.html";
     return null;
   }
   return token;
@@ -156,7 +156,7 @@ function getAdminToken() {
 // Enhanced admin login check
 function isAdminLoggedIn() {
   if (!localStorage.getItem("adminLoggedIn")) {
-    window.location.href = "admin_login_interface.html";
+    window.location.href = "./admin_login_interface.html";
     return false;
   }
   return true;

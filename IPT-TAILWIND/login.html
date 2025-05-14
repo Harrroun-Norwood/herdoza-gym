@@ -176,7 +176,7 @@
     <!-- Forgot Password Modal -->
     <div
       id="forgotPasswordModal"
-      class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50"
+      class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50"
     >
       <div class="bg-black p-8 rounded-lg shadow-lg max-w-md w-full mx-4">
         <h2 class="text-2xl font-bold mb-4 text-center text-white">
@@ -384,7 +384,7 @@
                 localStorage.setItem("adminLoggedIn", "true");
                 localStorage.setItem("adminName", "Admin");
                 localStorage.setItem("adminEmail", email);
-                window.location.href = "admin/admin_dashboard.html";
+                window.location.href = "../admin/admin_dashboard.html";
               }, 1000);
               return;
             }

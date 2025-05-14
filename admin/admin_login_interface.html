@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Admin Login - Herdoza Fitness Center</title>
+    <title>Admin Login - Fitness Center</title>
     <!-- Favicon -->
     <link rel="icon" type="image" href="./assets/HFC_Logo.png" />
     <!-- Stylesheets -->
@@ -15,7 +15,6 @@
     <!-- Scripts -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script type="module" src="./javascript/admin-api.js"></script>
-    <script type="module" src="./javascript/general.js"></script>
     <script type="module" src="./javascript/admin_login-interface.js"></script>
   </head>
 
@@ -93,6 +92,14 @@
                 <i class="ri-eye-line text-gray-400 hover:text-gray-500"></i>
               </button>
             </div>
+          </div>
+
+          <!-- Error Message -->
+          <div
+            id="loginError"
+            class="hidden text-red-600 text-sm bg-red-50 p-3 rounded"
+          >
+            Invalid email or password. Please try again.
           </div>
 
           <!-- Submit Button -->
