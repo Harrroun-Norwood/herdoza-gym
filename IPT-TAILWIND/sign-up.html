@@ -13,6 +13,59 @@
     <link rel="stylesheet" href="./src/mystyles.css" />
     <script type="module" src="./scripts/auth-api.js"></script>
     <style>
+      /* Background styles */
+      body {
+        background-image: linear-gradient(
+            to bottom,
+            rgba(255, 255, 255, 0.1),
+            rgba(0, 0, 0, 0.7)
+          ),
+          url("./assets/Herdoza-background.jpg");
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+      }
+
+      /* Toast Notification Styles */
+      .toast-notification {
+        position: fixed;
+        top: 1.5rem;
+        left: 50%;
+        transform: translateX(-50%);
+        padding: 1rem 1.5rem;
+        border-radius: 8px;
+        background-color: #22c55e;
+        color: white;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        z-index: 9999;
+        opacity: 0;
+        animation: fadeInOut 3s ease forwards;
+      }
+
+      @keyframes fadeInOut {
+        0% {
+          opacity: 0;
+          transform: translate(-50%, -100%);
+        }
+        15% {
+          opacity: 1;
+          transform: translate(-50%, 0);
+        }
+        85% {
+          opacity: 1;
+          transform: translate(-50%, 0);
+        }
+        100% {
+          opacity: 0;
+          transform: translate(-50%, -100%);
+        }
+      }
+
       .checkbox-error {
         border: 2px solid red;
         border-radius: 4px;
@@ -108,9 +161,9 @@
       }
     </style>
   </head>
-  <body class="flex items-center justify-center min-h-screen p-4">
+  <body class="flex items-center justify-center min-h-screen text-white">
     <div
-      class="flex flex-col md:flex-row text-white bg-black shadow-lg rounded-lg overflow-hidden w-full max-w-4xl js-create-acc"
+      class="flex flex-col md:flex-row bg-black-3 w-full max-w-4xl rounded-lg overflow-hidden shadow-lg js-create-acc"
     >
       <div
         class="flex flex-col items-center justify-center p-8 w-full md:w-1/2"
