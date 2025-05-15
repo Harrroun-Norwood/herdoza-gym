@@ -67,6 +67,7 @@ function showTab(tabName) {
 
 async function approveRegistration(registrationId) {
   try {
+    // Get registration details
     const registrations = JSON.parse(
       localStorage.getItem("registrations") || "[]"
     );
@@ -83,147 +84,114 @@ async function approveRegistration(registrationId) {
       name: registration.name,
       email: registration.email,
       contact: registration.contact,
-      type: registration.type,
-      membershipType: registration.type.toLowerCase().includes("gym")
-        ? "gym"
-        : registration.type.toLowerCase().includes("mma")
-        ? "mma"
-        : "dance",
+      membershipType: registration.type,
+      membershipDuration: registration.membershipDuration,
       dateOfMembership: new Date().toISOString(),
       dateOfExpiration: calculateExpirationDate(
         registration.membershipDuration
       ),
       status: "active",
-      paymentStatus: "paid",
       paymentMethod: registration.paymentMethod,
-      membershipDuration: registration.membershipDuration,
     };
 
     // Add to members database
     members.push(newMember);
     localStorage.setItem("members", JSON.stringify(members));
 
-    // Remove from registrations completely
+    // Remove from registrations
     const updatedRegistrations = registrations.filter(
       (r) => r.id !== registrationId
     );
     localStorage.setItem("registrations", JSON.stringify(updatedRegistrations));
 
-    // Update dashboard stats
-    const stats = JSON.parse(
-      localStorage.getItem("stats") ||
-        '{"newMembers":0,"pendingApproval":0,"activeMembers":0,"expiredMembers":0}'
-    );
-    stats.newMembers++;
-    stats.activeMembers++;
-    stats.pendingApproval = updatedRegistrations.filter(
-      (r) => r.status === "pending"
-    ).length;
-    localStorage.setItem("stats", JSON.stringify(stats));
+    // Update stats
+    updateStats();
 
-    // Send welcome email (mock)
-    console.log(`Welcome email sent to ${registration.email}`);
-
-    showToast("Registration approved and member added successfully", "success");
-
-    // Remove the registration card from UI immediately
-    const registrationCard = document.querySelector(
+    // Remove card from UI
+    const card = document.querySelector(
       `[data-registration-id="${registrationId}"]`
     );
-    if (registrationCard) {
-      registrationCard.remove();
+    if (card) {
+      card.remove();
     }
 
-    // Refresh the current tab to update the display
-    const currentTab =
-      document.querySelector(".tab-active")?.id.replace("Tab", "") || "gym";
-    loadRegistrations(currentTab);
+    showNotification("Registration approved and member added successfully");
   } catch (error) {
     console.error("Error approving registration:", error);
-    showToast("Failed to approve registration", "error");
+    showNotification("Error approving registration", "error");
   }
 }
 
 async function rejectRegistration(registrationId) {
   try {
+    // Get current registrations
     const registrations = JSON.parse(
       localStorage.getItem("registrations") || "[]"
     );
-    const registration = registrations.find((r) => r.id === registrationId);
 
-    if (!registration) {
-      throw new Error("Registration not found");
-    }
-
-    // Store rejection reason in rejected registrations history (for audit purposes)
-    const rejectedRegistrations = JSON.parse(
-      localStorage.getItem("rejectedRegistrations") || "[]"
-    );
-    rejectedRegistrations.push({
-      ...registration,
-      rejectionDate: new Date().toISOString(),
-      status: "rejected",
-    });
-    localStorage.setItem(
-      "rejectedRegistrations",
-      JSON.stringify(rejectedRegistrations)
-    );
-
-    // Remove from registrations completely
+    // Remove registration
     const updatedRegistrations = registrations.filter(
       (r) => r.id !== registrationId
     );
     localStorage.setItem("registrations", JSON.stringify(updatedRegistrations));
 
-    // Update dashboard stats
-    const stats = JSON.parse(
-      localStorage.getItem("stats") ||
-        '{"newMembers":0,"pendingApproval":0,"activeMembers":0,"expiredMembers":0}'
-    );
-    stats.pendingApproval = updatedRegistrations.filter(
-      (r) => r.status === "pending"
-    ).length;
-    localStorage.setItem("stats", JSON.stringify(stats));
+    // Update stats
+    updateStats();
 
-    showToast("Registration rejected and removed successfully", "success");
-
-    // Remove the registration card from UI immediately
-    const registrationCard = document.querySelector(
+    // Remove card from UI
+    const card = document.querySelector(
       `[data-registration-id="${registrationId}"]`
     );
-    if (registrationCard) {
-      registrationCard.remove();
+    if (card) {
+      card.remove();
     }
 
-    // Refresh the current tab to update the display
-    const currentTab =
-      document.querySelector(".tab-active")?.id.replace("Tab", "") || "gym";
-    loadRegistrations(currentTab);
+    showNotification("Registration rejected successfully");
   } catch (error) {
     console.error("Error rejecting registration:", error);
-    showToast("Failed to reject registration", "error");
+    showNotification("Error rejecting registration", "error");
   }
 }
 
 function calculateExpirationDate(duration) {
-  const today = new Date();
-  switch (duration.toLowerCase()) {
-    case "1 month":
-      today.setMonth(today.getMonth() + 1);
-      break;
-    case "3 months":
-      today.setMonth(today.getMonth() + 3);
-      break;
-    case "6 months":
-      today.setMonth(today.getMonth() + 6);
-      break;
-    case "1 year":
-      today.setFullYear(today.getFullYear() + 1);
-      break;
-    default:
-      today.setMonth(today.getMonth() + 1); // Default to 1 month
-  }
-  return today.toISOString();
+  const months = parseInt(duration);
+  const expirationDate = new Date();
+  expirationDate.setMonth(expirationDate.getMonth() + months);
+  return expirationDate.toISOString();
+}
+
+function updateStats() {
+  // Update dashboard stats
+  const registrations = JSON.parse(
+    localStorage.getItem("registrations") || "[]"
+  );
+  const members = JSON.parse(localStorage.getItem("members") || "[]");
+
+  const stats = {
+    newMembers: members.filter((m) => {
+      const membershipDate = new Date(m.dateOfMembership);
+      const thirtyDaysAgo = new Date();
+      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+      return membershipDate >= thirtyDaysAgo;
+    }).length,
+    pendingApproval: registrations.filter((r) => r.status === "pending").length,
+    activeMembers: members.filter((m) => m.status === "active").length,
+    expiredMembers: members.filter((m) => m.status === "expired").length,
+  };
+
+  localStorage.setItem("stats", JSON.stringify(stats));
+}
+
+function showNotification(message, type = "success") {
+  const notification = document.createElement("div");
+  notification.className = `fixed bottom-4 right-4 px-4 py-2 rounded-lg shadow-lg ${
+    type === "success"
+      ? "bg-green-100 text-green-800"
+      : "bg-red-100 text-red-800"
+  }`;
+  notification.textContent = message;
+  document.body.appendChild(notification);
+  setTimeout(() => notification.remove(), 3000);
 }
 
 async function loadRegistrations(tab = "gym") {

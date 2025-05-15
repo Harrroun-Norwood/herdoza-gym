@@ -419,57 +419,51 @@ function generateUniqueId() {
   return Date.now().toString() + Math.random().toString(36).substring(2);
 }
 
-// Admin API with localStorage implementation
+// Simple Admin API using localStorage
 const adminApi = {
-  // Initialize default data if not exists
+  baseUrl: API_URL,
+
   init() {
-    if (!localStorage.getItem("members")) {
-      localStorage.setItem("members", JSON.stringify([]));
-    }
-    if (!localStorage.getItem("registrations")) {
-      localStorage.setItem("registrations", JSON.stringify([]));
-    }
-    if (!localStorage.getItem("stats")) {
-      localStorage.setItem(
-        "stats",
-        JSON.stringify({
-          newMembers: 0,
-          pendingApproval: 0,
-          activeMembers: 0,
-          expiredMembers: 0,
-        })
-      );
+    // Load mock data if no data exists
+    if (
+      !localStorage.getItem("members") ||
+      JSON.parse(localStorage.getItem("members")).length === 0
+    ) {
+      this.loadMockData();
     }
   },
 
-  // Get dashboard stats
-  getDashboardStats() {
-    return JSON.parse(
-      localStorage.getItem("stats") ||
-        '{"newMembers":0,"pendingApproval":0,"activeMembers":0,"expiredMembers":0}'
-    );
-  },
-
-  // Update dashboard stats
-  updateStats() {
-    const members = this.getMembers();
-    const registrations = this.getPendingRegistrations();
-
-    const stats = {
-      newMembers: members.filter((m) => {
-        const membershipDate = new Date(m.dateOfMembership);
-        const thirtyDaysAgo = new Date();
-        thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-        return membershipDate >= thirtyDaysAgo;
-      }).length,
-      pendingApproval: registrations.filter((r) => r.status === "pending")
-        .length,
-      activeMembers: members.filter((m) => m.status === "active").length,
-      expiredMembers: members.filter((m) => m.status === "expired").length,
-    };
-
-    localStorage.setItem("stats", JSON.stringify(stats));
-    return stats;
+  loadMockData() {
+    // Add some initial mock data
+    const mockMembers = [
+      {
+        id: "1",
+        name: "John Alvarez",
+        email: "john.alvarez@example.com",
+        contact: "0917 860 1822",
+        dateOfMembership: "2025-04-06",
+        dateOfExpiration: "2025-05-06",
+        status: "active",
+        membershipType: "Gym Fitness",
+        membershipDuration: "1",
+        paymentMethod: "Cash",
+        paymentStatus: "paid",
+      },
+      {
+        id: "2",
+        name: "Maria Santos",
+        email: "maria.santos@example.com",
+        contact: "0918-234-5678",
+        dateOfMembership: "2025-04-06",
+        dateOfExpiration: "2025-05-06",
+        status: "active",
+        membershipType: "MMA Training",
+        membershipDuration: "1",
+        paymentMethod: "GCash",
+        paymentStatus: "paid",
+      },
+    ];
+    localStorage.setItem("members", JSON.stringify(mockMembers));
   },
 
   // Get all members
@@ -480,191 +474,193 @@ const adminApi = {
   // Add new member
   addMember(memberData) {
     const members = this.getMembers();
+
+    // Validate required fields
+    if (!memberData.name || !memberData.email || !memberData.contact) {
+      throw new Error("Missing required member information");
+    }
+
+    // Check for duplicate email
+    if (members.some((m) => m.email === memberData.email)) {
+      throw new Error("A member with this email already exists");
+    }
+
+    // Ensure consistent data structure
     const newMember = {
       id: Date.now().toString(),
-      ...memberData,
+      name: memberData.name,
+      email: memberData.email,
+      contact: memberData.contact,
+      membershipType: memberData.membershipType || "Gym Fitness",
+      membershipDuration: memberData.membershipDuration || "1",
       dateOfMembership: new Date().toISOString(),
+      dateOfExpiration: this.calculateExpirationDate(
+        memberData.membershipDuration || "1"
+      ),
       status: "active",
+      paymentMethod: memberData.paymentMethod || "Cash",
+      paymentStatus: "paid",
     };
+
     members.push(newMember);
     localStorage.setItem("members", JSON.stringify(members));
-    this.updateStats();
     return newMember;
   },
 
-  // Get pending registrations
-  getPendingRegistrations() {
-    return JSON.parse(localStorage.getItem("registrations") || "[]");
+  // Renew membership
+  renewMembership(memberId, duration) {
+    const members = this.getMembers();
+    const memberIndex = members.findIndex((m) => m.id === memberId);
+
+    if (memberIndex !== -1) {
+      const currentExpiration = new Date(members[memberIndex].dateOfExpiration);
+      const newExpiration = new Date(
+        currentExpiration.getTime() + duration * 30 * 24 * 60 * 60 * 1000
+      );
+
+      members[memberIndex] = {
+        ...members[memberIndex],
+        dateOfExpiration: newExpiration.toISOString(),
+        status: "active",
+        lastRenewal: new Date().toISOString(),
+      };
+
+      localStorage.setItem("members", JSON.stringify(members));
+      return members[memberIndex];
+    }
+    return null;
   },
 
-  // Add new registration
-  addRegistration(registrationData) {
-    const registrations = this.getPendingRegistrations();
-    const newRegistration = {
-      id: generateUniqueId(),
-      ...registrationData,
-      status: "pending",
-      timestamp: new Date().toISOString(),
-      paymentStatus:
-        registrationData.paymentMethod === "Gcash"
-          ? "pending_verification"
-          : "pending_payment",
+  // Cancel membership
+  cancelMembership(memberId) {
+    const members = this.getMembers();
+    const memberIndex = members.findIndex((m) => m.id === memberId);
+
+    if (memberIndex !== -1) {
+      members[memberIndex].status = "expired";
+      members[memberIndex].dateOfExpiration = new Date().toISOString();
+      localStorage.setItem("members", JSON.stringify(members));
+      return members[memberIndex];
+    }
+    return null;
+  },
+
+  // Remove member
+  removeMember(memberId) {
+    const members = this.getMembers();
+    const updatedMembers = members.filter((m) => m.id !== memberId);
+    localStorage.setItem("members", JSON.stringify(updatedMembers));
+    return true;
+  },
+
+  // Update member contact
+  updateMemberContact(memberId, contact) {
+    const members = this.getMembers();
+    const memberIndex = members.findIndex((m) => m.id === memberId);
+
+    if (memberIndex !== -1) {
+      members[memberIndex].contact = contact;
+      localStorage.setItem("members", JSON.stringify(members));
+      return members[memberIndex];
+    }
+    return null;
+  },
+  // Add new member
+  addMember(memberData) {
+    const members = this.getMembers();
+
+    // Validate required fields
+    if (!memberData.name || !memberData.email || !memberData.contact) {
+      throw new Error("Missing required member information");
+    }
+
+    // Check for duplicate email
+    if (members.some((m) => m.email === memberData.email)) {
+      throw new Error("A member with this email already exists");
+    }
+
+    // Ensure consistent data structure
+    const newMember = {
+      id: Date.now().toString(),
+      name: memberData.name,
+      email: memberData.email,
+      contact: memberData.contact,
+      membershipType: memberData.membershipType || "Gym Fitness",
+      membershipDuration: memberData.membershipDuration || "1",
+      dateOfMembership: new Date().toISOString(),
+      dateOfExpiration: this.calculateExpirationDate(
+        memberData.membershipDuration || "1"
+      ),
+      status: "active",
+      paymentMethod: memberData.paymentMethod || "Cash",
+      paymentStatus: "paid",
     };
-    registrations.push(newRegistration);
-    localStorage.setItem("registrations", JSON.stringify(registrations));
-    this.updateStats();
-    return newRegistration;
+
+    members.push(newMember);
+    localStorage.setItem("members", JSON.stringify(members));
+    return newMember;
   },
 
-  // Update registration status
-  updateRegistrationStatus(registrationId, status) {
-    const registrations = this.getPendingRegistrations();
-    const registration = registrations.find((r) => r.id === registrationId);
+  // Renew membership
+  renewMembership(memberId, duration) {
+    const members = this.getMembers();
+    const memberIndex = members.findIndex((m) => m.id === memberId);
 
-    if (!registration) {
-      throw new Error("Registration not found");
-    }
-
-    // If approving, add to members
-    if (status === "approved") {
-      this.addMember({
-        name: registration.name,
-        email: registration.email || "",
-        contact: registration.contact,
-        membershipDuration: registration.membershipDuration,
-        type: registration.type,
-        dateOfMembership: new Date().toISOString(),
-        dateOfExpiration: this.calculateExpirationDate(
-          registration.membershipDuration
-        ),
-        paymentStatus: "paid",
-        paymentMethod: registration.paymentMethod,
-      });
-
-      // Remove from registrations
-      const updatedRegistrations = registrations.filter(
-        (r) => r.id !== registrationId
+    if (memberIndex !== -1) {
+      const currentExpiration = new Date(members[memberIndex].dateOfExpiration);
+      const newExpiration = new Date(
+        currentExpiration.getTime() + duration * 30 * 24 * 60 * 60 * 1000
       );
-      localStorage.setItem(
-        "registrations",
-        JSON.stringify(updatedRegistrations)
-      );
-    } else {
-      // Just update status for rejected
-      registration.status = status;
-      localStorage.setItem("registrations", JSON.stringify(registrations));
-    }
 
-    this.updateStats();
-    return { success: true, message: `Registration ${status} successfully` };
-  },
-
-  // Update registration payment status
-  updatePaymentStatus(registrationId, paymentStatus) {
-    const registrations = this.getPendingRegistrations();
-    const registration = registrations.find((r) => r.id === registrationId);
-
-    if (!registration) {
-      throw new Error("Registration not found");
-    }
-
-    registration.paymentStatus = paymentStatus;
-    localStorage.setItem("registrations", JSON.stringify(registrations));
-    this.updateStats();
-
-    return { success: true, message: `Payment ${paymentStatus}` };
-  },
-
-  // Calculate expiration date based on membership duration
-  calculateExpirationDate(duration) {
-    const today = new Date();
-    switch (duration.toLowerCase()) {
-      case "1 month":
-        today.setMonth(today.getMonth() + 1);
-        break;
-      case "3 months":
-        today.setMonth(today.getMonth() + 3);
-        break;
-      case "6 months":
-        today.setMonth(today.getMonth() + 6);
-        break;
-      case "1 year":
-        today.setFullYear(today.getFullYear() + 1);
-        break;
-      default:
-        today.setMonth(today.getMonth() + 1); // Default to 1 month
-    }
-    return today.toISOString();
-  },
-
-  // Mock data for testing
-  loadMockData() {
-    // Mock registrations
-    const mockRegistrations = [
-      {
-        id: "1",
-        name: "John Doe",
-        type: "Gym Fitness",
-        paymentMethod: "GCash",
-        status: "pending",
-        contact: "09123456789",
-        membershipDuration: "1 Month",
-        timestamp: new Date().toISOString(),
-      },
-      {
-        id: "2",
-        name: "Jane Smith",
-        type: "MMA Training",
-        paymentMethod: "Cash",
-        status: "pending",
-        contact: "09187654321",
-        membershipDuration: "3 Months",
-        timestamp: new Date().toISOString(),
-      },
-    ];
-
-    // Mock members
-    const mockMembers = [
-      {
-        id: "101",
-        name: "Mike Johnson",
-        email: "mike@example.com",
-        contact: "09198765432",
-        type: "Gym Fitness",
-        dateOfMembership: new Date().toISOString(),
-        dateOfExpiration: this.calculateExpirationDate("1 Month"),
+      members[memberIndex] = {
+        ...members[memberIndex],
+        dateOfExpiration: newExpiration.toISOString(),
         status: "active",
-      },
-      {
-        id: "102",
-        name: "Sarah Wilson",
-        email: "sarah@example.com",
-        contact: "09167890123",
-        type: "Dance Studio",
-        dateOfMembership: new Date().toISOString(),
-        dateOfExpiration: this.calculateExpirationDate("3 Months"),
-        status: "active",
-      },
-    ];
+        lastRenewal: new Date().toISOString(),
+      };
 
-    localStorage.setItem("registrations", JSON.stringify(mockRegistrations));
-    localStorage.setItem("members", JSON.stringify(mockMembers));
-    this.updateStats();
+      localStorage.setItem("members", JSON.stringify(members));
+      return members[memberIndex];
+    }
+    return null;
+  },
+
+  // Cancel membership
+  cancelMembership(memberId) {
+    const members = this.getMembers();
+    const memberIndex = members.findIndex((m) => m.id === memberId);
+
+    if (memberIndex !== -1) {
+      members[memberIndex].status = "expired";
+      members[memberIndex].dateOfExpiration = new Date().toISOString();
+      localStorage.setItem("members", JSON.stringify(members));
+      return members[memberIndex];
+    }
+    return null;
+  },
+
+  // Update member contact
+  updateMemberContact(memberId, contact) {
+    const members = this.getMembers();
+    const memberIndex = members.findIndex((m) => m.id === memberId);
+
+    if (memberIndex !== -1) {
+      members[memberIndex].contact = contact;
+      localStorage.setItem("members", JSON.stringify(members));
+      return members[memberIndex];
+    }
+    return null;
+  },
+  // Calculate expiration date
+  calculateExpirationDate(months) {
+    const expirationDate = new Date();
+    expirationDate.setMonth(expirationDate.getMonth() + parseInt(months));
+    return expirationDate.toISOString();
   },
 };
 
-// Initialize the API
-adminApi.init();
-
-// Add to window object for global access
+// Initialize the API and add to window object
 window.adminApi = adminApi;
-
-// Load mock data if no data exists
-if (
-  !localStorage.getItem("members") ||
-  JSON.parse(localStorage.getItem("members")).length === 0
-) {
-  adminApi.loadMockData();
-}
+adminApi.init();
 
 export default adminApi;

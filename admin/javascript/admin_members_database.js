@@ -1,7 +1,4 @@
-import config from "./config.js";
-
-// Base API URL
-const API_URL = config.apiUrl;
+// Simple member management using localStorage
 let isEditing = false; // Track editing state
 
 // Load members when page loads
@@ -22,10 +19,31 @@ document.addEventListener("DOMContentLoaded", async function () {
   await loadMembers(filterParam || "all");
   setupStatusFilter();
   setupAutoRefresh();
+  setupEventListeners();
 
   // Update current date
   updateCurrentDate();
 });
+
+// Setup event listeners
+function setupEventListeners() {
+  // Create member button
+  document.getElementById("createMemberBtn").addEventListener("click", () => {
+    showModal();
+  });
+
+  // Member form submission
+  document.getElementById("memberForm").addEventListener("submit", (e) => {
+    e.preventDefault();
+    handleMemberFormSubmit(e);
+  });
+
+  // Renewal form submission
+  document.getElementById("renewalForm").addEventListener("submit", (e) => {
+    e.preventDefault();
+    handleRenewalFormSubmit(e);
+  });
+}
 
 function setupAutoRefresh() {
   // Refresh data every 5 seconds if not editing
@@ -40,27 +58,55 @@ function setupAutoRefresh() {
 
 async function loadMembers(filter = "all") {
   try {
-    // Get members from localStorage via adminApi
-    const members = window.adminApi.getMembers();
+    showLoadingState();
+    let members = await window.adminApi.getMembers();
 
-    // Check for expired memberships and update status
-    const updatedMembers = members.map((member) => {
-      const expirationDate = new Date(member.dateOfExpiration);
+    // Validate member data structure and fix if necessary
+    members = members.map((member) => {
+      // Ensure all required fields are present
+      const validatedMember = {
+        id: member.id || Date.now().toString(),
+        name: member.name || "Unknown Member",
+        email: member.email || "",
+        contact: member.contact || "",
+        membershipType: member.membershipType || "Gym Fitness",
+        membershipDuration: member.membershipDuration || "1",
+        dateOfMembership: member.dateOfMembership || new Date().toISOString(),
+        dateOfExpiration: member.dateOfExpiration || new Date().toISOString(),
+        status: member.status || "active",
+        paymentMethod: member.paymentMethod || "Cash",
+        paymentStatus: member.paymentStatus || "paid",
+      };
+
+      // Check for expired membership
       const now = new Date();
-      if (expirationDate < now && member.status === "active") {
-        member.status = "expired";
+      const expirationDate = new Date(validatedMember.dateOfExpiration);
+      if (expirationDate < now && validatedMember.status === "active") {
+        validatedMember.status = "expired";
       }
-      return member;
+
+      return validatedMember;
     });
 
-    // Filter members based on selection
-    const filteredMembers = filterMembers(updatedMembers, filter);
+    // Update localStorage with validated members
+    localStorage.setItem("members", JSON.stringify(members));
 
-    // Display members in the table
+    // Filter and display members
+    const filteredMembers = filterMembers(members, filter);
     displayMembers(filteredMembers);
   } catch (error) {
     console.error("Error loading members:", error);
-    showLoadingState();
+    showNotification(
+      "Error loading members: " + (error.message || "Unknown error"),
+      "error"
+    );
+
+    // Show empty state instead of loading
+    const tableBody = document.getElementById("memberTableBody");
+    if (tableBody) {
+      tableBody.innerHTML =
+        '<tr><td colspan="7" class="text-center py-4 text-gray-500">Error loading members. Please try refreshing the page.</td></tr>';
+    }
   }
 }
 
@@ -69,13 +115,14 @@ function filterMembers(members, filter) {
   return members.filter((member) => member.status === filter);
 }
 
+// Update the display members function to include action buttons
 function displayMembers(members) {
   const tableBody = document.getElementById("memberTableBody");
   if (!tableBody) return;
 
   if (!members.length) {
     tableBody.innerHTML =
-      '<tr><td colspan="6" class="text-center py-4 text-gray-500">No members found</td></tr>';
+      '<tr><td colspan="7" class="text-center py-4 text-gray-500">No members found</td></tr>';
     return;
   }
 
@@ -97,7 +144,9 @@ function displayMembers(members) {
       <td class="py-4">
         <div class="contact-row">
           <span class="contact-display">${member.contact}</span>
-          <button onclick="editContact('${member.id}')" class="edit-btn ml-2">
+          <button onclick="editContact('${
+            member.id
+          }')" class="edit-btn ml-2" data-tooltip="Edit contact info">
             <i class="ri-pencil-line"></i>
           </button>
           <div class="edit-form hidden">
@@ -112,12 +161,12 @@ function displayMembers(members) {
                              }');">
             <button onclick="saveContact('${
               member.id
-            }')" class="text-green-500 ml-1">
+            }')" class="text-green-500 ml-1" data-tooltip="Save changes">
               <i class="ri-check-line"></i>
             </button>
             <button onclick="cancelEdit('${
               member.id
-            }')" class="text-red-500 ml-1">
+            }')" class="text-red-500 ml-1" data-tooltip="Cancel editing">
               <i class="ri-close-line"></i>
             </button>
           </div>
@@ -137,6 +186,31 @@ function displayMembers(members) {
         }">
           ${capitalizeFirst(member.status)}
         </span>
+      </td>
+      <td class="py-4">
+        <div class="flex items-center space-x-2">
+          ${
+            member.status === "active"
+              ? `
+            <button onclick="showRenewalModal('${member.id}')" class="text-blue-600 hover:text-blue-800" data-tooltip="Renew membership">
+              <i class="ri-refresh-line"></i>
+            </button>
+            <button onclick="cancelMembership('${member.id}')" class="text-red-600 hover:text-red-800" data-tooltip="Cancel active membership">
+              <i class="ri-close-circle-line"></i>
+            </button>
+          `
+              : `
+            <button onclick="showRenewalModal('${member.id}')" class="text-green-600 hover:text-green-800" data-tooltip="Renew expired membership">
+              <i class="ri-refresh-line"></i>
+            </button>
+          `
+          }
+          <button onclick="removeMember('${
+            member.id
+          }')" class="text-red-600 hover:text-red-800" data-tooltip="Delete member">
+            <i class="ri-delete-bin-line"></i>
+          </button>
+        </div>
       </td>
     </tr>
   `
@@ -222,7 +296,7 @@ function editContact(memberId) {
   input.select(); // Select all text for easy editing
 }
 
-function saveContact(memberId) {
+async function saveContact(memberId) {
   const row = document.querySelector(`tr[data-member-id="${memberId}"]`);
   if (!row) return;
 
@@ -230,19 +304,14 @@ function saveContact(memberId) {
   const newContact = input.value.trim();
   if (!newContact) return;
 
-  // Update in localStorage
-  const members = window.adminApi.getMembers();
-  const memberIndex = members.findIndex((m) => m.id === memberId);
-  if (memberIndex !== -1) {
-    members[memberIndex].contact = newContact;
-    localStorage.setItem("members", JSON.stringify(members));
-
-    // Update display
+  try {
+    await window.adminApi.updateMemberContact(memberId, newContact);
     row.querySelector(".contact-display").textContent = newContact;
     cancelEdit(memberId);
-
-    // Show success notification
     showNotification("Contact updated successfully", "success");
+  } catch (error) {
+    console.error("Error updating contact:", error);
+    showNotification("Error updating contact", "error");
   }
 }
 
@@ -254,6 +323,24 @@ function cancelEdit(memberId) {
   row.querySelector(".contact-display").style.display = "";
   row.querySelector(".edit-btn").style.display = "";
   row.querySelector(".edit-form").classList.add("hidden");
+}
+
+async function removeMember(memberId) {
+  if (
+    !confirm(
+      "Are you sure you want to remove this member? This action cannot be undone."
+    )
+  )
+    return;
+
+  try {
+    await window.adminApi.removeMember(memberId);
+    await loadMembers(document.getElementById("statusFilter").value);
+    showNotification("Member removed successfully");
+  } catch (error) {
+    console.error("Error removing member:", error);
+    showNotification("Error removing member", "error");
+  }
 }
 
 function showNotification(message, type = "success") {
@@ -271,7 +358,152 @@ function showNotification(message, type = "success") {
   }, 3000);
 }
 
+// Modal functions
+function showModal(memberId = null) {
+  const modal = document.getElementById("memberModal");
+  const title = document.getElementById("modalTitle");
+  const form = document.getElementById("memberForm");
+
+  if (memberId) {
+    title.textContent = "Edit Member";
+    // Load member data into form
+    const members = window.adminApi.getMembers();
+    const member = members.find((m) => m.id === memberId);
+    if (member) {
+      document.getElementById("memberName").value = member.name;
+      document.getElementById("memberEmail").value = member.email;
+      document.getElementById("memberContact").value = member.contact;
+      document.getElementById("membershipType").value = member.membershipType;
+    }
+  } else {
+    title.textContent = "Create New Member";
+    form.reset();
+  }
+
+  modal.style.display = "flex";
+}
+
+function closeModal() {
+  document.getElementById("memberModal").style.display = "none";
+}
+
+function showRenewalModal(memberId) {
+  const modal = document.getElementById("renewalModal");
+  const members = window.adminApi.getMembers();
+  const member = members.find((m) => m.id === memberId);
+
+  if (member) {
+    document.getElementById("renewMemberId").value = member.id;
+    document.getElementById("renewMemberName").value = member.name;
+    document.getElementById("currentExpirationDate").value =
+      member.dateOfExpiration;
+  }
+
+  modal.style.display = "flex";
+}
+
+function closeRenewalModal() {
+  document.getElementById("renewalModal").style.display = "none";
+}
+
+// Form submission handlers
+async function handleMemberFormSubmit(e) {
+  e.preventDefault();
+
+  // Get form values
+  const name = document.getElementById("memberName").value.trim();
+  const email = document.getElementById("memberEmail").value.trim();
+  const contact = document.getElementById("memberContact").value.trim();
+  const membershipType = document.getElementById("membershipType").value;
+  const membershipDuration =
+    document.getElementById("membershipDuration").value;
+  const paymentMethod = document.getElementById("paymentMethod").value;
+
+  // Validate required fields
+  if (!name || !email || !contact) {
+    showNotification("Please fill in all required fields", "error");
+    return;
+  }
+
+  // Validate email format
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email)) {
+    showNotification("Please enter a valid email address", "error");
+    return;
+  }
+
+  const memberData = {
+    name,
+    email,
+    contact,
+    membershipType,
+    membershipDuration,
+    paymentMethod,
+  };
+
+  try {
+    // Attempt to add new member
+    await window.adminApi.addMember(memberData);
+
+    // Refresh the member list with current filter
+    const currentFilter =
+      document.getElementById("statusFilter").value || "all";
+    await loadMembers(currentFilter);
+
+    // Close the modal and show success message
+    closeModal();
+    showNotification("Member added successfully", "success");
+  } catch (error) {
+    console.error("Error adding member:", error);
+    const errorMessage = error.message || "Error adding member";
+    showNotification(errorMessage, "error");
+  }
+}
+
+async function handleRenewalFormSubmit(e) {
+  e.preventDefault();
+
+  const memberId = document.getElementById("renewMemberId").value;
+  const duration = parseInt(document.getElementById("renewalDuration").value);
+  const paymentMethod = document.getElementById("renewalPaymentMethod").value;
+
+  try {
+    await window.adminApi.renewMembership(memberId, duration, paymentMethod);
+    await loadMembers(document.getElementById("statusFilter").value);
+    closeRenewalModal();
+    showNotification("Membership renewed successfully", "success");
+  } catch (error) {
+    console.error("Error renewing membership:", error);
+    showNotification("Error renewing membership", "error");
+  }
+}
+
+async function cancelMembership(memberId) {
+  if (!confirm("Are you sure you want to cancel this membership?")) return;
+
+  try {
+    await window.adminApi.cancelMembership(memberId);
+    await loadMembers(document.getElementById("statusFilter").value);
+    showNotification("Membership cancelled successfully", "success");
+  } catch (error) {
+    console.error("Error cancelling membership:", error);
+    showNotification("Error cancelling membership", "error");
+  }
+}
+
+// Utility functions
+function calculateExpirationDate(months) {
+  const expirationDate = new Date();
+  expirationDate.setMonth(expirationDate.getMonth() + months);
+  return expirationDate.toISOString();
+}
+
 // Make functions available globally
 window.editContact = editContact;
 window.saveContact = saveContact;
 window.cancelEdit = cancelEdit;
+window.showRenewalModal = showRenewalModal;
+window.closeRenewalModal = closeRenewalModal;
+window.closeModal = closeModal;
+window.cancelMembership = cancelMembership;
+window.removeMember = removeMember;

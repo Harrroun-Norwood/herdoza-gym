@@ -421,39 +421,36 @@
             email: formData.email,
             contact: formData.contactNumber,
             password: formData.password,
-            type: "Gym Fitness",
-            membershipDuration: "", // Empty since they haven't picked yet
-            paymentMethod: "", // Empty since they haven't paid yet
+            type: "Gym Fitness", // Default type
+            membershipDuration: "1", // Default 1 month
+            paymentMethod: "Cash", // Default payment method
             status: "pending",
             timestamp: new Date().toISOString(),
-            members: 0, // Initialize with zero members
-            schedules: [], // Initialize with empty schedules
-            membershipStart: null, // Will be set when membership is approved
-            membershipEnd: null, // Will be set when membership is approved
+            paymentStatus: "pending",
           };
 
-          // Store in registrations
+          // Store in registrations for admin approval
           const registrations = JSON.parse(
             localStorage.getItem("registrations") || "[]"
           );
+
+          // Check if email already exists
+          if (registrations.some((r) => r.email === userData.email)) {
+            errorElement.textContent =
+              "Email already registered. Please use a different email.";
+            errorElement.classList.remove("hidden");
+            modal.classList.remove("show");
+            return;
+          }
+
           registrations.push(userData);
           localStorage.setItem("registrations", JSON.stringify(registrations));
 
-          // Store minimal user data
+          // Store minimal user data for UI
           localStorage.setItem("userEmail", userData.email);
           localStorage.setItem("userName", userData.name);
-          localStorage.setItem("userToken", "demo-token");
-          localStorage.setItem("userPicture", "./assets/profile-icon.png");
-
-          // Clear all booking-related localStorage
-          localStorage.removeItem("membershipData");
-          localStorage.removeItem("smallStudioBookings");
-          localStorage.removeItem("largeStudioBookings");
-          localStorage.removeItem("mmaPerSessionBookings");
-          localStorage.removeItem("mma25SessionUserBookings");
-          localStorage.removeItem("mma25SessionBookedSlots");
-          localStorage.removeItem("mmaZumbaBookings");
-          localStorage.removeItem("zumbaBookings");
+          localStorage.setItem("userContact", userData.contact);
+          localStorage.setItem("userStatus", "pending");
 
           // Show success message and redirect
           alert(
