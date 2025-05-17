@@ -180,6 +180,22 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 });
 
+// Function to show toast notification
+function showToast(message, type = "success") {
+  const toast = document.createElement("div");
+  toast.className = "toast-notification";
+  toast.innerHTML = `
+    <i class="bi bi-${
+      type === "success" ? "check-circle" : "exclamation-circle"
+    } text-xl"></i>
+    <span>${message}</span>
+  `;
+  document.body.appendChild(toast);
+  setTimeout(() => {
+    toast.remove();
+  }, 3000);
+}
+
 // Helper function to clear user data and redirect
 function clearUserDataAndRedirect() {
   localStorage.removeItem("userToken");
@@ -187,7 +203,12 @@ function clearUserDataAndRedirect() {
   localStorage.removeItem("userEmail");
   localStorage.removeItem("userPicture");
   localStorage.removeItem("userDetails");
-  window.location.href = "index.html";
+
+  // Show logout success toast and redirect after a delay
+  showToast("Successfully logged out!");
+  setTimeout(() => {
+    window.location.href = "index.html";
+  }, 2000);
 }
 
 // Function to handle logout

@@ -27,6 +27,14 @@
         background-attachment: fixed;
       }
 
+      /* Force input text color */
+      input[type="text"],
+      input[type="email"],
+      input[type="tel"],
+      input[type="password"] {
+        color: black !important;
+      }
+
       /* Toast Notification Styles */
       .toast-notification {
         position: fixed;
@@ -180,79 +188,85 @@
 
           <div class="grid grid-cols-2 gap-4 mb-4">
             <div>
-              <label for="firstName" class="text-sm">First Name</label>
+              <label for="firstName" class="text-sm text-white"
+                >First Name</label
+              >
               <input
                 type="text"
                 id="firstName"
-                placeholder="first name"
-                class="border rounded-md w-full bg-black p-2 text-sm mt-1 focus:outline-none focus:ring-2 focus:ring-red-600"
                 required
+                placeholder="Juan"
+                class="border border-gray-300 rounded-md w-full bg-white p-2 text-sm mt-1 focus:outline-none focus:ring-2 focus:ring-red-600 text-black"
               />
             </div>
 
             <div>
-              <label for="lastName" class="text-sm">Last Name</label>
+              <label for="lastName" class="text-sm text-white">Last Name</label>
               <input
                 type="text"
                 id="lastName"
-                placeholder="last name"
-                class="border rounded-md w-full bg-black p-2 text-sm mt-1 focus:outline-none focus:ring-2 focus:ring-red-600"
                 required
+                placeholder="Dela Cruz"
+                class="border border-gray-300 rounded-md w-full bg-white p-2 text-sm mt-1 focus:outline-none focus:ring-2 focus:ring-red-600 text-black"
               />
             </div>
           </div>
 
           <div class="mb-4">
-            <label for="email" class="block text-sm font-medium text-white"
-              >Email</label
-            >
+            <label for="email" class="block text-sm text-white">Email</label>
             <input
               type="email"
               id="email"
-              name="email"
-              placeholder="example@gmail.com"
               required
-              class="mt-1 block w-full px-3 py-2 bg-black border border-gray-300 rounded-md shadow-sm text-white text-sm overflow-hidden text-ellipsis"
+              placeholder="example@gmail.com"
+              class="border border-gray-300 rounded-md w-full bg-white p-2 text-sm mt-1 focus:outline-none focus:ring-2 focus:ring-red-600 text-black"
               style="max-width: 100%; overflow: hidden; text-overflow: ellipsis"
             />
           </div>
 
           <div class="mb-4">
-            <label for="contactNumber" class="text-sm">Contact Number</label>
+            <label for="contactNumber" class="text-sm text-white"
+              >Contact Number</label
+            >
             <input
               type="tel"
               id="contactNumber"
+              required
               placeholder="+63 912 345 6789"
-              class="border rounded-md w-full bg-black p-2 text-sm mt-1 focus:outline-none focus:ring-2 focus:ring-red-600"
+              class="border border-gray-300 rounded-md w-full bg-white p-2 text-sm mt-1 focus:outline-none focus:ring-2 focus:ring-red-600 text-black"
             />
           </div>
 
           <div class="mb-4">
-            <label for="password" class="text-sm">Password</label>
+            <label for="password" class="text-sm text-white">Password</label>
             <div class="relative">
               <input
                 type="password"
                 id="password"
                 placeholder="Enter your password"
-                class="border rounded-md w-full bg-black p-2 pr-10 text-sm mt-1 focus:outline-none focus:ring-2 focus:ring-red-600"
                 required
-                minlength="7"
+                class="border border-gray-300 rounded-md w-full bg-white p-2 pr-10 text-sm mt-1 focus:outline-none focus:ring-2 focus:ring-red-600 text-black"
               />
               <button
                 type="button"
                 onclick="togglePasswordVisibility('password')"
-                class="absolute right-0 top-0 h-full px-3 mt-1 text-gray-400 hover:text-gray-200"
+                class="absolute top-0 right-0 h-full px-3 flex items-center justify-center"
+                style="color: black !important"
               >
-                <i id="password-toggle-icon" class="bi bi-eye-slash"></i>
+                <i
+                  id="password-toggle-icon"
+                  class="bi bi-eye-slash"
+                  style="color: black !important"
+                ></i>
               </button>
             </div>
             <p class="text-gray-400 text-xs mt-1">
-              Password must be at least 7 characters long
+              Must be at least 8 characters long
             </p>
           </div>
 
           <div class="mb-4">
-            <label for="confirm-password" class="text-sm"
+            <label for="confirm-password" class="text-sm text-white"
               >Confirm Password</label
             >
             <div class="relative">
@@ -260,22 +274,24 @@
                 type="password"
                 id="confirm-password"
                 placeholder="Re-enter your password"
-                class="border rounded-md w-full bg-black p-2 pr-10 text-sm mt-1 focus:outline-none focus:ring-2 focus:ring-red-600"
                 required
+                class="border border-gray-300 rounded-md w-full bg-white p-2 pr-10 text-sm mt-1 focus:outline-none focus:ring-2 focus:ring-red-600 text-black"
               />
               <button
                 type="button"
                 onclick="togglePasswordVisibility('confirm-password')"
-                class="absolute right-0 top-0 h-full px-3 mt-1 text-gray-400 hover:text-gray-200"
+                class="absolute top-0 right-0 h-full px-3 flex items-center justify-center"
+                style="color: black !important"
               >
                 <i
                   id="confirm-password-toggle-icon"
                   class="bi bi-eye-slash"
+                  style="color: black !important"
                 ></i>
               </button>
             </div>
             <p class="text-gray-400 text-xs mt-1">
-              Please enter your password again to confirm
+              Re-enter your password to confirm
             </p>
           </div>
 
@@ -317,36 +333,6 @@
       </div>
     </div>
 
-    <!-- OTP Modal -->
-    <div id="otpModal" class="modal">
-      <div class="modal-content text-white">
-        <h2 class="text-2xl font-bold mb-4 text-center">OTP Verification</h2>
-        <p class="text-sm text-gray-400 mb-4 text-center">
-          Enter the OTP code to verify your account
-        </p>
-        <input
-          type="text"
-          id="otpInput"
-          class="otp-input border rounded-md w-full bg-black p-2 text-sm mb-4 focus:outline-none focus:ring-2 focus:ring-red-600"
-          placeholder="0000"
-          maxlength="4"
-        />
-        <p class="text-xs text-gray-400 mb-4 text-center">
-          For testing purposes, use OTP: 0000
-        </p>
-        <div
-          id="otpError"
-          class="text-red-500 text-sm mb-4 hidden text-center"
-        ></div>
-        <button
-          id="verifyOtpBtn"
-          class="bg-red-600 px-6 py-2 rounded-lg hover:bg-red-700 transition text-white w-full text-lg"
-        >
-          Verify OTP
-        </button>
-      </div>
-    </div>
-
     <!-- Import scripts -->
     <script type="module" src="./scripts/config.js"></script>
     <script type="module" src="./scripts/api-client.js"></script>
@@ -355,11 +341,22 @@
     <script type="module">
       document.addEventListener("DOMContentLoaded", function () {
         const form = document.getElementById("signupForm");
-        const modal = document.getElementById("otpModal");
-        const otpInput = document.getElementById("otpInput");
-        const verifyOtpBtn = document.getElementById("verifyOtpBtn");
-        const otpError = document.getElementById("otpError");
-        let formData = {};
+
+        function showToast(message, type = "success") {
+          const toast = document.createElement("div");
+          toast.className = "toast-notification";
+          toast.innerHTML = `
+            <i class="bi bi-${
+              type === "success" ? "check-circle" : "exclamation-circle"
+            } text-xl"></i>
+            <span>${message}</span>
+          `;
+          document.body.appendChild(toast);
+
+          setTimeout(() => {
+            toast.remove();
+          }, 3000);
+        }
 
         if (form) {
           form.addEventListener("submit", async function (e) {
@@ -386,91 +383,101 @@
               document
                 .getElementById("checkbox-error")
                 .classList.remove("hidden");
+              document
+                .getElementById("terms-checkbox-container")
+                .classList.add("checkbox-error");
               return;
             }
 
-            // Store form data temporarily
-            formData = {
-              firstName: document.getElementById("firstName").value,
-              lastName: document.getElementById("lastName").value,
+            // Create user data
+            const userData = {
+              id: Date.now().toString(),
+              name: `${document.getElementById("firstName").value} ${
+                document.getElementById("lastName").value
+              }`,
               email: document.getElementById("email").value,
-              contactNumber: document.getElementById("contactNumber").value,
+              contact: document.getElementById("contactNumber").value,
               password: password,
+              type: "Gym Fitness",
+              membershipDuration: "1",
+              paymentMethod: "Cash",
+              status: "pending",
+              timestamp: new Date().toISOString(),
+              paymentStatus: "pending",
             };
 
-            // Show OTP modal
-            modal.classList.add("show");
-            otpInput.focus();
+            // Store in registrations for admin approval
+            const registrations = JSON.parse(
+              localStorage.getItem("registrations") || "[]"
+            );
+
+            // Check if email already exists
+            if (registrations.some((r) => r.email === userData.email)) {
+              errorElement.textContent =
+                "Email already registered. Please use a different email.";
+              errorElement.classList.remove("hidden");
+              return;
+            }
+
+            registrations.push(userData);
+            localStorage.setItem(
+              "registrations",
+              JSON.stringify(registrations)
+            ); // Store user session data
+            const userSessionData = {
+              email: userData.email,
+              name: userData.name,
+              contact: userData.contact,
+              type: "Gym Fitness",
+              token: "new-member",
+              status: "pending",
+              membershipExpiry: new Date(
+                Date.now() + 30 * 24 * 60 * 60 * 1000
+              ).toISOString(),
+              timestamp: Date.now(),
+              expiresIn: 24 * 60 * 60 * 1000, // 24 hours
+            };
+
+            // Store user data in localStorage
+            localStorage.setItem("userEmail", userData.email);
+            localStorage.setItem("userName", userData.name);
+            localStorage.setItem("userContact", userData.contact);
+            localStorage.setItem("userStatus", "pending");
+            localStorage.setItem("userToken", "new-member");
+            localStorage.setItem("userType", "Gym Fitness");
+            localStorage.setItem(
+              "membershipExpiry",
+              userSessionData.membershipExpiry
+            );
+            localStorage.setItem(
+              "userSession",
+              JSON.stringify(userSessionData)
+            ); // Reset any existing service selections, bookings, and membership data
+            localStorage.removeItem("selectedService");
+            localStorage.removeItem("bookingData");
+            localStorage.removeItem("selectedTimeSlots");
+            localStorage.removeItem("selectedDates");
+            localStorage.removeItem("hasMembership");
+            localStorage.removeItem("membershipData");
+            localStorage.removeItem("membershipType");
+            localStorage.removeItem("membershipStatus");
+
+            // Show success toast and redirect
+            showToast("Signup successful! Welcome to Herdoza Fitness!");
+            setTimeout(() => {
+              window.location.href = "index.html";
+            }, 2000);
           });
         }
-
-        // Handle OTP verification
-        verifyOtpBtn.addEventListener("click", function () {
-          otpError.classList.add("hidden");
-
-          if (otpInput.value !== "0000") {
-            otpError.textContent = "Invalid OTP. Please try again (use 0000)";
-            otpError.classList.remove("hidden");
-            return;
-          }
-
-          // Create user data
-          const userData = {
-            id: Date.now().toString(),
-            name: `${formData.firstName} ${formData.lastName}`,
-            email: formData.email,
-            contact: formData.contactNumber,
-            password: formData.password,
-            type: "Gym Fitness", // Default type
-            membershipDuration: "1", // Default 1 month
-            paymentMethod: "Cash", // Default payment method
-            status: "pending",
-            timestamp: new Date().toISOString(),
-            paymentStatus: "pending",
-          };
-
-          // Store in registrations for admin approval
-          const registrations = JSON.parse(
-            localStorage.getItem("registrations") || "[]"
-          );
-
-          // Check if email already exists
-          if (registrations.some((r) => r.email === userData.email)) {
-            errorElement.textContent =
-              "Email already registered. Please use a different email.";
-            errorElement.classList.remove("hidden");
-            modal.classList.remove("show");
-            return;
-          }
-
-          registrations.push(userData);
-          localStorage.setItem("registrations", JSON.stringify(registrations));
-
-          // Store minimal user data for UI
-          localStorage.setItem("userEmail", userData.email);
-          localStorage.setItem("userName", userData.name);
-          localStorage.setItem("userContact", userData.contact);
-          localStorage.setItem("userStatus", "pending");
-
-          // Show success message and redirect
-          alert(
-            "Registration submitted successfully! Please wait for admin approval."
-          );
-          window.location.href = "index.html";
-        });
-
-        // Close modal if clicking outside
-        modal.addEventListener("click", function (e) {
-          if (e.target === modal) {
-            modal.classList.remove("show");
-          }
-        });
 
         // Reset checkbox error on checkbox change
         document
           .getElementById("agreeTerms")
-          .addEventListener("change", function () {
+          ?.addEventListener("change", function () {
             document.getElementById("checkbox-error").classList.add("hidden");
+            document
+              .getElementById("terms-checkbox-container")
+              .classList.remove("checkbox-error");
           });
 
         // Make password toggle function globally accessible

@@ -24,13 +24,7 @@ document.addEventListener("DOMContentLoaded", function () {
     localStorage.removeItem("adminToken");
     localStorage.removeItem("adminBookingsData");
   }
-
-  // Check if already logged in
-  if (localStorage.getItem("adminLoggedIn")) {
-    window.location.href = "admin_dashboard.html";
-    return;
-  }
-
+  // Clear any stale login state
   clearLoginState();
 
   // Show Toast Message with auto-cleanup
