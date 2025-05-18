@@ -24,25 +24,43 @@
     <!-- Membership Status Notification -->
     <div
       id="membership-notification"
-      class="fixed top-24 right-4 z-50 w-72 cursor-move hidden"
+      class="fixed top-1/2 -translate-y-1/2 right-0 z-50 w-72 flex items-center opacity-100"
     >
+      <!-- Pull tab for the notification -->
       <div
-        class="bg-black-2 text-white rounded-lg shadow-lg border border-red-600 p-4 relative select-none hover:shadow-2xl"
+        class="bg-red-600 px-4 py-3 cursor-pointer shadow-lg hover:bg-red-700 transition-colors text-center rounded-l-lg"
+        id="notification-pull-tab"
+      >
+        <i
+          class="bi bi-person-badge text-white text-2xl pointer-events-none"
+        ></i>
+      </div>
+      <!-- Main notification panel with drag handle -->
+      <div
+        id="notification-panel"
+        class="bg-black-2 text-white rounded-lg shadow-lg border border-red-600 p-4 flex-1 cursor-default"
       >
         <div class="flex justify-between items-start">
-          <div class="flex items-center cursor-move" id="notification-handle">
-            <i class="ri-drag-move-fill text-red-600 text-xl mr-2"></i>
-            <i class="ri-vip-crown-2-fill text-red-600 text-xl mr-2"></i>
+          <div class="flex items-start space-x-3">
+            <div
+              id="notification-handle"
+              class="cursor-move touch-none group-hover:bg-red-600/10 rounded-lg transition-colors p-1"
+            >
+              <i
+                class="ri-drag-move-fill text-red-600 text-xl pointer-events-none"
+              ></i>
+            </div>
+            <i class="ri-vip-crown-2-fill text-red-600 text-xl mt-1"></i>
             <div>
-              <h3 class="font-bold text-lg">Your Membership</h3>
+              <h3 class="font-bold text-lg leading-tight">Your Membership</h3>
               <p class="text-sm text-gray-400" id="user-name">Welcome back!</p>
             </div>
           </div>
           <button
             onclick="this.closest('#membership-notification').classList.add('hidden')"
-            class="text-gray-400 hover:text-white"
+            class="text-gray-400 hover:text-white flex-shrink-0 ml-2"
           >
-            <i class="ri-close-line"></i>
+            <i class="ri-close-line text-xl"></i>
           </button>
         </div>
         <div class="mt-3" id="membership-details">
@@ -252,8 +270,9 @@
       <div
         class="container mx-auto px-6 md:px-12 lg:px-16 text-white hidden md:block py-10"
       >
-        <div class="text-5xl font-bold mb-5 text-black text-center">
-          <span class="text-red-600">Our</span> Services
+        <div class="text-5xl font-bold mb-5 text-center">
+          <span class="text-red-600">Our</span>
+          <span class="text-black">Services</span>
         </div>
         <div class="flex flex-wrap justify-center gap-12">
           <div class="card rounded-2xl bg-black-2 shadow-2xl">
@@ -325,8 +344,9 @@
         </div>
       </div>
       <div class="swiper-container lg:hidden block text-white">
-        <div class="text-4xl font-bold mb-5 text-center text-black">
-          <span class="text-red-600">Our</span> Services
+        <div class="text-4xl font-bold mb-5 text-center">
+          <span class="text-red-600">Our</span>
+          <span class="text-black">Services</span>
         </div>
         <div class="swiper mySwiper">
           <div class="swiper-wrapper">
