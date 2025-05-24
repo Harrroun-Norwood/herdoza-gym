@@ -5,183 +5,91 @@ document.addEventListener("DOMContentLoaded", () => {
   const okButton = document.querySelector(".ok-btn");
   const cancelButton = document.querySelector(".cancel-btn");
   const timeSlots = document.querySelectorAll('input[name="time-slot"]');
-  const peopleInput = document.querySelector('input[name="number-of-people"]');
-  const paymentModal = document.querySelector(".payment-modal");
-  const paymentMethodInputs = document.querySelectorAll(
-    'input[name="payment-method"]'
-  );
-  const confirmPaymentBtn = document.querySelector(".confirm-payment-btn");
-  const cancelPaymentBtn = document.querySelector(".cancel-payment-btn");
-  const gcashDetails = document.getElementById("gcash-details");
-  const onsiteDetails = document.getElementById("onsite-details");
-  const priceDisplay = document.querySelector(".price-display");
-
+  const peopleInput = document.querySelector('#numberOfPeople');
+  const priceDisplay = document.querySelector('.price-display');
+  
   const months = [
-    "January",
-    "February",
-    "March",
-    "April",
-    "May",
-    "June",
-    "July",
-    "August",
-    "September",
-    "October",
-    "November",
-    "December",
+    "January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December"
   ];
 
-  // Initialize state
-  let bookedSlots = JSON.parse(
-    localStorage.getItem("largeStudioBookings") || "[]"
-  );
+  // State variables
   let date = new Date();
   let month = date.getMonth();
   let year = date.getFullYear();
   let selectedDate = null;
   let selectedTime = null;
+  let bookedSlots = JSON.parse(localStorage.getItem("largeStudioBookings") || "[]");
 
-  function updatePriceDisplay(numberOfPeople) {
-    const price = numberOfPeople * 25; // ₱25 per person
-    const formattedPrice = `₱${price.toFixed(2)}`;
-    if (priceDisplay) {
-      priceDisplay.textContent = formattedPrice;
-    }
-  }
-
-  // Payment method selection handlers
-  paymentMethodInputs.forEach((input) => {
-    input.addEventListener("change", () => {
-      gcashDetails.classList.toggle("hidden", input.value !== "Gcash");
-      onsiteDetails.classList.toggle("hidden", input.value !== "Onsite");
-
-      // Enable confirm button and update styling based on payment method
-      confirmPaymentBtn.classList.remove("bg-gray-500");
-      if (input.value === "Gcash") {
-        confirmPaymentBtn.classList.add("bg-blue-600", "hover:bg-blue-800");
-      } else {
-        confirmPaymentBtn.classList.add("bg-green-600", "hover:bg-green-800");
-      }
-    });
-  });
-
-  peopleInput?.addEventListener("input", (e) => {
-    const value = parseInt(e.target.value) || 0;
-    if (value < 4) {
-      e.target.setCustomValidity(
-        "Minimum 4 people required for large studio booking"
-      );
-    } else if (value > 30) {
-      e.target.setCustomValidity("Maximum 30 people allowed");
-    } else {
-      e.target.setCustomValidity("");
-    }
-    updatePriceDisplay(value);
-  });
-
-  function saveBookings() {
-    localStorage.setItem("largeStudioBookings", JSON.stringify(bookedSlots));
-
-    // If connected to backend, sync bookings
-    syncBookingsToBackend();
-  }
-
-  // Function to sync bookings to backend
-  function syncBookingsToBackend() {
-    // This will only work if bookingApi exists and user is logged in
-    if (
-      window.bookingApi &&
-      localStorage.getItem("userToken") &&
-      localStorage.getItem("userToken") !== "demo-token"
-    ) {
-      window.bookingApi
-        .getUserBookings()
-        .then((response) => {
-          console.log("Synced bookings with backend");
-        })
-        .catch((error) => {
-          console.error("Failed to sync bookings:", error);
-        });
-    }
+  function isSameDate(date1, date2) {
+    return date1.getFullYear() === date2.getFullYear() &&
+      date1.getMonth() === date2.getMonth() &&
+      date1.getDate() === date2.getDate();
   }
 
   function renderCalendar() {
-    if (!dates || !header) {
-      console.error("Calendar elements not found!");
-      return;
-    }
+    if (!dates || !header) return;
 
     const today = new Date();
-    const start = new Date(year, month, 1).getDay();
-    const endDate = new Date(year, month + 1, 0).getDate();
-    const end = new Date(year, month, endDate).getDay();
-    const endDatePrev = new Date(year, month, 0).getDate();
+    const firstDay = new Date(year, month, 1).getDay();
+    const lastDate = new Date(year, month + 1, 0).getDate();
+    const lastDayIndex = new Date(year, month, lastDate).getDay();
+    const prevLastDate = new Date(year, month, 0).getDate();
 
+    header.textContent = `${months[month]} ${year}`;
     let datesHTML = "";
 
     // Previous month's days
-    for (let i = start; i > 0; i--) {
-      datesHTML += `<li class="inactive">${endDatePrev - i + 1}</li>`;
+    for (let i = firstDay; i > 0; i--) {
+      datesHTML += `<li class="inactive">${prevLastDate - i + 1}</li>`;
     }
 
     // Current month's days
-    for (let i = 1; i <= endDate; i++) {
+    for (let i = 1; i <= lastDate; i++) {
       let className = "";
       let currentDate = new Date(year, month, i);
-      let dayOfWeek = currentDate.getDay(); // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
-      let formattedDate = `${months[month]} ${i}, ${year}`;
+      let dayOfWeek = currentDate.getDay();
 
-      // Check if it's Sunday (dayOfWeek === 0)
+      // Check if it's Sunday
       if (dayOfWeek === 0) {
-        className = "inactive sunday"; // Added 'sunday' class for additional styling if needed
+        className = "inactive sunday";
       }
-      // Check if date is in the past (excluding today)
-      else if (
-        currentDate < today &&
-        !(
-          currentDate.getDate() === today.getDate() &&
-          currentDate.getMonth() === today.getMonth()
-        )
-      ) {
+      // Check if date is in the past
+      else if (currentDate < today && !isSameDate(currentDate, today)) {
         className = "inactive";
       }
       // Check if it's today
-      else if (currentDate.toDateString() === today.toDateString()) {
+      else if (isSameDate(currentDate, today)) {
         className = "today";
       }
-
-      // Check if date is selected
-      if (
-        selectedDate &&
-        selectedDate.day === i &&
-        selectedDate.month === month &&
-        selectedDate.year === year
-      ) {
+      
+      // Check if this is the selected date
+      if (selectedDate &&
+          selectedDate.day === i &&
+          selectedDate.month === month &&
+          selectedDate.year === year) {
         className = "selected";
       }
 
       datesHTML += `<li class="${className}" data-day="${i}" data-month="${month}" data-year="${year}">${i}</li>`;
     }
 
-    // Next month's days
-    for (let i = end; i < 6; i++) {
-      datesHTML += `<li class="inactive">${i - end + 1}</li>`;
-    }
-
     dates.innerHTML = datesHTML;
-    header.textContent = `${months[month]} ${year}`;
 
-    // Add click event to days (excluding inactive ones)
+    // Add click events to dates
     document.querySelectorAll(".dates li:not(.inactive)").forEach((day) => {
       day.addEventListener("click", () => {
-        let dayNumber = parseInt(day.dataset.day);
-        selectedDate = { day: dayNumber, month: month, year: year };
+        selectedDate = {
+          day: parseInt(day.dataset.day),
+          month: parseInt(day.dataset.month),
+          year: parseInt(day.dataset.year)
+        };
         updateAvailableTimeSlots();
         renderCalendar();
       });
     });
 
-    // Disable prev button if showing current or past month
+    // Disable prev button if showing current month
     const todayMonth = today.getMonth();
     const todayYear = today.getFullYear();
     document.getElementById("prev").disabled =
@@ -189,30 +97,19 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function updateAvailableTimeSlots() {
-    if (!selectedDate) return;
-
-    let selectedDateStr = `${months[selectedDate.month]} ${selectedDate.day}, ${
-      selectedDate.year
-    }`;
-
     timeSlots.forEach((slot) => {
-      let slotLabel = slot.nextElementSibling.textContent
-        .replace(/ \(Already Booked\)/g, "")
-        .trim();
-      let isBooked = bookedSlots.some(
-        (bookedSlot) =>
-          bookedSlot.date === selectedDateStr && bookedSlot.time === slotLabel
+      let isSlotBooked = bookedSlots.some(booking =>
+        booking.date === `${selectedDate?.day}/${selectedDate?.month + 1}/${selectedDate?.year}` &&
+        booking.time === slot.value
       );
 
-      slot.disabled = isBooked;
-      slot.checked = false;
-
-      if (isBooked) {
-        slot.nextElementSibling.innerHTML = `<span class="time-label">${slotLabel}</span> <span class="booked-text">(Already Booked)</span>`;
-        slot.parentElement.style.color = "#ccc";
+      slot.disabled = isSlotBooked;
+      const slotLabel = slot.nextElementSibling.textContent.replace(/ \(Already Booked\)/g, "").trim();
+      if (isSlotBooked) {
+        slot.checked = false;
+        slot.nextElementSibling.innerHTML = `${slotLabel} <span class="text-red-500">(Already Booked)</span>`;
       } else {
-        slot.nextElementSibling.innerHTML = `<span class="time-label">${slotLabel}</span>`;
-        slot.parentElement.style.color = "";
+        slot.nextElementSibling.innerHTML = slotLabel;
       }
     });
   }
@@ -221,9 +118,8 @@ document.addEventListener("DOMContentLoaded", () => {
   navs.forEach((nav) => {
     nav.addEventListener("click", (e) => {
       const btnId = e.target.id;
-      const today = new Date();
 
-      if (btnId === "prev") {
+      if (btnId === "prev" && !document.getElementById("prev").disabled) {
         month--;
         if (month < 0) {
           month = 11;
@@ -238,273 +134,104 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       renderCalendar();
+      updateAvailableTimeSlots();
     });
   });
+  // Handle people input changes
+  peopleInput?.addEventListener("input", () => {
+    const numberOfPeople = parseInt(peopleInput.value) || 0;
+    const pricePerPerson = window.paymentConfigs.studio.large.pricePerPerson;
+    const totalPrice = numberOfPeople * pricePerPerson;
 
-  // OK Button - Open payment popup with validation
-  okButton.addEventListener("click", () => {
-    // Get current selections
-    selectedTime = document.querySelector('input[name="time-slot"]:checked');
-    const selectedPeople = peopleInput.value;
-
-    // Validate all fields
-    let errorMessage = "";
-
-    if (!selectedDate) {
-      errorMessage += "• Please select a date\n";
+    if (priceDisplay) {
+      if (numberOfPeople >= 4 && numberOfPeople <= 30) {
+        priceDisplay.textContent = `₱ ${totalPrice}`;
+        priceDisplay.classList.remove("opacity-50");
+      } else {
+        priceDisplay.textContent = "---";
+        priceDisplay.classList.add("opacity-50");
+      }
     }
-
-    if (!selectedTime) {
-      errorMessage += "• Please select a time slot\n";
-    }
-
-    if (!selectedPeople || selectedPeople < 4) {
-      errorMessage += "• Please enter number of people (minimum 4)\n";
-    }
-
-    if (selectedPeople > 30) {
-      errorMessage += "• Maximum group size is 30 people\n";
-    }
-
-    if (errorMessage) {
-      alert("Please complete the following:\n" + errorMessage);
-      return;
-    }
-
-    // Create and show payment popup
-    showPaymentPopup();
   });
 
-  function showPaymentPopup() {
-    const formattedDate = `${months[selectedDate.month]} ${selectedDate.day}, ${
-      selectedDate.year
-    }`;
-    const time = selectedTime.nextElementSibling.textContent
+  // OK Button handler - Show payment popup
+  okButton?.addEventListener("click", () => {
+    selectedTime = document.querySelector('input[name="time-slot"]:checked');
+    const numberOfPeople = parseInt(peopleInput?.value) || 0;
+
+    // Basic required field validation
+    if (!selectedDate) {
+      alert("Please select a date");
+      return;
+    }
+    if (!selectedTime) {
+      alert("Please select a time slot");
+      return;
+    }
+    if (!numberOfPeople) {
+      alert("Please enter number of people");
+      return;
+    }    const dateStr = `${months[selectedDate.month]} ${selectedDate.day}, ${selectedDate.year}`;
+    const timeStr = selectedTime.nextElementSibling.textContent
       .replace(" (Already Booked)", "")
       .trim();
-    const price = parseInt(peopleInput.value) * 25;
 
-    const popupHTML = `
-        <div class="payment-summary text-white bg-black-1 open-payment-summary" id="studio-pop-up">
-            <div class="bg-red-600 text-center font-bold py-1">Payment Summary</div>
-            <div class="p-4">
-                <div class="flex flex-col sm:flex-row border-4 border-red-600 mb-8 mt-4">
-                    <div class="bg-red-600 rounded-br-3xl rounded-tr-3xl mr-4 pr-2 hidden sm:block">
-                        <img src="./assets/herdoza-logo-trans.png" alt="Herdoza Fitness Center" class="h-30">
-                    </div>
-
-                    <div class="flex flex-col justify-center mr-1 flex-1 p-4">
-                        <div class="text-xs text-red-600 font-bold">
-                            You're Paying for:
-                        </div>
-                        <div class="font-bold text-2xl">
-                            Dance Studio - Large Group
-                        </div>
-                        <div class="booking-date">
-                            ${formattedDate}
-                        </div>
-                        <div class="booking-details">
-                            ${peopleInput.value} person(s) at ${time}
-                        </div>
-                        <div class="text-sm mt-2 sm:hidden">
-                            Price: ₱${price}.00 (₱25 per person)
-                        </div>
-                    </div>
-
-                    <div class="bg-none md:bg-red-600 amount flex flex-col justify-center items-center px-6 py-2 my-2 mx-2 text-sm">
-                        <div class="text-sm">
-                            Amount
-                        </div>
-                        <div class="font-bold text-3xl md:text-lg price-display">
-                            ₱ ${price}.00
-                        </div>
-                    </div>
-                </div>
-
-                <form id="payment-form">
-                    <div class="text-center text-xs mb-3">Payment Method</div>
-                    <div class="flex gap-4 justify-center mb-6">
-                        <label class="mobile-touch-target">
-                            <input type="radio" name="payment-method" value="Gcash" required class="hidden peer/gcash" />
-                            <div class="bg-red-600 peer-checked/gcash:bg-blue-800 hover:cursor-pointer 
-                                        text-sm px-4 py-2 sm:text-lg sm:px-8 sm:py-3 rounded-md text-white text-center transition-all button-text-mobile">
-                                Gcash
-                            </div>
-                        </label>
-
-                        <label class="mobile-touch-target">
-                            <input type="radio" name="payment-method" value="Onsite" required class="hidden peer/onsite" />
-                            <div class="bg-red-600 peer-checked/onsite:bg-blue-800 hover:cursor-pointer 
-                                        text-sm px-4 py-2 sm:text-lg sm:px-8 sm:py-3 rounded-md text-white text-center transition-all button-text-mobile">
-                                Cash(Onsite)
-                            </div>
-                        </label>
-                    </div>
-
-                    <div id="gcashDetails" class="gcash-details hidden mb-6">
-                        <div class="bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-100 p-3 rounded-md text-center">
-                            <p class="font-bold mb-2">GCash Payment Details</p>
-                            <div class="flex justify-center mb-4">
-                                <img src="./assets/instapay-qr.jpg" alt="GCash QR Code" class="w-48 h-48 rounded-lg shadow-lg">
-                            </div>
-                            <p>Send payment to: <span class="font-bold">09307561163</span></p>
-                            <p>Amount: ₱${price}.00</p>
-                            <p class="text-xs mt-2">After scanning and sending payment:</p>
-                            <p class="text-xs text-blue-700 dark:text-blue-300 mt-1">Note: Registration will be pending until proof of payment is verified</p>
-                        </div>
-                    </div>
-
-                    <div id="onsiteDetails" class="onsite-details hidden mb-6">
-                        <div class="bg-amber-100 text-amber-800 p-3 rounded-md text-center">
-                            <p class="font-bold mb-2">Cash Payment (Onsite)</p>
-                            <p>Please pay at the gym reception counter</p>
-                            <p>Amount: ₱${price}.00</p>
-                            <p class="text-xs mt-2">Your reservation will be pending until payment is received at the gym</p>
-                        </div>
-                    </div>
-
-                    <hr>
-                    <div class="text-center md:text-end mt-3">
-                        <button type="button"
-                            class="popup-cancel-btn bg-red-600 hover:cursor-pointer hover:bg-red-700 mx-2 text-lg font-bold px-8 py-2 rounded-md mobile-touch-target button-text-mobile">
-                            Cancel
-                        </button>
-                        <button type="submit"
-                            class="pay-now-btn bg-gray-500 hover:bg-gray-700 text-lg font-bold px-8 py-2 rounded-md cursor-pointer mobile-touch-target button-text-mobile">
-                            Pay now
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>`;
-
-    popupContainer.innerHTML = popupHTML;
-
-    // Add event listeners for payment methods
-    const gcashRadio = document.querySelector('input[value="Gcash"]');
-    const onsiteRadio = document.querySelector('input[value="Onsite"]');
-    const payNowBtn = document.querySelector(".pay-now-btn");
-
-    gcashRadio?.addEventListener("change", function () {
-      document.getElementById("gcashDetails").classList.remove("hidden");
-      document.getElementById("onsiteDetails").classList.add("hidden");
-      payNowBtn.classList.remove("bg-gray-500");
-      payNowBtn.classList.add("bg-blue-600", "hover:bg-blue-800");
-    });
-
-    onsiteRadio?.addEventListener("change", function () {
-      document.getElementById("gcashDetails").classList.add("hidden");
-      document.getElementById("onsiteDetails").classList.remove("hidden");
-      payNowBtn.classList.remove("bg-gray-500");
-      payNowBtn.classList.add("bg-green-600", "hover:bg-green-800");
-    });
-
-    // Add event listeners for the popup buttons
-    document
-      .querySelector(".popup-cancel-btn")
-      ?.addEventListener("click", closePaymentPopup);
-    document
-      .querySelector(".pay-now-btn")
-      ?.addEventListener("click", confirmBooking);
-  }
-
-  function closePaymentPopup() {
-    popupContainer.innerHTML = "";
-  }
-
-  function confirmBooking(e) {
-    e.preventDefault();
-
-    const selectedPayment = document.querySelector(
-      'input[name="payment-method"]:checked'
-    );
-
-    if (!selectedPayment) {
-      alert("Please select a payment method before proceeding.");
+    // Show warning if less than 4 people
+    if (numberOfPeople > 0 && numberOfPeople < 4) {
+      if (!confirm("For groups with less than 4 people, please use the Solo/Small Group option. Would you like to go back to the studio selection page?")) {
+        return;
+      }
+      window.location.href = "dance-studio.html";
       return;
     }
 
-    const price = parseInt(peopleInput.value) * 25;
-
-    const bookingDetails = {
-      date: `${months[selectedDate.month]} ${selectedDate.day}, ${
-        selectedDate.year
-      }`,
-      time: selectedTime.nextElementSibling.textContent
-        .replace(" (Already Booked)", "")
-        .trim(),
-      people: peopleInput.value,
-      paymentMethod: selectedPayment.value,
-      price: price,
-      type: "large", // Indicates this is a large studio booking
-    };
-
-    if (
-      !confirm(
-        `Confirm Booking?\n📅 Date: ${bookingDetails.date}\n⏰ Time: ${bookingDetails.time}\n👥 People: ${bookingDetails.people}\n💳 Payment: ${bookingDetails.paymentMethod}\n\nPrice: ₱${price}.00 (₱25 per person)`
-      )
-    ) {
+    if (numberOfPeople > 30) {
+      alert("Maximum group size is 30 people");
       return;
     }
 
-    bookedSlots.push(bookingDetails);
-    saveBookings();
-
-    // If connected to backend, send booking to server
-    if (window.bookingApi) {
-      const backendBookingData = {
-        sessionType: "studio",
-        date: bookingDetails.date,
-        time: bookingDetails.time,
-        studioType: "large",
-        numberOfPeople: parseInt(bookingDetails.people),
-        price: bookingDetails.price,
-        paymentMethod: bookingDetails.paymentMethod,
-      };
-
-      window.bookingApi
-        .bookStudioSession(backendBookingData)
-        .then((response) => {
-          console.log("Booking saved to database:", response);
-        })
-        .catch((error) => {
-          console.error("Failed to save booking to database:", error);
-        });
-    }
-
-    updateAvailableTimeSlots();
-    renderCalendar();
-    closePaymentPopup();
-
-    alert(
-      `✅ Dance Studio Booking Confirmed!\n📅 Date: ${bookingDetails.date}\n⏰ Time: ${bookingDetails.time}\n👥 People: ${bookingDetails.people}\n💳 Payment: ${bookingDetails.paymentMethod}\n\nPrice: ₱${price}.00\n\nYou can view your booking in your schedule.`
-    );
-
-    // Redirect to user schedule page after a short delay
-    setTimeout(() => {
-      window.location.href = "user-schedule-studio.html";
-    }, 1500);
-  }
-
-  // Cancel button - Reset selections
-  cancelButton.addEventListener("click", () => {
-    selectedDate = null;
-    selectedTime = null;
-    peopleInput.value = "";
-
-    timeSlots.forEach((slot) => {
-      slot.checked = false;
-      slot.nextElementSibling.innerHTML = slot.nextElementSibling.textContent
-        .replace(" (Already Booked)", "")
-        .trim();
-      slot.parentElement.style.color = "";
+    // Show centralized payment popup 
+    window.openPaymentPopup({
+      ...window.paymentConfigs.studio.large,
+      date: dateStr,
+      time: timeStr,
+      extras: {
+        numberOfPeople,  
+      },
+      price: numberOfPeople * window.paymentConfigs.studio.large.pricePerPerson,
+      redirectUrl: 'user-schedule-studio.html'
     });
-
-    updateAvailableTimeSlots();
-    renderCalendar();
-    closePaymentPopup();
   });
 
-  // Initial render
+  // Cancel button - Reset selections and return to main page
+  cancelButton?.addEventListener("click", () => {
+    selectedDate = null;
+    selectedTime = null;
+    if (peopleInput) peopleInput.value = "";
+
+    // Reset time slots
+    timeSlots.forEach((slot) => {
+      slot.checked = false;
+      const label = slot.nextElementSibling;
+      if (label) {
+        label.innerHTML = label.textContent.replace(" (Already Booked)", "").trim();
+      }
+    });
+
+    // Reset price display
+    if (priceDisplay) {
+      priceDisplay.textContent = "---";
+      priceDisplay.classList.add("opacity-50");
+    }
+
+    updateAvailableTimeSlots();
+    renderCalendar();
+
+    // Return to main page
+    window.location.href = "dance-studio.html";
+  });
+
+  // Initialize the calendar
   renderCalendar();
+  updateAvailableTimeSlots();
 });

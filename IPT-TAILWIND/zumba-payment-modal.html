@@ -1,0 +1,76 @@
+<!-- Zumba Payment Modal -->
+<div class="payment-modal opacity-0 pointer-events-none fixed inset-0 bg-black bg-opacity-50 z-50 overflow-y-auto">
+  <div class="flex justify-center items-center min-h-screen py-4">
+    <div class="bg-black-2 text-white rounded-lg relative w-full max-w-2xl mx-4">
+      <div class="bg-red-600 px-6 py-3 sticky top-0 z-10 border-b border-red-700">
+        <h2 class="text-xl font-bold text-center">Zumba Class Payment</h2>
+      </div>
+      <div class="p-6">
+        <div class="flex flex-col sm:flex-row border-4 border-red-600 mb-8 rounded-lg overflow-hidden">
+          <div class="bg-red-600 rounded-br-3xl rounded-tr-3xl mr-4 pr-2 hidden sm:block">
+            <img src="./assets/herdoza-logo-trans.png" alt="Herdoza Fitness Center" class="h-30">
+          </div>
+
+          <div class="flex flex-col justify-center mr-1 flex-1 p-4">
+            <div class="text-xs text-red-600 font-bold">You're Paying for:</div>
+            <div class="font-bold text-2xl mb-2">Zumba Group Class</div>
+            <div class="booking-details text-gray-300"></div>
+          </div>
+
+          <div class="bg-none md:bg-red-600 amount flex flex-col justify-center items-center px-6 py-4 my-2 mx-2 rounded-lg">
+            <div class="text-sm">Amount</div>
+            <div class="font-bold text-3xl md:text-2xl">₱150.00</div>
+          </div>
+        </div>
+        
+        <form id="payment-form">
+          <div class="text-center text-sm mb-4">Payment Method</div>
+          <div class="flex justify-center gap-4 mb-6">
+            <label>
+              <input type="radio" name="payment-method" value="Gcash" required class="hidden peer/gcash">
+              <div class="bg-red-600 peer-checked/gcash:bg-blue-700 hover:cursor-pointer hover:bg-red-700 transition-all text-sm px-6 py-2 sm:text-base sm:px-8 sm:py-2 rounded-lg text-white text-center">
+                Gcash
+              </div>
+            </label>
+            <label>
+              <input type="radio" name="payment-method" value="Onsite" required class="hidden peer/onsite">
+              <div class="bg-red-600 peer-checked/onsite:bg-green-700 hover:cursor-pointer hover:bg-red-700 transition-all text-sm px-6 py-2 sm:text-base sm:px-8 sm:py-2 rounded-lg text-white text-center">
+                Cash(Onsite)
+              </div>
+            </label>
+          </div>
+
+          <!-- GCash Details -->
+          <div id="gcash-details" class="gcash-details hidden mb-6">
+            <div class="bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-100 p-4 rounded-lg text-center">
+              <p class="font-bold mb-3">GCash Payment Details</p>
+              <div class="flex justify-center mb-4">
+                <img src="./assets/instapay-qr.jpg" alt="GCash QR Code" class="w-48 h-48 rounded-lg shadow-lg">
+              </div>
+              <p class="mb-1">Send payment to: <span class="font-bold">09307561163</span></p>
+              <p class="mb-3">Amount: ₱150.00</p>
+              <p class="text-xs mt-2">After scanning and sending payment:</p>
+              <p class="text-xs text-blue-700 dark:text-blue-300 mt-1">Note: Registration will be pending until proof of payment is verified</p>
+            </div>
+          </div>
+
+          <!-- Onsite Payment Details -->
+          <div id="onsite-details" class="onsite-details hidden mb-6">
+            <div class="bg-amber-100 text-amber-800 p-4 rounded-lg text-center">
+              <p class="font-bold mb-2">Cash Payment (Onsite)</p>
+              <p class="mb-2">Please pay at the gym reception counter</p>
+              <p class="mb-3">Amount: ₱150.00</p>
+              <p class="text-xs mt-2">Your reservation will be pending until payment is received at the gym</p>
+            </div>
+          </div>
+
+          <hr class="border-gray-700">
+          <div class="text-center md:text-end mt-4">
+            <button type="button" class="cancel-payment-btn bg-red-600 hover:bg-red-700 transition-all mx-2 text-base font-bold px-8 py-2 rounded-lg">Cancel</button>
+            <button type="submit" class="confirm-payment-btn bg-gray-500 hover:bg-gray-600 transition-all text-base font-bold px-8 py-2 rounded-lg cursor-pointer">Pay now</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

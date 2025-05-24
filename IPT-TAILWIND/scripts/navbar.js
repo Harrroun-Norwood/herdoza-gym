@@ -13,15 +13,11 @@ document.addEventListener("DOMContentLoaded", function () {
   // Determine what should be displayed in the login/profile area
   let loginOrProfileHTML;
 
-  if (userToken) {
-    // User is logged in - show profile dropdown
-    loginOrProfileHTML = `
-      <div class="relative">
-        <div class="flex items-center gap-2 cursor-pointer profile-toggle">
-          <img src="${
+  if (userToken) {    // User is logged in - show profile dropdown
+    loginOrProfileHTML = `      <div class="relative">        <div class="flex items-center gap-2 cursor-pointer profile-toggle">          <img src="${
             userPicture || "./assets/profile-icon.png"
           }" alt="Profile" class="h-8 w-8 rounded-full object-cover">
-          <span class="hidden md:block">${userName || "User"}</span>
+          <span class="hidden md:flex items-center">${userName || "User"}</span>
           <i class="bi bi-chevron-down"></i>
         </div>
         

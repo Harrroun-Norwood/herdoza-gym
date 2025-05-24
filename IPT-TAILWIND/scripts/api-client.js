@@ -10,12 +10,16 @@ const MAX_RETRIES = 3;
 const RETRY_DELAY = 1000;
 
 // Base API URL
-const API_URL = config.apiUrl;
+const API_URL = 'http://localhost:3000/api';
 
 // Simple function to handle fetch requests with error handling
 async function fetchAPI(endpoint, options = {}) {
   try {
     // Add default headers
+    options.headers = {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    };
     const headers = {
       "Content-Type": "application/json",
       ...options.headers,

@@ -1,52 +1,3 @@
-function addPopupStyles() {
-  const style = document.createElement("style");
-  style.textContent = `
-    .payment-summary {
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%) scale(0.7);
-      z-index: 10001;
-      width: 90%;
-      max-width: 650px;
-      opacity: 0;
-      visibility: hidden;
-      transition: all 0.3s ease-in-out;
-    }
-
-    .payment-summary.open-payment-summary {
-      opacity: 1;
-      visibility: visible;
-      transform: translate(-50%, -50%) scale(1);
-    }
-
-    .overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: rgba(0, 0, 0, 0.7);
-      opacity: 0;
-      visibility: hidden;
-      z-index: 10000;
-      transition: all 0.3s ease-in-out;
-    }
-
-    .overlay:not(.hidden) {
-      opacity: 1;
-      visibility: visible;
-    }
-
-    @media (max-width: 640px) {
-      .payment-summary {
-        width: 95%;
-      }
-    }
-  `;
-  document.head.appendChild(style);
-}
-
 document.addEventListener("DOMContentLoaded", () => {
   const dates = document.querySelector(".dates");
   const header = document.querySelector(".calendar h3");
@@ -66,7 +17,7 @@ document.addEventListener("DOMContentLoaded", () => {
   let year = date.getFullYear();
   let selectedDate = null;
   let selectedTime = null;
-  let bookedSlots = JSON.parse(localStorage.getItem("mma25SessionBookings") || "[]");
+  let bookedSlots = JSON.parse(localStorage.getItem("mmaZumbaBookings") || "[]");
 
   function renderCalendar() {
     if (!dates || !header) return;
@@ -131,6 +82,7 @@ document.addEventListener("DOMContentLoaded", () => {
           year: parseInt(day.dataset.year)
         };
         updateAvailableTimeSlots();
+        updateZumbaSchedule();
         renderCalendar();
       });
     });
@@ -148,63 +100,39 @@ document.addEventListener("DOMContentLoaded", () => {
            date1.getFullYear() === date2.getFullYear();
   }
 
-  function get25DayRangeDates(startDateObj) {
-    const dates = [];
-    let daysCounted = 0;
-    let currentDate = new Date(
-      startDateObj.year,
-      startDateObj.month,
-      startDateObj.day
-    );
-
-    while (daysCounted < 25) {
-      if (currentDate.getDay() !== 0) { // Skip Sundays
-        dates.push({
-          day: currentDate.getDate(),
-          month: currentDate.getMonth(),
-          year: currentDate.getFullYear(),
-        });
-        daysCounted++;
-      }
-      currentDate.setDate(currentDate.getDate() + 1);
-    }
-
-    return dates;
-  }
-
   function updateAvailableTimeSlots() {
     if (!selectedDate) return;
 
-    // Get all dates in the 25-day range (excluding Sundays)
-    let bookingDates = get25DayRangeDates(selectedDate);
+    const dateStr = `${months[selectedDate.month]} ${selectedDate.day}, ${selectedDate.year}`;
 
     timeSlots.forEach((slot) => {
-      let slotLabel = slot.nextElementSibling.textContent
-        .replace(/ \(Already Booked\)/g, "")
-        .trim();
-      let isBooked = false;
-
-      // Check if this time slot is booked on any of the 25 days
-      bookingDates.forEach((bookingDate) => {
-        let dateStr = `${months[bookingDate.month]} ${bookingDate.day}, ${bookingDate.year}`;
-
-        if (bookedSlots.some(
-          (bookedSlot) =>
-            bookedSlot.date === dateStr && bookedSlot.time === slotLabel
-        )) {
-          isBooked = true;
-        }
-      });
+      const timeStr = slot.nextElementSibling.textContent.replace(/ \(Already Booked\)/g, "").trim();
+      const isBooked = bookedSlots.some(booking => 
+        booking.date === dateStr && booking.time === timeStr
+      );
 
       slot.disabled = isBooked;
       slot.checked = false;
-
+      
       if (isBooked) {
-        slot.nextElementSibling.innerHTML = `${slotLabel} <span class="text-red-500">(Already Booked)</span>`;
+        slot.nextElementSibling.innerHTML = `${timeStr} <span class="text-red-500">(Already Booked)</span>`;
       } else {
-        slot.nextElementSibling.innerHTML = slotLabel;
+        slot.nextElementSibling.innerHTML = timeStr;
       }
     });
+  }
+
+  // Add updateZumbaSchedule function
+  function updateZumbaSchedule() {
+    const zumbaScheduleDiv = document.getElementById("zumba-schedule");
+    
+    if (selectedDate) {
+      const dateStr = `${months[selectedDate.month]} ${selectedDate.day}, ${selectedDate.year}`;
+      const timeStr = "7:00 AM - 8:00 AM";
+      zumbaScheduleDiv.innerHTML = `${dateStr}<br>${timeStr}`;
+    } else {
+      zumbaScheduleDiv.textContent = "Select an MMA date first";
+    }
   }
 
   // Calendar navigation
@@ -227,8 +155,8 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  // OK Button handler - Show payment popup
-  okButton?.addEventListener("click", () => {
+  // OK Button handler
+  okButton.addEventListener("click", () => {
     selectedTime = document.querySelector('input[name="time-slot"]:checked');
 
     if (!selectedDate || !selectedTime) {
@@ -239,25 +167,23 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    // Calculate 25-day range and show popup
-    const bookingDates = get25DayRangeDates(selectedDate);
-    const startDateStr = `${months[selectedDate.month]} ${selectedDate.day}, ${selectedDate.year}`;
-    const endDate = bookingDates[bookingDates.length - 1];
-    const endDateStr = `${months[endDate.month]} ${endDate.day}, ${endDate.year}`;
+    const dateStr = `${months[selectedDate.month]} ${selectedDate.day}, ${selectedDate.year}`;
     const timeStr = selectedTime.nextElementSibling.textContent.trim();
+    const zumbaTimeStr = "7:00 AM - 8:00 AM";
 
-    // Show centralized payment popup
-    window.openPaymentPopup({
-      ...window.paymentConfigs.mma.package25,
-      date: `${startDateStr} to ${endDateStr}`,
-      time: timeStr,
-      extras: {
-        startDate: startDateStr,
-        endDate: endDateStr,
-        sessionDates: bookingDates
-      },
-      redirectUrl: 'user-schedule-mma.html'
-    });
+    // Get the mma-zumba popup from popup container
+    const popup = document.getElementById('mma-zumba');
+    if (!popup) return;
+
+    // Update booking details
+    const bookingDetails = document.querySelector('#mma-zumba .booking-details');
+    if (bookingDetails) {
+      bookingDetails.innerHTML = `MMA Training: ${dateStr}, ${timeStr}<br>Zumba Session: ${dateStr}, ${zumbaTimeStr}`;
+    }
+
+    // Show popup
+    popup.classList.remove('opacity-0', 'pointer-events-none');
+    document.querySelector('.overlay')?.classList.remove('hidden');
   });
 
   // Cancel button handler - Return to MMA page
@@ -268,4 +194,5 @@ document.addEventListener("DOMContentLoaded", () => {
   // Initialize calendar and available time slots
   renderCalendar();
   updateAvailableTimeSlots();
+  updateZumbaSchedule();
 });

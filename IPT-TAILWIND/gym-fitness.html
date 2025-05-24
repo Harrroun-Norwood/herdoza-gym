@@ -4,13 +4,13 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Herdoza Fitness Center</title>
-    <link rel="icon" type="image" href="./assets/herdoza-logo-trans.png" />
-    <link rel="stylesheet" href="./src/output.css" />
+    <link rel="icon" type="image" href="./assets/herdoza-logo-trans.png" />    <link rel="stylesheet" href="./src/output.css" />
     <link
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css"
     />
     <link rel="stylesheet" href="./src/mystyles.css" />
+    <link rel="stylesheet" href="./src/payment-modal.css" />
     <link
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"
@@ -59,13 +59,10 @@
           </div>
         </div>
 
-        <div
-          class="hidden grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:grid"
-        >
-          <div
-            class="border-4 border-red-700 p-6"
-            style="display: flex; flex-direction: column"
-          >
+        <!-- Desktop View Buttons -->
+        <div class="hidden grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:grid">
+          <!-- 30 Days Pass -->
+          <div class="border-4 border-red-700 p-6" style="display: flex; flex-direction: column">
             <div class="text-red-600 text-xs font-bold mb-2">
               Types of Membership
             </div>
@@ -99,15 +96,14 @@
             </div>
             <button
               class="bg-red-600 px-8 py-3 mt-4 rounded-lg hover:bg-red-700 transition text-white w-full font-bold cursor-pointer"
-              onclick="openPopup1()"
+              id="gym-full"
             >
               ₱500.00
             </button>
           </div>
-          <div
-            class="border-4 border-red-700 p-6"
-            style="display: flex; flex-direction: column"
-          >
+
+          <!-- 15 Days Pass -->
+          <div class="border-4 border-red-700 p-6" style="display: flex; flex-direction: column">
             <div class="text-red-600 text-xs font-bold mb-2">
               Types of Membership
             </div>
@@ -138,15 +134,14 @@
             </div>
             <button
               class="bg-red-600 px-8 py-3 mt-4 rounded-lg hover:bg-red-700 transition text-white w-full font-bold cursor-pointer"
-              onclick="openPopup2()"
+              id="gym-half"
             >
               ₱250.00
             </button>
           </div>
-          <div
-            class="border-4 border-red-700 p-6"
-            style="display: flex; flex-direction: column"
-          >
+
+          <!-- Regular Pass -->
+          <div class="border-4 border-red-700 p-6" style="display: flex; flex-direction: column">
             <div class="text-red-600 text-xs font-bold mb-2">
               Types of Membership
             </div>
@@ -177,16 +172,18 @@
             </div>
             <button
               class="bg-red-600 px-8 py-3 mt-4 rounded-lg hover:bg-red-700 transition text-white w-full font-bold cursor-pointer"
-              onclick="openPopup3()"
+              id="gym-regular"
             >
               ₱40.00
             </button>
           </div>
         </div>
 
+        <!-- Mobile View Buttons (Swiper) -->
         <div class="swiper-container lg:hidden">
           <div class="swiper mySwiper">
             <div class="swiper-wrapper">
+              <!-- 30 Days Pass -->
               <div class="swiper-slide">
                 <div class="border-4 border-red-700 p-6 mb-7">
                   <div class="text-red-600 text-xs font-bold mb-2">
@@ -224,14 +221,15 @@
                     </div>
                   </div>
                   <button
-                    class="bg-red-600 px-8 py-3 mt-4 rounded-lg hover:bg-red-700 transition text-white w-full font-bold cursor-pointer"
-                    onclick="openPopup1()"
+                    class="bg-red-600 px-8 py-3 mt-22 rounded-lg hover:bg-red-700 transition text-white w-full font-bold cursor-pointer"
+                    id="gym-full-mobile"
                   >
                     ₱500.00
                   </button>
                 </div>
               </div>
 
+              <!-- 15 Days Pass -->
               <div class="swiper-slide">
                 <div class="border-4 border-red-700 p-6 mb-7">
                   <div class="text-red-600 text-xs font-bold mb-2">
@@ -266,14 +264,15 @@
                     </div>
                   </div>
                   <button
-                    class="bg-red-600 px-8 py-3 mt-8 rounded-lg hover:bg-red-700 transition text-white w-full font-bold cursor-pointer"
-                    onclick="openPopup2()"
+                    class="bg-red-600 px-8 py-3 mt-22 rounded-lg hover:bg-red-700 transition text-white w-full font-bold cursor-pointer"
+                    id="gym-half-mobile"
                   >
                     ₱250.00
                   </button>
                 </div>
               </div>
 
+              <!-- Regular Pass -->
               <div class="swiper-slide">
                 <div class="border-4 border-red-700 p-6 mb-7">
                   <div class="text-red-600 text-xs font-bold mb-2">
@@ -308,7 +307,7 @@
                   </div>
                   <button
                     class="bg-red-600 px-8 py-3 mt-22 rounded-lg hover:bg-red-700 transition text-white w-full font-bold cursor-pointer"
-                    onclick="openPopup3()"
+                    id="gym-regular-mobile"
                   >
                     ₱40.00
                   </button>
@@ -365,30 +364,28 @@
         <div class="flex justify-center gap-2 mt-5">
           <button
             class="bg-red-600 text-white px-5 py-3 rounded-lg hover:bg-red-800 transition cursor-pointer"
-            onclick="openPopup5()"
+            id="trainer-25"
           >
             25 Days with Trainer <br />
             ₱ 2000
           </button>
           <button
             class="bg-red-600 text-white px-5 py-3 rounded-lg hover:bg-red-800 transition cursor-pointer"
-            onclick="openPopup4()"
+            id="trainer-single"
           >
             1 Day with Trainer <br />
             ₱ 100
           </button>
         </div>
-
-        <div class="pop-up-con"></div>
       </div>
     </section>
 
-    <footer class="hidden md:block"></footer>
-
+    <div class="pop-up-con"></div>    <footer class="hidden md:block"></footer>
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+    <script type="module" src="./scripts/payment-popup.js"></script>
+    <script type="module" src="./scripts/gym-pop-up.js"></script>
     <script type="module" src="./scripts/navbar.js"></script>
     <script type="module" src="./scripts/swiper.js"></script>
-    <script type="module" src="./scripts/gym-pop-up.js"></script>
     <script type="module" src="./scripts/menu.js"></script>
     <script type="module" src="./scripts/footer.js"></script>
     <script src="./scripts/auth-check.js"></script>

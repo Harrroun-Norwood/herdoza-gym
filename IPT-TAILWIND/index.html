@@ -34,24 +34,20 @@
         <i
           class="bi bi-person-badge text-white text-2xl pointer-events-none"
         ></i>
-      </div>
-      <!-- Main notification panel with drag handle -->
-      <div
+      </div>      <!-- Main notification panel with drag handle -->      <div
         id="notification-panel"
         class="bg-black-2 text-white rounded-lg shadow-lg border border-red-600 p-4 flex-1 cursor-default"
-      >
-        <div class="flex justify-between items-start">
-          <div class="flex items-start space-x-3">
-            <div
+      >        <div class="flex justify-between items-start">
+          <div class="flex items-end space-x-3">            <div
               id="notification-handle"
-              class="cursor-move touch-none group-hover:bg-red-600/10 rounded-lg transition-colors p-1"
+              class="cursor-move touch-none hover:bg-red-600/10 rounded-lg transition-all p-1 opacity-0 mt-[6px]"
             >
               <i
                 class="ri-drag-move-fill text-red-600 text-xl pointer-events-none"
               ></i>
             </div>
-            <i class="ri-vip-crown-2-fill text-red-600 text-xl mt-1"></i>
-            <div>
+            <i class="ri-vip-crown-2-fill text-red-600 text-xl -mb-1"></i>
+            <div class="flex flex-col justify-start">
               <h3 class="font-bold text-lg leading-tight">Your Membership</h3>
               <p class="text-sm text-gray-400" id="user-name">Welcome back!</p>
             </div>
@@ -85,10 +81,8 @@
           View Details
         </a>
       </div>
-    </div>
-
-    <div id="home-section" class="home pt-60">
-      <div class="px-8 md:px-12 lg:px-48 -mt-14">
+    </div>    <div id="home-section" class="home min-h-screen flex items-center">
+      <div class="px-8 md:px-12 lg:px-48 w-full">
         <div class="mb-6 font-bold">
           <div class="text-red-600 text-4xl md:text-5xl lg:text-6xl mb-2">
             Join the Movement
@@ -266,13 +260,10 @@
       </div>
     </section>
 
-    <section id="service-section" class="py-10">
-      <div
-        class="container mx-auto px-6 md:px-12 lg:px-16 text-white hidden md:block py-10"
-      >
-        <div class="text-5xl font-bold mb-5 text-center">
+    <section id="service-section" class="py-10">      <div
+        class="container mx-auto px-6 md:px-12 lg:px-16 text-white hidden md:block py-10"      >        <div class="text-5xl font-bold mb-5 text-center">
           <span class="text-red-600">Our</span>
-          <span class="text-black">Services</span>
+          <span class="!text-black dark:!text-white">Services</span>
         </div>
         <div class="flex flex-wrap justify-center gap-12">
           <div class="card rounded-2xl bg-black-2 shadow-2xl">
@@ -342,11 +333,9 @@
             </div>
           </div>
         </div>
-      </div>
-      <div class="swiper-container lg:hidden block text-white">
-        <div class="text-4xl font-bold mb-5 text-center">
+      </div>      <div class="swiper-container lg:hidden block text-white">        <div class="text-4xl font-bold mb-5 text-center">
           <span class="text-red-600">Our</span>
-          <span class="text-black">Services</span>
+          <span style="color: black; @media (prefers-color-scheme: dark) { color: white; }">Services</span>
         </div>
         <div class="swiper mySwiper">
           <div class="swiper-wrapper">
@@ -453,9 +442,8 @@
     <script type="module" src="./scripts/navbar.js"></script>
     <script type="module" src="./scripts/footer.js"></script>
     <script type="module" src="./scripts/menu.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
-    <script type="module" src="./scripts/swiper.js"></script>
-    <script type="module" src="./scripts/auth-api.js"></script>
-    <script src="./scripts/membership-notification.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>    <script type="module" src="./scripts/swiper.js"></script>
+    <script type="module" src="./scripts/auth-api.js"></script>    <script type="module" src="./scripts/membership-notification.js"></script>
+    <script type="module" src="./scripts/notification-drag.js"></script>
   </body>
 </html>

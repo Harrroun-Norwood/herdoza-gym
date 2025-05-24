@@ -36,9 +36,8 @@
             for="collapsible-toggle-2"
             class="hover:text-red-500 block cursor-pointer font-bold text-lg relative"
           >
-            Schedule
-            <i
-              class="bi bi-chevron-down absolute right-2 top-1/2 transform -translate-y-1/2 transition-transform"
+            Schedule            <i
+              class="bi bi-chevron-down absolute right-2 top-[50%] -translate-y-1/2 transition-transform"
             ></i>
           </label>
           <div
@@ -76,33 +75,27 @@
         <div class="text-2xl sm:text-3xl font-bold mb-5 text-center">
           Active Membership Duration
         </div>
-        <div class="p-2">
-          <span
+        <div class="p-2">          <span
             id="days-left"
-            class="bg-white text-4xl sm:text-5xl text-red-700 px-6 sm:px-10 py-4 rounded-lg font-bold block text-center"
+            class="bg-white text-4xl sm:text-5xl text-red-700 dark:text-red-700 px-6 sm:px-10 py-4 rounded-lg font-bold block text-center"
           >
-            30
+            0
           </span>
           <div class="p-2 text-center font-bold mt-4 text-xl sm:text-2xl">
             Days Left
           </div>
         </div>
-        <div class="w-full mt-4">
-          <div
-            class="bg-white text-black p-4 sm:p-6 mb-5 rounded-lg grid grid-cols-1 sm:grid-cols-2 gap-y-4 sm:gap-x-10"
-          >
-            <div>
-              <div class="text-base sm:text-lg font-bold">Next Payment Due</div>
-              <div id="next-payment-date" class="text-sm">April 9, 2025</div>
+        <div class="w-full mt-4">          <div
+            class="bg-white p-4 sm:p-6 mb-5 rounded-lg grid grid-cols-1 sm:grid-cols-2 gap-y-4 sm:gap-x-10"
+          >            <div>              <div class="text-base sm:text-lg font-bold text-black">Next Payment Due</div>              <div id="next-payment-date" class="text-sm text-black">April 9, 2025</div>
             </div>
             <div>
-              <div class="text-base sm:text-lg font-bold">Monthly Fee</div>
-              <div id="membership-fee" class="text-sm">PHP 500.00</div>
+              <div class="text-base sm:text-lg font-bold text-black">Monthly Fee</div>
+              <div id="membership-fee" class="text-sm text-black">PHP 500.00</div>
             </div>
           </div>
-          <button
-            id="renew-membership"
-            class="bg-white w-full text-lg sm:text-2xl font-bold text-red-600 py-2 rounded-lg mt-3 shadow-lg hover:cursor-pointer hover:bg-red-100 transition"
+          <button            id="renew-membership"
+            class="bg-white w-full text-lg sm:text-2xl font-bold text-red-600 dark:text-red-600 py-2 rounded-lg mt-3 shadow-lg hover:cursor-pointer hover:bg-red-100 dark:hover:bg-red-100 transition"
           >
             Renew Membership
           </button>

@@ -68,17 +68,25 @@ function showTab(tabName) {
 async function approveRegistration(registrationId) {
   try {
     // Get registration details
-    const registrations = JSON.parse(
-      localStorage.getItem("registrations") || "[]"
-    );
-    const registration = registrations.find((r) => r.id === registrationId);
+    const registrations = JSON.parse(localStorage.getItem("registrations") || "[]");
+    const registration = registrations.find(r => r.id === registrationId);
 
     if (!registration) {
       throw new Error("Registration not found");
     }
 
+    // Parse membership duration to get number of days
+    const durationMatch = registration.membershipDuration.match(/(\d+)/);
+    const months = durationMatch ? parseInt(durationMatch[1]) : 1;
+    const days = months * 30; // Approximate days per month
+
+    // Calculate expiration date
+    const startDate = new Date();
+    const expirationDate = new Date(startDate);
+    expirationDate.setMonth(expirationDate.getMonth() + months);
+
     // Create new member entry
-    const members = JSON.parse(localStorage.getItem("members") || "[]");
+    const membershipId = 'mem_' + Date.now().toString();
     const newMember = {
       id: Date.now().toString(),
       name: registration.name,
@@ -86,39 +94,87 @@ async function approveRegistration(registrationId) {
       contact: registration.contact,
       membershipType: registration.type,
       membershipDuration: registration.membershipDuration,
-      dateOfMembership: new Date().toISOString(),
-      dateOfExpiration: calculateExpirationDate(
-        registration.membershipDuration
-      ),
+      dateOfMembership: startDate.toISOString(),
+      dateOfExpiration: expirationDate.toISOString(),
       status: "active",
       paymentMethod: registration.paymentMethod,
+      paymentStatus: "paid",
+      membershipId: membershipId
     };
 
     // Add to members database
+    const members = JSON.parse(localStorage.getItem("members") || "[]");
     members.push(newMember);
     localStorage.setItem("members", JSON.stringify(members));
 
+    // Create membership data including selected sessions if any
+    const membershipData = {
+      daysLeft: days,
+      nextPaymentDate: expirationDate.toLocaleDateString("en-US", {
+        month: "long",
+        day: "numeric",
+        year: "numeric"
+      }),
+      fee: registration.fee || 0,
+      purchaseDate: startDate.toISOString(),
+      originalDuration: days,
+      type: registration.type,
+      status: "active",
+      membershipId: membershipId,
+      sessions: registration.selectedSessions || []
+    };
+
+    // Update user's localStorage data
+    const userEmail = registration.email;
+    
+    // Store type preference
+    localStorage.setItem(`userType_${userEmail}`, registration.type);
+    
+    // Store membership data for this user
+    localStorage.setItem(`membershipData_${userEmail}`, JSON.stringify(membershipData));
+    
+    // Store selected session information based on membership type
+    if (registration.selectedSessions) {
+      switch (registration.type.toLowerCase()) {
+        case "mma training":
+        case "mma":
+          localStorage.setItem(`mma25SessionUserBookings_${userEmail}`, 
+            JSON.stringify(registration.selectedSessions));
+          break;
+        case "dance studio":
+        case "dance":
+          localStorage.setItem(`studioBookings_${userEmail}`, 
+            JSON.stringify(registration.selectedSessions));
+          break;
+      }
+    }
+
+    // Store global membership data for reference
+    const membersData = JSON.parse(localStorage.getItem("members-data") || "{}");
+    membersData[registration.email] = membershipData;
+    localStorage.setItem("members-data", JSON.stringify(membersData));
+
     // Remove from registrations
-    const updatedRegistrations = registrations.filter(
-      (r) => r.id !== registrationId
-    );
+    const updatedRegistrations = registrations.filter(r => r.id !== registrationId);
     localStorage.setItem("registrations", JSON.stringify(updatedRegistrations));
 
     // Update stats
     updateStats();
 
-    // Remove card from UI
-    const card = document.querySelector(
-      `[data-registration-id="${registrationId}"]`
-    );
+    // Remove card from UI and show success message
+    const card = document.querySelector(`[data-registration-id="${registrationId}"]`);
     if (card) {
       card.remove();
     }
+    
+    showToast("Registration approved successfully", "success");
+    
+    // Reload registrations to update the view
+    await loadRegistrations(document.querySelector('.active-tab').id.replace('Tab', ''));
 
-    showNotification("Registration approved and member added successfully");
   } catch (error) {
     console.error("Error approving registration:", error);
-    showNotification("Error approving registration", "error");
+    showToast(`Error: ${error.message || "Failed to approve registration"}`, "error");
   }
 }
 

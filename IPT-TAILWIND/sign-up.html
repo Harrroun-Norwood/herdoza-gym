@@ -344,7 +344,7 @@
 
         function showToast(message, type = "success") {
           const toast = document.createElement("div");
-          toast.className = "toast-notification";
+          toast.className = "toast-notification flex items-center gap-2";
           toast.innerHTML = `
             <i class="bi bi-${
               type === "success" ? "check-circle" : "exclamation-circle"
@@ -367,8 +367,11 @@
 
             // Validate form fields first
             const password = document.getElementById("password").value;
-            const confirmPassword =
-              document.getElementById("confirm-password").value;
+            const confirmPassword = document.getElementById("confirm-password").value;
+            const firstName = document.getElementById("firstName").value;
+            const lastName = document.getElementById("lastName").value;
+            const email = document.getElementById("email").value;
+            const contact = document.getElementById("contactNumber").value;
 
             // Validate passwords match
             if (password !== confirmPassword) {
@@ -380,79 +383,74 @@
             // Validate terms agreement
             const agreeTerms = document.getElementById("agreeTerms");
             if (!agreeTerms.checked) {
-              document
-                .getElementById("checkbox-error")
-                .classList.remove("hidden");
-              document
-                .getElementById("terms-checkbox-container")
-                .classList.add("checkbox-error");
+              document.getElementById("checkbox-error").classList.remove("hidden");
+              document.getElementById("terms-checkbox-container").classList.add("checkbox-error");
               return;
             }
 
             // Create user data
             const userData = {
               id: Date.now().toString(),
-              name: `${document.getElementById("firstName").value} ${
-                document.getElementById("lastName").value
-              }`,
-              email: document.getElementById("email").value,
-              contact: document.getElementById("contactNumber").value,
+              name: `${firstName} ${lastName}`,
+              email: email,
+              contact: contact,
               password: password,
               type: "Gym Fitness",
               membershipDuration: "1",
               paymentMethod: "Cash",
               status: "pending",
               timestamp: new Date().toISOString(),
-              paymentStatus: "pending",
+              paymentStatus: "pending"
             };
 
             // Store in registrations for admin approval
-            const registrations = JSON.parse(
-              localStorage.getItem("registrations") || "[]"
-            );
+            const registrations = JSON.parse(localStorage.getItem("registrations") || "[]");
 
             // Check if email already exists
             if (registrations.some((r) => r.email === userData.email)) {
-              errorElement.textContent =
-                "Email already registered. Please use a different email.";
+              errorElement.textContent = "Email already registered. Please use a different email.";
               errorElement.classList.remove("hidden");
               return;
             }
 
             registrations.push(userData);
-            localStorage.setItem(
-              "registrations",
-              JSON.stringify(registrations)
-            ); // Store user session data
+            localStorage.setItem("registrations", JSON.stringify(registrations));
+
+            // Initialize user-specific membership data
+            const initialMembershipData = {
+              daysLeft: 0,
+              nextPaymentDate: null,
+              fee: 0,
+              purchaseDate: null,
+              originalDuration: 0,
+              type: "Gym Fitness",
+              status: "pending",
+              sessions: [],
+              membershipId: "mem_" + Date.now().toString()
+            };
+
+            // Store user data in a consistent format
             const userSessionData = {
-              email: userData.email,
-              name: userData.name,
-              contact: userData.contact,
+              email: email,
+              name: `${firstName} ${lastName}`,
               type: "Gym Fitness",
               token: "new-member",
               status: "pending",
-              membershipExpiry: new Date(
-                Date.now() + 30 * 24 * 60 * 60 * 1000
-              ).toISOString(),
+              membershipExpiry: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
               timestamp: Date.now(),
-              expiresIn: 24 * 60 * 60 * 1000, // 24 hours
+              expiresIn: 24 * 60 * 60 * 1000 // 24 hours
             };
 
-            // Store user data in localStorage
-            localStorage.setItem("userEmail", userData.email);
-            localStorage.setItem("userName", userData.name);
-            localStorage.setItem("userContact", userData.contact);
+            // Store essential user data
+            localStorage.setItem("userEmail", email);
+            localStorage.setItem("userName", userSessionData.name);
             localStorage.setItem("userStatus", "pending");
             localStorage.setItem("userToken", "new-member");
-            localStorage.setItem("userType", "Gym Fitness");
-            localStorage.setItem(
-              "membershipExpiry",
-              userSessionData.membershipExpiry
-            );
-            localStorage.setItem(
-              "userSession",
-              JSON.stringify(userSessionData)
-            ); // Reset any existing service selections, bookings, and membership data
+            localStorage.setItem("userContact", contact);
+            localStorage.setItem(`membershipData_${email}`, JSON.stringify(initialMembershipData));
+            localStorage.setItem("userSession", JSON.stringify(userSessionData));
+
+            // Clean up any old data
             localStorage.removeItem("selectedService");
             localStorage.removeItem("bookingData");
             localStorage.removeItem("selectedTimeSlots");
@@ -465,20 +463,16 @@
             // Show success toast and redirect
             showToast("Signup successful! Welcome to Herdoza Fitness!");
             setTimeout(() => {
-              window.location.href = "index.html";
+              window.location.href = "login.html";
             }, 2000);
           });
         }
 
         // Reset checkbox error on checkbox change
-        document
-          .getElementById("agreeTerms")
-          ?.addEventListener("change", function () {
-            document.getElementById("checkbox-error").classList.add("hidden");
-            document
-              .getElementById("terms-checkbox-container")
-              .classList.remove("checkbox-error");
-          });
+        document.getElementById("agreeTerms")?.addEventListener("change", function () {
+          document.getElementById("checkbox-error").classList.add("hidden");
+          document.getElementById("terms-checkbox-container").classList.remove("checkbox-error");
+        });
 
         // Make password toggle function globally accessible
         window.togglePasswordVisibility = function (fieldId) {
