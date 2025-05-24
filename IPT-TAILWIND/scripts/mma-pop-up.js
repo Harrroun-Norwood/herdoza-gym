@@ -6,7 +6,7 @@ const mma_payment_summary = [
     description: "One MMA training session.",
     price: 150,
     function_no: 1,
-    duration: 1
+    duration: 1,
   },
   {
     id: "mma-25",
@@ -14,7 +14,7 @@ const mma_payment_summary = [
     description: "25 MMA training sessions package.",
     price: 2500,
     function_no: 2,
-    duration: 25
+    duration: 25,
   },
   {
     id: "mma-zumba",
@@ -22,15 +22,16 @@ const mma_payment_summary = [
     description: "One MMA session and one Zumba session on the same day.",
     price: 200,
     function_no: 3,
-    duration: 1  }
+    duration: 1,
+  },
 ];
 
 // Create overlay if it doesn't exist
 function ensureOverlay() {
-  let overlay = document.querySelector('.overlay');
+  let overlay = document.querySelector(".overlay");
   if (!overlay) {
-    overlay = document.createElement('div');
-    overlay.className = 'overlay hidden';
+    overlay = document.createElement("div");
+    overlay.className = "overlay hidden";
     document.body.appendChild(overlay);
   }
   return overlay;
@@ -43,17 +44,17 @@ function createPopupModal(item, bookingDetails = {}) {
     return existingPopup;
   }
 
-  const popupContainer = document.querySelector('.pop-up-con');
+  const popupContainer = document.querySelector(".pop-up-con");
   if (!popupContainer) {
-    console.error('Popup container not found!');
+    console.error("Popup container not found!");
     return null;
   }
 
-  const popup = document.createElement('div');
+  const popup = document.createElement("div");
   popup.id = item.id;
-  popup.className = 'payment-modal opacity-0 pointer-events-none';
-  popup.setAttribute('data-item', JSON.stringify(item));
-  
+  popup.className = "payment-modal opacity-0 pointer-events-none";
+  popup.setAttribute("data-item", JSON.stringify(item));
+
   popup.innerHTML = `
     <div class="bg-black-2 text-white rounded-lg relative w-full max-w-2xl mx-4">
       <div class="bg-red-600 px-6 py-3 sticky top-0 z-10 border-b border-red-700">
@@ -67,9 +68,17 @@ function createPopupModal(item, bookingDetails = {}) {
 
           <div class="flex flex-col justify-center mr-1 flex-1 p-4">
             <div class="text-xs text-red-600 font-bold">You're Paying for:</div>
-            <div class="font-bold text-2xl mb-2">MMA Training - ${item.pass}</div>
-            <div class="text-gray-300 booking-details">${bookingDetails.date || ''} ${bookingDetails.time || ''}</div>
-            ${bookingDetails.zumbaTime ? `<div class="text-gray-300">Zumba: ${bookingDetails.zumbaTime}</div>` : ''}
+            <div class="font-bold text-2xl mb-2">MMA Training - ${
+              item.pass
+            }</div>
+            <div class="text-gray-300 booking-details">${
+              bookingDetails.date || ""
+            } ${bookingDetails.time || ""}</div>
+            ${
+              bookingDetails.zumbaTime
+                ? `<div class="text-gray-300">Zumba: ${bookingDetails.zumbaTime}</div>`
+                : ""
+            }
             <div class="text-gray-300">${item.description}</div>
           </div>
 
@@ -143,81 +152,93 @@ function createPopupModal(item, bookingDetails = {}) {
 // Initialize payment handlers for a popup
 function initializePaymentHandlers(popup) {
   // Get references to DOM elements
-  const paymentMethodInputs = popup.querySelectorAll('input[name="payment-method"]');
-  const gcashDetails = popup.querySelector('#gcash-details');
-  const onsiteDetails = popup.querySelector('#onsite-details');
-  const payNowBtn = popup.querySelector('.pay-now-btn');
-  const cancelBtn = popup.querySelector('.cancel-btn');
-  const item = JSON.parse(popup.getAttribute('data-item') || '{}');
+  const paymentMethodInputs = popup.querySelectorAll(
+    'input[name="payment-method"]'
+  );
+  const gcashDetails = popup.querySelector("#gcash-details");
+  const onsiteDetails = popup.querySelector("#onsite-details");
+  const payNowBtn = popup.querySelector(".pay-now-btn");
+  const cancelBtn = popup.querySelector(".cancel-btn");
+  const item = JSON.parse(popup.getAttribute("data-item") || "{}");
 
   // Handle payment method changes
-  paymentMethodInputs.forEach(input => {
-    input.addEventListener('change', () => {
+  paymentMethodInputs.forEach((input) => {
+    input.addEventListener("change", () => {
       if (gcashDetails && onsiteDetails) {
-        gcashDetails.classList.toggle('hidden', input.value !== 'Gcash');
-        onsiteDetails.classList.toggle('hidden', input.value !== 'Onsite');
+        gcashDetails.classList.toggle("hidden", input.value !== "Gcash");
+        onsiteDetails.classList.toggle("hidden", input.value !== "Onsite");
       }
 
       if (payNowBtn) {
-        payNowBtn.classList.remove('bg-gray-500', 'bg-blue-600', 'bg-green-600', 'hover:bg-gray-600', 'hover:bg-blue-700', 'hover:bg-green-700');
-        if (input.value === 'Gcash') {
-          payNowBtn.classList.add('bg-blue-600', 'hover:bg-blue-700');
+        payNowBtn.classList.remove(
+          "bg-gray-500",
+          "bg-blue-600",
+          "bg-green-600",
+          "hover:bg-gray-600",
+          "hover:bg-blue-700",
+          "hover:bg-green-700"
+        );
+        if (input.value === "Gcash") {
+          payNowBtn.classList.add("bg-blue-600", "hover:bg-blue-700");
         } else {
-          payNowBtn.classList.add('bg-green-600', 'hover:bg-green-700');
+          payNowBtn.classList.add("bg-green-600", "hover:bg-green-700");
         }
       }
     });
   });
 
   // Handle form submission
-  const form = popup.querySelector('#payment-form');
+  const form = popup.querySelector("#payment-form");
   if (form) {
-    form.addEventListener('submit', async (e) => {
+    form.addEventListener("submit", async (e) => {
       e.preventDefault();
 
-      const selectedPayment = popup.querySelector('input[name="payment-method"]:checked');
+      const selectedPayment = popup.querySelector(
+        'input[name="payment-method"]:checked'
+      );
       if (!selectedPayment) {
-        alert('Please select a payment method');
+        alert("Please select a payment method");
         return;
       }
 
       try {
-        const bookingDetails = popup.querySelector('.booking-details')?.textContent || '';
+        const bookingDetails =
+          popup.querySelector(".booking-details")?.textContent || "";
         let bookingData = {
           sessionType: "mma",
           type: item.pass,
           price: item.price,
-          paymentMethod: selectedPayment.value
+          paymentMethod: selectedPayment.value,
         };
 
         // Add date and time if they exist in the booking details
-        const [date, time] = bookingDetails.split('at').map(s => s.trim());
+        const [date, time] = bookingDetails.split("at").map((s) => s.trim());
         if (date) bookingData.date = date;
         if (time) bookingData.time = time;
 
         // Process payment through booking API
         const booking = await window.bookingApi.createBooking(bookingData);
 
-        const message = booking.paymentMethod === "Gcash" ?
-          "Your session will be confirmed after GCash payment verification." :
-          "Your session will be confirmed after payment at the gym.";
+        const message =
+          booking.paymentMethod === "Gcash"
+            ? "Your session will be confirmed after GCash payment verification."
+            : "Your session will be confirmed after payment at the gym.";
 
         alert(
           `✅ MMA Training Booking Process Started!\n\n` +
-          `📅 Type: ${booking.type}\n` +
-          `📅 Date: ${booking.date || ''}\n` +
-          `⏰ Time: ${booking.time || ''}\n` +
-          `💳 Payment: ${booking.paymentMethod}\n\n` +
-          `${message}\n\n` +
-          `You can view your schedule in your dashboard.`
+            `📅 Type: ${booking.type}\n` +
+            `📅 Date: ${booking.date || ""}\n` +
+            `⏰ Time: ${booking.time || ""}\n` +
+            `💳 Payment: ${booking.paymentMethod}\n\n` +
+            `${message}\n\n` +
+            `You can view your schedule in your dashboard.`
         );
 
         // Close popup and redirect
         closePopup(popup.id);
         setTimeout(() => {
-          window.location.href = "user-schedule-mma.html"; 
+          window.location.href = "user-schedule-mma.html";
         }, 1500);
-
       } catch (error) {
         console.error("Error processing payment:", error);
         alert("There was an error processing your payment. Please try again.");
@@ -226,7 +247,7 @@ function initializePaymentHandlers(popup) {
   }
 
   // Handle cancel button
-  cancelBtn?.addEventListener('click', () => {
+  cancelBtn?.addEventListener("click", () => {
     closePopup(popup.id);
   });
 }
@@ -235,25 +256,25 @@ function initializePaymentHandlers(popup) {
 function showPopupModal(item, bookingDetails = {}) {
   const popup = createPopupModal(item, bookingDetails);
   const overlay = ensureOverlay();
-  
-  popup?.classList.remove('opacity-0', 'pointer-events-none');
-  overlay?.classList.remove('hidden');
-  document.body.style.overflow = 'hidden';
+
+  popup?.classList.remove("opacity-0", "pointer-events-none");
+  overlay?.classList.remove("hidden");
+  document.body.style.overflow = "hidden";
 }
 
 // Close popup modal
 function closePopup(popupId) {
   const popup = document.getElementById(popupId);
-  const overlay = document.querySelector('.overlay');
-  
-  popup?.classList.add('opacity-0', 'pointer-events-none');
-  overlay?.classList.add('hidden');
-  document.body.style.overflow = '';
+  const overlay = document.querySelector(".overlay");
+
+  popup?.classList.add("opacity-0", "pointer-events-none");
+  overlay?.classList.add("hidden");
+  document.body.style.overflow = "";
 }
 
-// Add opener functions to window for HTML onclick access 
-window.openMmaSingle = function(bookingDetails = {}) {
-  const item = mma_payment_summary.find(x => x.id === "mma-single");
+// Add opener functions to window for HTML onclick access
+window.openMmaSingle = function (bookingDetails = {}) {
+  const item = mma_payment_summary.find((x) => x.id === "mma-single");
   if (item) {
     window.openPaymentPopup({
       type: "mma",
@@ -261,13 +282,13 @@ window.openMmaSingle = function(bookingDetails = {}) {
       price: item.price,
       description: item.description,
       duration: item.duration,
-      ...bookingDetails
+      ...bookingDetails,
     });
   }
 };
 
-window.openMma25 = function(bookingDetails = {}) {
-  const item = mma_payment_summary.find(x => x.id === "mma-25");
+window.openMma25 = function (bookingDetails = {}) {
+  const item = mma_payment_summary.find((x) => x.id === "mma-25");
   if (item) {
     window.openPaymentPopup({
       type: "mma",
@@ -275,21 +296,21 @@ window.openMma25 = function(bookingDetails = {}) {
       price: item.price,
       description: item.description,
       duration: item.duration,
-      ...bookingDetails
+      ...bookingDetails,
     });
   }
 };
 
-window.openMmaZumba = function(bookingDetails = {}) {
-  const item = mma_payment_summary.find(x => x.id === "mma-zumba");
+window.openMmaZumba = function (bookingDetails = {}) {
+  const item = mma_payment_summary.find((x) => x.id === "mma-zumba");
   if (item) {
     window.openPaymentPopup({
       type: "mma-zumba",
-      pass: item.pass, 
+      pass: item.pass,
       price: item.price,
       description: item.description,
       duration: item.duration,
-      ...bookingDetails
+      ...bookingDetails,
     });
   }
 };

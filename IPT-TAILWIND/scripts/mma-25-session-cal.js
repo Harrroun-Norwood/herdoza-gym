@@ -54,10 +54,20 @@ document.addEventListener("DOMContentLoaded", () => {
   const okButton = document.querySelector(".ok-btn");
   const cancelButton = document.querySelector(".cancel-btn");
   const timeSlots = document.querySelectorAll('input[name="time-slot"]');
-  
+
   const months = [
-    "January", "February", "March", "April", "May", "June",
-    "July", "August", "September", "October", "November", "December"
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
   ];
 
   // State variables
@@ -66,7 +76,9 @@ document.addEventListener("DOMContentLoaded", () => {
   let year = date.getFullYear();
   let selectedDate = null;
   let selectedTime = null;
-  let bookedSlots = JSON.parse(localStorage.getItem("mma25SessionBookings") || "[]");
+  let bookedSlots = JSON.parse(
+    localStorage.getItem("mma25SessionBookings") || "[]"
+  );
 
   function renderCalendar() {
     if (!dates || !header) return;
@@ -103,12 +115,14 @@ document.addEventListener("DOMContentLoaded", () => {
       else if (isSameDate(currentDate, today)) {
         className = "today";
       }
-      
+
       // Check if this is the selected date
-      if (selectedDate &&
-          selectedDate.day === i &&
-          selectedDate.month === month &&
-          selectedDate.year === year) {
+      if (
+        selectedDate &&
+        selectedDate.day === i &&
+        selectedDate.month === month &&
+        selectedDate.year === year
+      ) {
         className = "selected";
       }
 
@@ -128,7 +142,7 @@ document.addEventListener("DOMContentLoaded", () => {
         selectedDate = {
           day: parseInt(day.dataset.day),
           month: parseInt(day.dataset.month),
-          year: parseInt(day.dataset.year)
+          year: parseInt(day.dataset.year),
         };
         updateAvailableTimeSlots();
         renderCalendar();
@@ -143,9 +157,11 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function isSameDate(date1, date2) {
-    return date1.getDate() === date2.getDate() &&
-           date1.getMonth() === date2.getMonth() &&
-           date1.getFullYear() === date2.getFullYear();
+    return (
+      date1.getDate() === date2.getDate() &&
+      date1.getMonth() === date2.getMonth() &&
+      date1.getFullYear() === date2.getFullYear()
+    );
   }
 
   function get25DayRangeDates(startDateObj) {
@@ -158,7 +174,8 @@ document.addEventListener("DOMContentLoaded", () => {
     );
 
     while (daysCounted < 25) {
-      if (currentDate.getDay() !== 0) { // Skip Sundays
+      if (currentDate.getDay() !== 0) {
+        // Skip Sundays
         dates.push({
           day: currentDate.getDate(),
           month: currentDate.getMonth(),
@@ -186,12 +203,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
       // Check if this time slot is booked on any of the 25 days
       bookingDates.forEach((bookingDate) => {
-        let dateStr = `${months[bookingDate.month]} ${bookingDate.day}, ${bookingDate.year}`;
+        let dateStr = `${months[bookingDate.month]} ${bookingDate.day}, ${
+          bookingDate.year
+        }`;
 
-        if (bookedSlots.some(
-          (bookedSlot) =>
-            bookedSlot.date === dateStr && bookedSlot.time === slotLabel
-        )) {
+        if (
+          bookedSlots.some(
+            (bookedSlot) =>
+              bookedSlot.date === dateStr && bookedSlot.time === slotLabel
+          )
+        ) {
           isBooked = true;
         }
       });
@@ -241,9 +262,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Calculate 25-day range and show popup
     const bookingDates = get25DayRangeDates(selectedDate);
-    const startDateStr = `${months[selectedDate.month]} ${selectedDate.day}, ${selectedDate.year}`;
+    const startDateStr = `${months[selectedDate.month]} ${selectedDate.day}, ${
+      selectedDate.year
+    }`;
     const endDate = bookingDates[bookingDates.length - 1];
-    const endDateStr = `${months[endDate.month]} ${endDate.day}, ${endDate.year}`;
+    const endDateStr = `${months[endDate.month]} ${endDate.day}, ${
+      endDate.year
+    }`;
     const timeStr = selectedTime.nextElementSibling.textContent.trim();
 
     // Show centralized payment popup
@@ -254,9 +279,9 @@ document.addEventListener("DOMContentLoaded", () => {
       extras: {
         startDate: startDateStr,
         endDate: endDateStr,
-        sessionDates: bookingDates
+        sessionDates: bookingDates,
       },
-      redirectUrl: 'user-schedule-mma.html'
+      redirectUrl: "user-schedule-mma.html",
     });
   });
 

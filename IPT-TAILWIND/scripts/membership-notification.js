@@ -1,17 +1,17 @@
 // Initialize or get membership data from localStorage
-import MembershipStatusManager from './membership-status-manager.js';
+import MembershipStatusManager from "./membership-status-manager.js";
 
 document.addEventListener("DOMContentLoaded", function () {
   const notification = document.getElementById("membership-notification");
   const pullTab = document.getElementById("notification-pull-tab");
   const panel = document.getElementById("notification-panel");
   const handle = document.getElementById("notification-handle");
-  
+
   if (!notification || !pullTab || !panel) return;
 
   // Initialize MembershipStatusManager watchers
   MembershipStatusManager.initStatusWatchers();
-  
+
   // Setup panel position
   let isOpen = localStorage.getItem("notificationOpen") !== "false";
   let isDragging = false;
@@ -26,8 +26,10 @@ document.addEventListener("DOMContentLoaded", function () {
     const userNameElement = document.getElementById("user-name");
     const typeElement = document.getElementById("membership-type");
     const daysElement = document.getElementById("membership-days");
-    const nextPaymentElement = document.getElementById("membership-next-payment");
-    
+    const nextPaymentElement = document.getElementById(
+      "membership-next-payment"
+    );
+
     // Early return if no user is logged in
     if (!userEmail) {
       notification.classList.add("hidden");
@@ -40,14 +42,16 @@ document.addEventListener("DOMContentLoaded", function () {
     // Get synchronized membership status and update days
     MembershipStatusManager.synchronizeStatus(userEmail);
     MembershipStatusManager.updateMembershipDays(userEmail);
-    
+
     // Get membership data with fallback
-    const membershipData = MembershipStatusManager.getUserMembershipData(userEmail) || 
+    const membershipData = MembershipStatusManager.getUserMembershipData(
+      userEmail
+    ) ||
       JSON.parse(localStorage.getItem(`membershipData_${userEmail}`)) || {
         type: "Gym Fitness",
         status: "pending",
         daysLeft: 0,
-        nextPaymentDate: "Not available"
+        nextPaymentDate: "Not available",
       };
 
     // Update welcome message
@@ -58,13 +62,21 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Update membership type and status
     if (typeElement) {
-      const status = membershipData.status === "active" ? "Active" : 
-                    membershipData.status === "pending" ? "Pending" : "Expired";
+      const status =
+        membershipData.status === "active"
+          ? "Active"
+          : membershipData.status === "pending"
+          ? "Pending"
+          : "Expired";
       typeElement.textContent = `${status} ${membershipData.type} Membership`;
-      
+
       // Update color based on status
-      const statusColor = membershipData.status === "active" ? "text-green-600" : 
-                         membershipData.status === "pending" ? "text-yellow-600" : "text-red-600";
+      const statusColor =
+        membershipData.status === "active"
+          ? "text-green-600"
+          : membershipData.status === "pending"
+          ? "text-yellow-600"
+          : "text-red-600";
       typeElement.className = `text-lg font-semibold ${statusColor}`;
     }
 
@@ -72,7 +84,7 @@ document.addEventListener("DOMContentLoaded", function () {
     if (daysElement) {
       const daysLeft = Math.max(0, parseInt(membershipData.daysLeft) || 0);
       daysElement.textContent = `${daysLeft} days remaining`;
-      
+
       // Add warning class if days are low
       if (daysLeft <= 7 && daysLeft > 0) {
         daysElement.classList.add("text-red-600");
@@ -93,21 +105,22 @@ document.addEventListener("DOMContentLoaded", function () {
   initMembershipContent();
 
   // Listen for membership status updates
-  window.addEventListener('membershipStatusUpdated', function(e) {
-    if (e.detail.email === localStorage.getItem('userEmail')) {
+  window.addEventListener("membershipStatusUpdated", function (e) {
+    if (e.detail.email === localStorage.getItem("userEmail")) {
       initMembershipContent();
     }
   });
 
   // Re-initialize when storage changes
   window.addEventListener("storage", function (e) {
-    if (e.key && (
-      e.key.includes('membershipData') || 
-      e.key === 'members' || 
-      e.key.includes('members-data') ||
-      e.key === 'userEmail' ||
-      e.key === 'userStatus'
-    )) {
+    if (
+      e.key &&
+      (e.key.includes("membershipData") ||
+        e.key === "members" ||
+        e.key.includes("members-data") ||
+        e.key === "userEmail" ||
+        e.key === "userStatus")
+    ) {
       initMembershipContent();
     }
   });
@@ -169,14 +182,18 @@ document.addEventListener("DOMContentLoaded", function () {
     isDragging = false;
 
     notification.classList.remove("dragging");
-    
+
     const threshold = panel.offsetWidth / 2;
-    const transform = new WebKitCSSMatrix(window.getComputedStyle(panel).transform);
+    const transform = new WebKitCSSMatrix(
+      window.getComputedStyle(panel).transform
+    );
     const finalPosition = transform.m41;
 
     if (Math.abs(finalPosition) > threshold) {
-      if ((side === "right" && finalPosition < -threshold) || 
-          (side === "left" && finalPosition > threshold)) {
+      if (
+        (side === "right" && finalPosition < -threshold) ||
+        (side === "left" && finalPosition > threshold)
+      ) {
         side = side === "right" ? "left" : "right";
         localStorage.setItem("notificationSide", side);
       }

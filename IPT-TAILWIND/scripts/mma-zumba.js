@@ -7,10 +7,20 @@ document.addEventListener("DOMContentLoaded", () => {
   const okButton = document.querySelector(".ok-btn");
   const cancelButton = document.querySelector(".cancel-btn");
   const timeSlots = document.querySelectorAll('input[name="time-slot"]');
-  
+
   const months = [
-    "January", "February", "March", "April", "May", "June",
-    "July", "August", "September", "October", "November", "December"
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
   ];
 
   // State variables
@@ -19,12 +29,16 @@ document.addEventListener("DOMContentLoaded", () => {
   let year = date.getFullYear();
   let selectedDate = null;
   let selectedTime = null;
-  let bookedSlots = JSON.parse(localStorage.getItem("mmaZumbaBookings") || "[]");
+  let bookedSlots = JSON.parse(
+    localStorage.getItem("mmaZumbaBookings") || "[]"
+  );
 
   function isSameDate(date1, date2) {
-    return date1.getFullYear() === date2.getFullYear() &&
+    return (
+      date1.getFullYear() === date2.getFullYear() &&
       date1.getMonth() === date2.getMonth() &&
-      date1.getDate() === date2.getDate();
+      date1.getDate() === date2.getDate()
+    );
   }
 
   function renderCalendar() {
@@ -54,7 +68,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (dayOfWeek === 0) {
         className = "inactive sunday";
       }
-      // Check if date is in the past 
+      // Check if date is in the past
       else if (currentDate < today && !isSameDate(currentDate, today)) {
         className = "inactive";
       }
@@ -62,12 +76,14 @@ document.addEventListener("DOMContentLoaded", () => {
       else if (isSameDate(currentDate, today)) {
         className = "today";
       }
-      
+
       // Check if this is the selected date
-      if (selectedDate &&
-          selectedDate.day === i &&
-          selectedDate.month === month &&
-          selectedDate.year === year) {
+      if (
+        selectedDate &&
+        selectedDate.day === i &&
+        selectedDate.month === month &&
+        selectedDate.year === year
+      ) {
         className = "selected";
       }
 
@@ -82,7 +98,7 @@ document.addEventListener("DOMContentLoaded", () => {
         selectedDate = {
           day: parseInt(day.dataset.day),
           month: parseInt(day.dataset.month),
-          year: parseInt(day.dataset.year)
+          year: parseInt(day.dataset.year),
         };
         updateAvailableTimeSlots();
         renderCalendar();
@@ -98,13 +114,18 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function updateAvailableTimeSlots() {
     timeSlots.forEach((slot) => {
-      let isSlotBooked = bookedSlots.some(booking =>
-        booking.date === `${selectedDate?.day}/${selectedDate?.month + 1}/${selectedDate?.year}` &&
-        booking.time === slot.value
+      let isSlotBooked = bookedSlots.some(
+        (booking) =>
+          booking.date ===
+            `${selectedDate?.day}/${selectedDate?.month + 1}/${
+              selectedDate?.year
+            }` && booking.time === slot.value
       );
 
       slot.disabled = isSlotBooked;
-      const slotLabel = slot.nextElementSibling.textContent.replace(/ \(Already Booked\)/g, "").trim();
+      const slotLabel = slot.nextElementSibling.textContent
+        .replace(/ \(Already Booked\)/g, "")
+        .trim();
       if (isSlotBooked) {
         slot.checked = false;
         slot.nextElementSibling.innerHTML = `${slotLabel} <span class="text-red-500">(Already Booked)</span>`;
@@ -147,7 +168,9 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    const dateStr = `${months[selectedDate.month]} ${selectedDate.day}, ${selectedDate.year}`;
+    const dateStr = `${months[selectedDate.month]} ${selectedDate.day}, ${
+      selectedDate.year
+    }`;
     const timeStr = selectedTime.nextElementSibling.textContent.trim();
     const zumbaTimeStr = "7:00 AM - 8:00 AM";
 
@@ -157,9 +180,9 @@ document.addEventListener("DOMContentLoaded", () => {
       date: dateStr,
       time: timeStr,
       extras: {
-        zumbaTime: zumbaTimeStr
+        zumbaTime: zumbaTimeStr,
       },
-      redirectUrl: 'user-schedule-mma-zumba.html'
+      redirectUrl: "user-schedule-mma-zumba.html",
     });
   });
 

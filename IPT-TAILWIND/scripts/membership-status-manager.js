@@ -4,8 +4,8 @@
 const MembershipStatusManager = {
   // Get current member from database
   getMember(email) {
-    const members = JSON.parse(localStorage.getItem('members') || '[]');
-    return members.find(m => m.email === email);
+    const members = JSON.parse(localStorage.getItem("members") || "[]");
+    return members.find((m) => m.email === email);
   },
 
   // Get user-specific membership data
@@ -15,7 +15,7 @@ const MembershipStatusManager = {
     try {
       return JSON.parse(userSpecificData);
     } catch (error) {
-      console.error('Error parsing membership data:', error);
+      console.error("Error parsing membership data:", error);
       return null;
     }
   },
@@ -26,7 +26,7 @@ const MembershipStatusManager = {
 
     // Get member from database
     const member = this.getMember(email);
-    
+
     // Get user's membership data
     const membershipData = this.getUserMembershipData(email);
 
@@ -34,13 +34,13 @@ const MembershipStatusManager = {
     if (!member && !membershipData) return;
 
     // Determine the correct status by checking expiration and current status
-    let currentStatus = 'pending';
+    let currentStatus = "pending";
     let expirationDate = null;
 
     if (member) {
       expirationDate = new Date(member.dateOfExpiration);
       if (expirationDate < new Date()) {
-        currentStatus = 'expired';
+        currentStatus = "expired";
       } else {
         currentStatus = member.status;
       }
@@ -49,46 +49,53 @@ const MembershipStatusManager = {
       if (membershipData.nextPaymentDate) {
         expirationDate = new Date(membershipData.nextPaymentDate);
         if (expirationDate < new Date()) {
-          currentStatus = 'expired';
+          currentStatus = "expired";
         }
       }
     }
 
     // Update member database
     if (member) {
-      const members = JSON.parse(localStorage.getItem('members') || '[]');
-      const memberIndex = members.findIndex(m => m.email === email);
+      const members = JSON.parse(localStorage.getItem("members") || "[]");
+      const memberIndex = members.findIndex((m) => m.email === email);
       if (memberIndex !== -1) {
         members[memberIndex].status = currentStatus;
         if (expirationDate) {
           members[memberIndex].dateOfExpiration = expirationDate.toISOString();
         }
-        localStorage.setItem('members', JSON.stringify(members));
+        localStorage.setItem("members", JSON.stringify(members));
       }
     }
 
     // Update user membership data
     if (membershipData) {
       membershipData.status = currentStatus;
-      localStorage.setItem(`membershipData_${email}`, JSON.stringify(membershipData));
+      localStorage.setItem(
+        `membershipData_${email}`,
+        JSON.stringify(membershipData)
+      );
     }
 
     // Update global user status
-    if (email === localStorage.getItem('userEmail')) {
-      localStorage.setItem('userStatus', currentStatus);
+    if (email === localStorage.getItem("userEmail")) {
+      localStorage.setItem("userStatus", currentStatus);
     }
 
     // Update global membership data
-    const membersData = JSON.parse(localStorage.getItem('members-data') || '{}');
+    const membersData = JSON.parse(
+      localStorage.getItem("members-data") || "{}"
+    );
     if (membersData[email]) {
       membersData[email].status = currentStatus;
-      localStorage.setItem('members-data', JSON.stringify(membersData));
+      localStorage.setItem("members-data", JSON.stringify(membersData));
     }
 
     // Dispatch event to notify other components
-    window.dispatchEvent(new CustomEvent('membershipStatusUpdated', {
-      detail: { email, status: currentStatus }
-    }));
+    window.dispatchEvent(
+      new CustomEvent("membershipStatusUpdated", {
+        detail: { email, status: currentStatus },
+      })
+    );
   },
 
   // Calculate days left in membership
@@ -107,19 +114,24 @@ const MembershipStatusManager = {
   updateMembershipDays(email) {
     const member = this.getMember(email);
     let membershipData = this.getUserMembershipData(email);
-    
+
     // If we have no data at all, return 0
     if (!member && !membershipData) return 0;
 
     // Calculate days left based on either member expiration or membershipData next payment date
-    const expirationDate = member?.dateOfExpiration || 
-                          (membershipData?.nextPaymentDate && new Date(membershipData.nextPaymentDate));
+    const expirationDate =
+      member?.dateOfExpiration ||
+      (membershipData?.nextPaymentDate &&
+        new Date(membershipData.nextPaymentDate));
     const daysLeft = this.calculateDaysLeft(expirationDate);
 
     // If we have membership data, update it with the new days count
     if (membershipData) {
       membershipData.daysLeft = daysLeft;
-      localStorage.setItem(`membershipData_${email}`, JSON.stringify(membershipData));
+      localStorage.setItem(
+        `membershipData_${email}`,
+        JSON.stringify(membershipData)
+      );
     }
 
     // If we don't have membership data but have member data, create new membership data
@@ -128,9 +140,12 @@ const MembershipStatusManager = {
         daysLeft: daysLeft,
         nextPaymentDate: member.dateOfExpiration,
         type: member.membershipType,
-        status: member.status
+        status: member.status,
       };
-      localStorage.setItem(`membershipData_${email}`, JSON.stringify(membershipData));
+      localStorage.setItem(
+        `membershipData_${email}`,
+        JSON.stringify(membershipData)
+      );
     }
 
     return daysLeft;
@@ -140,7 +155,7 @@ const MembershipStatusManager = {
   initStatusWatchers() {
     // Check status every hour
     setInterval(() => {
-      const userEmail = localStorage.getItem('userEmail');
+      const userEmail = localStorage.getItem("userEmail");
       if (userEmail) {
         this.synchronizeStatus(userEmail);
         this.updateMembershipDays(userEmail);
@@ -148,16 +163,21 @@ const MembershipStatusManager = {
     }, 60 * 60 * 1000); // Every hour
 
     // Watch for storage changes
-    window.addEventListener('storage', (e) => {
-      if (e.key && (e.key.includes('membershipData') || e.key === 'members' || e.key.includes('members-data'))) {
-        const userEmail = localStorage.getItem('userEmail');
+    window.addEventListener("storage", (e) => {
+      if (
+        e.key &&
+        (e.key.includes("membershipData") ||
+          e.key === "members" ||
+          e.key.includes("members-data"))
+      ) {
+        const userEmail = localStorage.getItem("userEmail");
         if (userEmail) {
           this.synchronizeStatus(userEmail);
           this.updateMembershipDays(userEmail);
         }
       }
     });
-  }
+  },
 };
 
 export default MembershipStatusManager;

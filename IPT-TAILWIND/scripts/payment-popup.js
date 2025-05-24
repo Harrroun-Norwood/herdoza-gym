@@ -1,34 +1,67 @@
 // Global payment popup configuration and functionality
 const paymentConfigs = {
   gym: {
-    regular: { title: 'Regular Pass', price: 40, redirectUrl: 'user-membership.html' },
-    half: { title: '15 Days Pass', price: 250, redirectUrl: 'user-membership.html' },
-    full: { title: '30 Days Pass', price: 500, redirectUrl: 'user-membership.html' },
-    trainerSingle: { title: 'Personal Training - Single Session', price: 100, redirectUrl: 'user-membership.html' },
-    trainer25: { title: 'Personal Training - 25 Sessions', price: 2000, redirectUrl: 'user-membership.html' }
+    regular: {
+      title: "Regular Pass",
+      price: 40,
+      redirectUrl: "user-membership.html",
+    },
+    half: {
+      title: "15 Days Pass",
+      price: 250,
+      redirectUrl: "user-membership.html",
+    },
+    full: {
+      title: "30 Days Pass",
+      price: 500,
+      redirectUrl: "user-membership.html",
+    },
+    trainerSingle: {
+      title: "Personal Training - Single Session",
+      price: 100,
+      redirectUrl: "user-membership.html",
+    },
+    trainer25: {
+      title: "Personal Training - 25 Sessions",
+      price: 2000,
+      redirectUrl: "user-membership.html",
+    },
   },
   mma: {
-    single: { title: 'MMA Single Session', price: 150, requiresCalendar: true },
-    package25: { title: 'MMA 25 Sessions', price: 2500, requiresCalendar: true },
-    zumba: { 
-      title: 'MMA + Zumba Package',
-      description: 'MMA training session + Zumba class on the same day',
-      price: 200, 
-      requiresCalendar: true 
-    }
+    single: { title: "MMA Single Session", price: 150, requiresCalendar: true },
+    package25: {
+      title: "MMA 25 Sessions",
+      price: 2500,
+      requiresCalendar: true,
+    },
+    zumba: {
+      title: "MMA + Zumba Package",
+      description: "MMA training session + Zumba class on the same day",
+      price: 200,
+      requiresCalendar: true,
+    },
   },
   studio: {
-    small: { title: 'Dance Studio - Solo/Small Group (1-3 people)', price: 100, requiresCalendar: true },
-    large: { title: 'Dance Studio - Large Group (4+ people)', pricePerPerson: 25, requiresCalendar: true }
+    small: {
+      title: "Dance Studio - Solo/Small Group (1-3 people)",
+      price: 100,
+      requiresCalendar: true,
+    },
+    large: {
+      title: "Dance Studio - Large Group (4+ people)",
+      pricePerPerson: 25,
+      requiresCalendar: true,
+    },
   },
   zumba: {
-    single: { 
-      title: 'Zumba Fitness Group Class',  
-      description: 'Join our energetic group fitness class led by professional Zumba instructors',
+    single: {
+      title: "Zumba Fitness Group Class",
+      description:
+        "Join our energetic group fitness class led by professional Zumba instructors",
       price: 150,
-      requiresCalendar: true 
-    }
-  }
+      requiresCalendar: true,
+    },
+  },
 };
 
 // Add required styles
@@ -111,16 +144,30 @@ function createPaymentPopupHTML(details) {
 
           <div class="flex flex-col justify-center mr-1 flex-1 p-4">
             <div class="text-xs text-red-500 font-bold uppercase tracking-wider">You're Paying for:</div>
-            <div class="font-bold text-2xl mb-2 text-white">${details.title}</div>
-            <div class="text-sm text-gray-400 mb-3">${details.description || ''}</div>
-            <div class="booking-date text-gray-300 font-medium">${details.date || ''}</div>
-            <div class="booking-time text-gray-300 font-medium">${details.time ? `Time: ${details.time}` : ''}</div>
-            ${details.extras?.zumbaTime ? `<div class="text-gray-300 font-medium">Zumba Time: ${details.extras.zumbaTime}</div>` : ''}
+            <div class="font-bold text-2xl mb-2 text-white">${
+              details.title
+            }</div>
+            <div class="text-sm text-gray-400 mb-3">${
+              details.description || ""
+            }</div>
+            <div class="booking-date text-gray-300 font-medium">${
+              details.date || ""
+            }</div>
+            <div class="booking-time text-gray-300 font-medium">${
+              details.time ? `Time: ${details.time}` : ""
+            }</div>
+            ${
+              details.extras?.zumbaTime
+                ? `<div class="text-gray-300 font-medium">Zumba Time: ${details.extras.zumbaTime}</div>`
+                : ""
+            }
           </div>
 
           <div class="bg-black-3 md:bg-red-900 amount flex flex-col justify-center items-center px-6 py-4 my-2 mx-2 rounded-lg">
             <div class="text-sm text-gray-300">Amount</div>
-            <div class="font-bold text-3xl md:text-2xl text-white">₱ ${details.price}</div>
+            <div class="font-bold text-3xl md:text-2xl text-white">₱ ${
+              details.price
+            }</div>
           </div>
         </div>
 
@@ -148,7 +195,9 @@ function createPaymentPopupHTML(details) {
                 <img src="./assets/instapay-qr.jpg" alt="GCash QR Code" class="w-96 h-96 rounded-lg shadow-lg">
               </div>
               <p class="mb-1 text-gray-300">Send payment to: <span class="font-bold text-white">09307561163</span></p>
-              <p class="mb-3 text-gray-300">Amount: <span class="font-bold text-white">₱${details.price}</span></p>
+              <p class="mb-3 text-gray-300">Amount: <span class="font-bold text-white">₱${
+                details.price
+              }</span></p>
               <p class="text-xs mt-2 text-gray-400">After scanning and sending payment:</p>
               <p class="text-xs text-blue-400 mt-1">Note: Registration will be pending until proof of payment is verified</p>
             </div>
@@ -180,64 +229,80 @@ function createPaymentPopupHTML(details) {
 
 // Payment popup handling functions
 function setupPaymentHandlers(container, details) {
-  const form = container.querySelector('#payment-form');
-  const cancelBtn = container.querySelector('.cancel-btn');
-  const paymentMethodInputs = container.querySelectorAll('input[name="payment-method"]');
-  const gcashDetails = container.querySelector('#gcash-details');
-  const onsiteDetails = container.querySelector('#onsite-details');
-  const payNowBtn = container.querySelector('.pay-now-btn');
+  const form = container.querySelector("#payment-form");
+  const cancelBtn = container.querySelector(".cancel-btn");
+  const paymentMethodInputs = container.querySelectorAll(
+    'input[name="payment-method"]'
+  );
+  const gcashDetails = container.querySelector("#gcash-details");
+  const onsiteDetails = container.querySelector("#onsite-details");
+  const payNowBtn = container.querySelector(".pay-now-btn");
 
   // Payment method changes
-  paymentMethodInputs.forEach(input => {
-    input.addEventListener('change', () => {
-      gcashDetails.classList.toggle('hidden', input.value !== 'Gcash');
-      onsiteDetails.classList.toggle('hidden', input.value !== 'Onsite');
+  paymentMethodInputs.forEach((input) => {
+    input.addEventListener("change", () => {
+      gcashDetails.classList.toggle("hidden", input.value !== "Gcash");
+      onsiteDetails.classList.toggle("hidden", input.value !== "Onsite");
 
-      payNowBtn.classList.remove('bg-gray-500', 'bg-blue-600', 'bg-green-600', 
-        'hover:bg-gray-600', 'hover:bg-blue-700', 'hover:bg-green-700');
-      
-      if (input.value === 'Gcash') {
-        payNowBtn.classList.add('bg-blue-600', 'hover:bg-blue-700');
+      payNowBtn.classList.remove(
+        "bg-gray-500",
+        "bg-blue-600",
+        "bg-green-600",
+        "hover:bg-gray-600",
+        "hover:bg-blue-700",
+        "hover:bg-green-700"
+      );
+
+      if (input.value === "Gcash") {
+        payNowBtn.classList.add("bg-blue-600", "hover:bg-blue-700");
       } else {
-        payNowBtn.classList.add('bg-green-600', 'hover:bg-green-700');
+        payNowBtn.classList.add("bg-green-600", "hover:bg-green-700");
       }
     });
   });
 
   // Form submission
-  form.addEventListener('submit', async (e) => {
+  form.addEventListener("submit", async (e) => {
     e.preventDefault();
-    
-    const selectedPayment = container.querySelector('input[name="payment-method"]:checked');
+
+    const selectedPayment = container.querySelector(
+      'input[name="payment-method"]:checked'
+    );
     if (!selectedPayment) {
-      alert('Please select a payment method');
+      alert("Please select a payment method");
       return;
     }
 
     try {
       const userEmail = localStorage.getItem("userEmail");
       if (!userEmail) {
-        alert('Please log in to continue');
-        window.location.href = 'login.html';
+        alert("Please log in to continue");
+        window.location.href = "login.html";
         return;
       }
 
       // Create booking object
       const booking = {
-        id: 'booking_' + Date.now(),
+        id: "booking_" + Date.now(),
         type: details.title,
         date: details.date,
         time: details.time,
         paymentMethod: selectedPayment.value,
         price: details.price,
         userEmail: userEmail,
-        status: selectedPayment.value === 'Gcash' ? 'pending_verification' : 'pending_payment',
+        status:
+          selectedPayment.value === "Gcash"
+            ? "pending_verification"
+            : "pending_payment",
         timestamp: new Date().toISOString(),
-        ...details.extras
+        ...details.extras,
       };
 
       // Save membership data for gym passes
-      if (details.title.includes('Pass') || details.title.includes('Training')) {
+      if (
+        details.title.includes("Pass") ||
+        details.title.includes("Training")
+      ) {
         const duration = details.duration || 1;
         const expiryDate = new Date();
         expiryDate.setDate(expiryDate.getDate() + duration);
@@ -248,76 +313,94 @@ function setupPaymentHandlers(container, details) {
           nextPaymentDate: expiryDate.toLocaleDateString("en-US", {
             month: "long",
             day: "numeric",
-            year: "numeric"
+            year: "numeric",
           }),
-          status: selectedPayment.value === 'Gcash' ? 'pending_verification' : 'pending_payment',
-          fee: details.price
+          status:
+            selectedPayment.value === "Gcash"
+              ? "pending_verification"
+              : "pending_payment",
+          fee: details.price,
         };
 
-        localStorage.setItem(`membershipData_${userEmail}`, JSON.stringify(membershipData));
+        localStorage.setItem(
+          `membershipData_${userEmail}`,
+          JSON.stringify(membershipData)
+        );
       }
 
       // Save booking for other services
       const bookingKey = getBookingStorageKey(details.title);
-      const existingBookings = JSON.parse(localStorage.getItem(bookingKey) || '[]');
+      const existingBookings = JSON.parse(
+        localStorage.getItem(bookingKey) || "[]"
+      );
       existingBookings.push(booking);
       localStorage.setItem(bookingKey, JSON.stringify(existingBookings));
 
       // Handle Gcash verification requests
-      if (selectedPayment.value === 'Gcash') {
+      if (selectedPayment.value === "Gcash") {
         const verificationRequest = {
-          id: 'verification_' + Date.now(),
+          id: "verification_" + Date.now(),
           bookingId: booking.id,
           userEmail: userEmail,
           amount: details.price,
           type: details.title,
-          status: 'pending',
-          timestamp: new Date().toISOString()
+          status: "pending",
+          timestamp: new Date().toISOString(),
         };
-        
-        const verifications = JSON.parse(localStorage.getItem('paymentVerifications') || '[]');
+
+        const verifications = JSON.parse(
+          localStorage.getItem("paymentVerifications") || "[]"
+        );
         verifications.push(verificationRequest);
-        localStorage.setItem('paymentVerifications', JSON.stringify(verifications));
+        localStorage.setItem(
+          "paymentVerifications",
+          JSON.stringify(verifications)
+        );
       }
 
       // Show appropriate message
-      const message = selectedPayment.value === 'Gcash' 
-        ? 'Your booking will be confirmed after GCash payment verification.\nPlease send your payment using the provided QR code.'
-        : 'Your booking will be confirmed after payment at the gym.\nPlease visit our reception to complete your payment.';
+      const message =
+        selectedPayment.value === "Gcash"
+          ? "Your booking will be confirmed after GCash payment verification.\nPlease send your payment using the provided QR code."
+          : "Your booking will be confirmed after payment at the gym.\nPlease visit our reception to complete your payment.";
 
-      alert(`✅ Booking Successful!\n\n` +
-        `📅 Type: ${booking.type}\n` +
-        `${booking.date ? `Date: ${booking.date}\n` : ''}` +
-        `${booking.time ? `⏰ Time: ${booking.time}\n` : ''}` +
-        `💳 Payment Method: ${booking.paymentMethod}\n\n` +
-        `${message}\n\n` +
-        `You can view your schedule and payment status in your dashboard.`);
+      alert(
+        `✅ Booking Successful!\n\n` +
+          `📅 Type: ${booking.type}\n` +
+          `${booking.date ? `Date: ${booking.date}\n` : ""}` +
+          `${booking.time ? `⏰ Time: ${booking.time}\n` : ""}` +
+          `💳 Payment Method: ${booking.paymentMethod}\n\n` +
+          `${message}\n\n` +
+          `You can view your schedule and payment status in your dashboard.`
+      );
 
       // Close popup and redirect
       closePaymentPopup();
-      
+
       if (details.redirectUrl) {
         setTimeout(() => {
           window.location.href = details.redirectUrl;
         }, 1500);
       }
-
     } catch (error) {
-      console.error('Error processing booking:', error);
-      alert('There was an error processing your booking. Please try again.');
+      console.error("Error processing booking:", error);
+      alert("There was an error processing your booking. Please try again.");
     }
   });
   // Cancel button
-  cancelBtn.addEventListener('click', () => {
-    const isGymMembership = details.title?.includes('Pass') || details.title?.includes('Training');
+  cancelBtn.addEventListener("click", () => {
+    const isGymMembership =
+      details.title?.includes("Pass") || details.title?.includes("Training");
     closePaymentPopup();
     // Handle gym membership cancellations
     if (isGymMembership) {
-      window.location.href = 'gym-fitness.html';
-    } 
+      window.location.href = "gym-fitness.html";
+    }
     // Handle calendar-based services
     else if (details.redirectUrl && details.requiresCalendar) {
-      window.location.href = details.redirectUrl.replace('user-schedule-', '').replace('.html', '.html');
+      window.location.href = details.redirectUrl
+        .replace("user-schedule-", "")
+        .replace(".html", ".html");
     }
   });
 }
@@ -325,24 +408,24 @@ function setupPaymentHandlers(container, details) {
 // Helper function to determine booking storage key
 function getBookingStorageKey(bookingType) {
   const type = bookingType.toLowerCase();
-  if (type.includes('mma') && type.includes('zumba')) {
-    return 'mmaZumbaBookings';
-  } else if (type.includes('mma') && type.includes('25')) {
-    return 'mma25SessionBookings';
-  } else if (type.includes('mma')) {
-    return 'mmaPerSessionBookings';
-  } else if (type.includes('zumba')) {
-    return 'zumbaBookings';
-  } else if (type.includes('studio')) {
-    return 'studioBookings';
+  if (type.includes("mma") && type.includes("zumba")) {
+    return "mmaZumbaBookings";
+  } else if (type.includes("mma") && type.includes("25")) {
+    return "mma25SessionBookings";
+  } else if (type.includes("mma")) {
+    return "mmaPerSessionBookings";
+  } else if (type.includes("zumba")) {
+    return "zumbaBookings";
+  } else if (type.includes("studio")) {
+    return "studioBookings";
   } else {
-    return 'gymBookings';
+    return "gymBookings";
   }
 }
 
 function handleCalendarRequiredService(details, redirectToCalendar) {
   // Special validation for large dance studio
-  if (details.title?.includes('Large Group')) {
+  if (details.title?.includes("Large Group")) {
     return true; // Skip validation since it's handled in calendar page
   }
 
@@ -356,40 +439,43 @@ function handleCalendarRequiredService(details, redirectToCalendar) {
 }
 
 function openPaymentPopup(details) {
-  const popupContainer = document.querySelector('.pop-up-con');
+  const popupContainer = document.querySelector(".pop-up-con");
   if (!popupContainer) return;
 
   // Handle calendar-required services
   const calendarRedirects = {
-    'MMA Single Session': 'mma-single-booking-calendar.html',
-    'MMA 25 Sessions': 'mma-25-session-booking.html',
-    'MMA + Zumba Package': 'mma-zumba-booking.html',
-    'Dance Studio - Solo/Small Group (1-3 people)': 'small-studio-calendar.html',
-    'Dance Studio - Large Group (4+ people)': 'large-studio-calendar.html',
-    'Zumba Session': 'zumba-booking.html'
+    "MMA Single Session": "mma-single-booking-calendar.html",
+    "MMA 25 Sessions": "mma-25-session-booking.html",
+    "MMA + Zumba Package": "mma-zumba-booking.html",
+    "Dance Studio - Solo/Small Group (1-3 people)":
+      "small-studio-calendar.html",
+    "Dance Studio - Large Group (4+ people)": "large-studio-calendar.html",
+    "Zumba Session": "zumba-booking.html",
   };
 
-  if (!handleCalendarRequiredService(details, calendarRedirects[details.title])) {
+  if (
+    !handleCalendarRequiredService(details, calendarRedirects[details.title])
+  ) {
     return;
   }
 
   // Add popup HTML
   popupContainer.innerHTML = createPaymentPopupHTML(details);
-  
+
   // Add styles if not already added
-  if (!document.querySelector('#payment-popup-styles')) {
-    const style = document.createElement('style');
-    style.id = 'payment-popup-styles';
+  if (!document.querySelector("#payment-popup-styles")) {
+    const style = document.createElement("style");
+    style.id = "payment-popup-styles";
     style.textContent = popupStyles;
     document.head.appendChild(style);
   }
 
   // Show popup with animation
   requestAnimationFrame(() => {
-    const summary = popupContainer.querySelector('.payment-summary');
-    const overlay = popupContainer.querySelector('.overlay');
-    summary.classList.add('open-payment-summary');
-    overlay.classList.add('show-overlay');
+    const summary = popupContainer.querySelector(".payment-summary");
+    const overlay = popupContainer.querySelector(".overlay");
+    summary.classList.add("open-payment-summary");
+    overlay.classList.add("show-overlay");
   });
 
   // Setup event handlers
@@ -397,23 +483,23 @@ function openPaymentPopup(details) {
 }
 
 function closePaymentPopup() {
-  const popupContainer = document.querySelector('.pop-up-con');
-  const summary = popupContainer?.querySelector('.payment-summary');
-  const overlay = popupContainer?.querySelector('.overlay');
+  const popupContainer = document.querySelector(".pop-up-con");
+  const summary = popupContainer?.querySelector(".payment-summary");
+  const overlay = popupContainer?.querySelector(".overlay");
 
   if (summary && overlay) {
-    summary.classList.remove('open-payment-summary');
-    overlay.classList.remove('show-overlay');
-    
+    summary.classList.remove("open-payment-summary");
+    overlay.classList.remove("show-overlay");
+
     // Remove content after animation
     setTimeout(() => {
-      popupContainer.innerHTML = '';
+      popupContainer.innerHTML = "";
     }, 300);
   }
 }
 
 // Make functions available globally
-if (typeof window !== 'undefined') {
+if (typeof window !== "undefined") {
   window.paymentConfigs = paymentConfigs;
   window.openPaymentPopup = openPaymentPopup;
   window.closePaymentPopup = closePaymentPopup;
@@ -422,21 +508,21 @@ if (typeof window !== 'undefined') {
   window.initPaymentButtons = () => {
     // Gym Membership buttons
     const gymButtons = [
-      {id: 'gym-full', mobileId: 'gym-full-mobile', type: 'full'},
-      {id: 'gym-half', mobileId: 'gym-half-mobile', type: 'half'},
-      {id: 'gym-regular', mobileId: 'gym-regular-mobile', type: 'regular'},
-      {id: 'trainer-single', type: 'trainerSingle'},
-      {id: 'trainer-25', type: 'trainer25'}
+      { id: "gym-full", mobileId: "gym-full-mobile", type: "full" },
+      { id: "gym-half", mobileId: "gym-half-mobile", type: "half" },
+      { id: "gym-regular", mobileId: "gym-regular-mobile", type: "regular" },
+      { id: "trainer-single", type: "trainerSingle" },
+      { id: "trainer-25", type: "trainer25" },
     ];
 
-    gymButtons.forEach(btn => {
+    gymButtons.forEach((btn) => {
       // Handle desktop button
       const desktopBtn = document.getElementById(btn.id);
       if (desktopBtn) {
         desktopBtn.onclick = () => {
           openPaymentPopup({
             ...paymentConfigs.gym[btn.type],
-            redirectUrl: 'user-schedule-gym.html'
+            redirectUrl: "user-schedule-gym.html",
           });
         };
       }
@@ -448,59 +534,59 @@ if (typeof window !== 'undefined') {
           mobileBtn.onclick = () => {
             openPaymentPopup({
               ...paymentConfigs.gym[btn.type],
-              redirectUrl: 'user-schedule-gym.html'
+              redirectUrl: "user-schedule-gym.html",
             });
           };
         }
       }
     });
 
-    // MMA + Zumba buttons 
-    document.querySelectorAll('[onclick*="openMmaZumba"]').forEach(btn => {
+    // MMA + Zumba buttons
+    document.querySelectorAll('[onclick*="openMmaZumba"]').forEach((btn) => {
       btn.onclick = (e) => {
         e.preventDefault();
         openPaymentPopup({
           ...paymentConfigs.mma.zumba,
-          redirectUrl: 'user-schedule-mma-zumba.html'
+          redirectUrl: "user-schedule-mma-zumba.html",
         });
       };
     });
 
     // MMA 25 Sessions buttons
-    document.querySelectorAll('[onclick*="openMma25"]').forEach(btn => {
+    document.querySelectorAll('[onclick*="openMma25"]').forEach((btn) => {
       btn.onclick = (e) => {
         e.preventDefault();
         openPaymentPopup({
           ...paymentConfigs.mma.package25,
-          redirectUrl: 'user-schedule-mma.html'
+          redirectUrl: "user-schedule-mma.html",
         });
       };
     });
 
-    // MMA Single Session buttons 
-    document.querySelectorAll('[onclick*="openMmaSingle"]').forEach(btn => {
+    // MMA Single Session buttons
+    document.querySelectorAll('[onclick*="openMmaSingle"]').forEach((btn) => {
       btn.onclick = (e) => {
         e.preventDefault();
         openPaymentPopup({
           ...paymentConfigs.mma.single,
-          redirectUrl: 'user-schedule-mma.html'
+          redirectUrl: "user-schedule-mma.html",
         });
       };
     });
 
     // Small Studio buttons
-    document.querySelectorAll('[onclick*="openSmallStudio"]').forEach(btn => {
+    document.querySelectorAll('[onclick*="openSmallStudio"]').forEach((btn) => {
       btn.onclick = (e) => {
         e.preventDefault();
         openPaymentPopup({
           ...paymentConfigs.studio.small,
-          redirectUrl: 'user-schedule-studio.html'
+          redirectUrl: "user-schedule-studio.html",
         });
       };
     });
 
-    // Large Studio buttons  
-    document.querySelectorAll('[onclick*="openLargeStudio"]').forEach(btn => {
+    // Large Studio buttons
+    document.querySelectorAll('[onclick*="openLargeStudio"]').forEach((btn) => {
       btn.onclick = (e) => {
         e.preventDefault();
         const numberOfPeople = 4; // Default minimum
@@ -508,14 +594,14 @@ if (typeof window !== 'undefined') {
           ...paymentConfigs.studio.large,
           numberOfPeople,
           price: numberOfPeople * paymentConfigs.studio.large.pricePerPerson,
-          redirectUrl: 'user-schedule-studio.html'
+          redirectUrl: "user-schedule-studio.html",
         });
       };
     });
   };
 
   // Initialize buttons when DOM loads
-  document.addEventListener('DOMContentLoaded', () => {
+  document.addEventListener("DOMContentLoaded", () => {
     window.initPaymentButtons();
   });
 }

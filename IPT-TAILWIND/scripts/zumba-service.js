@@ -1,7 +1,7 @@
 // Function to show Zumba popup
-window.showZumbaModal = function(event) {
+window.showZumbaModal = function (event) {
   event.preventDefault();
-  
+
   // Get selected time from either desktop or mobile select
   const desktopSelect = document.getElementById("selected_time_date_zumba");
   const mobileSelect = document.getElementById("mobile_time_date_zumba");
@@ -18,6 +18,6 @@ window.showZumbaModal = function(event) {
     ...window.paymentConfigs.zumba.single,
     date: selectedDay,
     time: "7:00 AM - 8:00 AM",
-    redirectUrl: 'user-schedule-zumba.html'
+    redirectUrl: "user-schedule-zumba.html",
   });
 };

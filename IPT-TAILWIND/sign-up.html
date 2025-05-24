@@ -367,7 +367,8 @@
 
             // Validate form fields first
             const password = document.getElementById("password").value;
-            const confirmPassword = document.getElementById("confirm-password").value;
+            const confirmPassword =
+              document.getElementById("confirm-password").value;
             const firstName = document.getElementById("firstName").value;
             const lastName = document.getElementById("lastName").value;
             const email = document.getElementById("email").value;
@@ -383,8 +384,12 @@
             // Validate terms agreement
             const agreeTerms = document.getElementById("agreeTerms");
             if (!agreeTerms.checked) {
-              document.getElementById("checkbox-error").classList.remove("hidden");
-              document.getElementById("terms-checkbox-container").classList.add("checkbox-error");
+              document
+                .getElementById("checkbox-error")
+                .classList.remove("hidden");
+              document
+                .getElementById("terms-checkbox-container")
+                .classList.add("checkbox-error");
               return;
             }
 
@@ -400,21 +405,27 @@
               paymentMethod: "Cash",
               status: "pending",
               timestamp: new Date().toISOString(),
-              paymentStatus: "pending"
+              paymentStatus: "pending",
             };
 
             // Store in registrations for admin approval
-            const registrations = JSON.parse(localStorage.getItem("registrations") || "[]");
+            const registrations = JSON.parse(
+              localStorage.getItem("registrations") || "[]"
+            );
 
             // Check if email already exists
             if (registrations.some((r) => r.email === userData.email)) {
-              errorElement.textContent = "Email already registered. Please use a different email.";
+              errorElement.textContent =
+                "Email already registered. Please use a different email.";
               errorElement.classList.remove("hidden");
               return;
             }
 
             registrations.push(userData);
-            localStorage.setItem("registrations", JSON.stringify(registrations));
+            localStorage.setItem(
+              "registrations",
+              JSON.stringify(registrations)
+            );
 
             // Initialize user-specific membership data
             const initialMembershipData = {
@@ -426,7 +437,7 @@
               type: "Gym Fitness",
               status: "pending",
               sessions: [],
-              membershipId: "mem_" + Date.now().toString()
+              membershipId: "mem_" + Date.now().toString(),
             };
 
             // Store user data in a consistent format
@@ -436,9 +447,11 @@
               type: "Gym Fitness",
               token: "new-member",
               status: "pending",
-              membershipExpiry: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+              membershipExpiry: new Date(
+                Date.now() + 30 * 24 * 60 * 60 * 1000
+              ).toISOString(),
               timestamp: Date.now(),
-              expiresIn: 24 * 60 * 60 * 1000 // 24 hours
+              expiresIn: 24 * 60 * 60 * 1000, // 24 hours
             };
 
             // Store essential user data
@@ -447,8 +460,14 @@
             localStorage.setItem("userStatus", "pending");
             localStorage.setItem("userToken", "new-member");
             localStorage.setItem("userContact", contact);
-            localStorage.setItem(`membershipData_${email}`, JSON.stringify(initialMembershipData));
-            localStorage.setItem("userSession", JSON.stringify(userSessionData));
+            localStorage.setItem(
+              `membershipData_${email}`,
+              JSON.stringify(initialMembershipData)
+            );
+            localStorage.setItem(
+              "userSession",
+              JSON.stringify(userSessionData)
+            );
 
             // Clean up any old data
             localStorage.removeItem("selectedService");
@@ -469,10 +488,14 @@
         }
 
         // Reset checkbox error on checkbox change
-        document.getElementById("agreeTerms")?.addEventListener("change", function () {
-          document.getElementById("checkbox-error").classList.add("hidden");
-          document.getElementById("terms-checkbox-container").classList.remove("checkbox-error");
-        });
+        document
+          .getElementById("agreeTerms")
+          ?.addEventListener("change", function () {
+            document.getElementById("checkbox-error").classList.add("hidden");
+            document
+              .getElementById("terms-checkbox-container")
+              .classList.remove("checkbox-error");
+          });
 
         // Make password toggle function globally accessible
         window.togglePasswordVisibility = function (fieldId) {

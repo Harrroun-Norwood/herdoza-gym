@@ -6,25 +6,39 @@ document.addEventListener("DOMContentLoaded", () => {
   const cancelButton = document.querySelector(".cancel-btn");
   const timeSlots = document.querySelectorAll('input[name="time-slot"]');
   const peopleSlots = document.querySelectorAll('input[name="people-slot"]');
-  
+
   const months = [
-    "January", "February", "March", "April", "May", "June",
-    "July", "August", "September", "October", "November", "December"
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
   ];
 
-  // State variables  
+  // State variables
   let date = new Date();
   let month = date.getMonth();
   let year = date.getFullYear();
   let selectedDate = null;
   let selectedTime = null;
   let selectedPeople = null;
-  let bookedSlots = JSON.parse(localStorage.getItem("smallStudioBookings") || "[]");
+  let bookedSlots = JSON.parse(
+    localStorage.getItem("smallStudioBookings") || "[]"
+  );
 
   function isSameDate(date1, date2) {
-    return date1.getFullYear() === date2.getFullYear() &&
+    return (
+      date1.getFullYear() === date2.getFullYear() &&
       date1.getMonth() === date2.getMonth() &&
-      date1.getDate() === date2.getDate();
+      date1.getDate() === date2.getDate()
+    );
   }
 
   function renderCalendar() {
@@ -62,12 +76,14 @@ document.addEventListener("DOMContentLoaded", () => {
       else if (isSameDate(currentDate, today)) {
         className = "today";
       }
-      
+
       // Check if this is the selected date
-      if (selectedDate &&
-          selectedDate.day === i &&
-          selectedDate.month === month &&
-          selectedDate.year === year) {
+      if (
+        selectedDate &&
+        selectedDate.day === i &&
+        selectedDate.month === month &&
+        selectedDate.year === year
+      ) {
         className = "selected";
       }
 
@@ -82,7 +98,7 @@ document.addEventListener("DOMContentLoaded", () => {
         selectedDate = {
           day: parseInt(day.dataset.day),
           month: parseInt(day.dataset.month),
-          year: parseInt(day.dataset.year)
+          year: parseInt(day.dataset.year),
         };
         updateAvailableTimeSlots();
         renderCalendar();
@@ -98,13 +114,18 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function updateAvailableTimeSlots() {
     timeSlots.forEach((slot) => {
-      let isSlotBooked = bookedSlots.some(booking =>
-        booking.date === `${selectedDate?.day}/${selectedDate?.month + 1}/${selectedDate?.year}` &&
-        booking.time === slot.value
+      let isSlotBooked = bookedSlots.some(
+        (booking) =>
+          booking.date ===
+            `${selectedDate?.day}/${selectedDate?.month + 1}/${
+              selectedDate?.year
+            }` && booking.time === slot.value
       );
 
       slot.disabled = isSlotBooked;
-      const slotLabel = slot.nextElementSibling.textContent.replace(/ \(Already Booked\)/g, "").trim();
+      const slotLabel = slot.nextElementSibling.textContent
+        .replace(/ \(Already Booked\)/g, "")
+        .trim();
       if (isSlotBooked) {
         slot.checked = false;
         slot.nextElementSibling.innerHTML = `${slotLabel} <span class="text-red-500">(Already Booked)</span>`;
@@ -118,7 +139,7 @@ document.addEventListener("DOMContentLoaded", () => {
   navs.forEach((nav) => {
     nav.addEventListener("click", (e) => {
       const btnId = e.target.id;
-      
+
       if (btnId === "prev" && !document.getElementById("prev").disabled) {
         month--;
         if (month < 0) {
@@ -141,7 +162,9 @@ document.addEventListener("DOMContentLoaded", () => {
   // OK Button - Open centralized payment popup with validation
   okButton.addEventListener("click", () => {
     selectedTime = document.querySelector('input[name="time-slot"]:checked');
-    selectedPeople = document.querySelector('input[name="people-slot"]:checked');
+    selectedPeople = document.querySelector(
+      'input[name="people-slot"]:checked'
+    );
 
     // Validate all fields
     const validations = [];
@@ -155,19 +178,23 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // Get booking details and open centralized payment popup
-    const dateStr = `${months[selectedDate.month]} ${selectedDate.day}, ${selectedDate.year}`;
-    const timeStr = selectedTime.nextElementSibling.textContent.replace(" (Already Booked)", "").trim();
+    const dateStr = `${months[selectedDate.month]} ${selectedDate.day}, ${
+      selectedDate.year
+    }`;
+    const timeStr = selectedTime.nextElementSibling.textContent
+      .replace(" (Already Booked)", "")
+      .trim();
     const peopleStr = selectedPeople.nextElementSibling.textContent.trim();
-    
+
     // Show centralized payment popup
     window.openPaymentPopup({
       ...window.paymentConfigs.studio.small,
       date: dateStr,
       time: timeStr,
       extras: {
-        people: peopleStr
+        people: peopleStr,
       },
-      redirectUrl: 'user-schedule-studio.html'
+      redirectUrl: "user-schedule-studio.html",
     });
   });
 
@@ -182,13 +209,15 @@ document.addEventListener("DOMContentLoaded", () => {
       slot.checked = false;
       const label = slot.nextElementSibling;
       if (label) {
-        label.innerHTML = `<span class="time-label">${label.textContent.replace(/ \(Already Booked\)/g, "").trim()}</span>`;
+        label.innerHTML = `<span class="time-label">${label.textContent
+          .replace(/ \(Already Booked\)/g, "")
+          .trim()}</span>`;
         label.style.color = "";
       }
     });
 
     // Reset people selection
-    peopleSlots.forEach((slot) => slot.checked = false);
+    peopleSlots.forEach((slot) => (slot.checked = false));
 
     // Update UI
     updateAvailableTimeSlots();

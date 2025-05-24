@@ -6,8 +6,8 @@
 // Authentication API client for interacting with backend
 // This abstracts away the API calls for user authentication
 
-import config from './config.js';
-import { mockApi } from './mockService.js';
+import config from "./config.js";
+import { mockApi } from "./mockService.js";
 
 // Base API URL
 const API_URL = config.apiUrl;

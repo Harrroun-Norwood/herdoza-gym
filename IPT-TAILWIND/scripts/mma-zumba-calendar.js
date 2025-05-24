@@ -5,10 +5,20 @@ document.addEventListener("DOMContentLoaded", () => {
   const okButton = document.querySelector(".ok-btn");
   const cancelButton = document.querySelector(".cancel-btn");
   const timeSlots = document.querySelectorAll('input[name="time-slot"]');
-  
+
   const months = [
-    "January", "February", "March", "April", "May", "June",
-    "July", "August", "September", "October", "November", "December"
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
   ];
 
   // State variables
@@ -17,7 +27,9 @@ document.addEventListener("DOMContentLoaded", () => {
   let year = date.getFullYear();
   let selectedDate = null;
   let selectedTime = null;
-  let bookedSlots = JSON.parse(localStorage.getItem("mmaZumbaBookings") || "[]");
+  let bookedSlots = JSON.parse(
+    localStorage.getItem("mmaZumbaBookings") || "[]"
+  );
 
   function renderCalendar() {
     if (!dates || !header) return;
@@ -54,12 +66,14 @@ document.addEventListener("DOMContentLoaded", () => {
       else if (isSameDate(currentDate, today)) {
         className = "today";
       }
-      
+
       // Check if this is the selected date
-      if (selectedDate &&
-          selectedDate.day === i &&
-          selectedDate.month === month &&
-          selectedDate.year === year) {
+      if (
+        selectedDate &&
+        selectedDate.day === i &&
+        selectedDate.month === month &&
+        selectedDate.year === year
+      ) {
         className = "selected";
       }
 
@@ -79,7 +93,7 @@ document.addEventListener("DOMContentLoaded", () => {
         selectedDate = {
           day: parseInt(day.dataset.day),
           month: parseInt(day.dataset.month),
-          year: parseInt(day.dataset.year)
+          year: parseInt(day.dataset.year),
         };
         updateAvailableTimeSlots();
         updateZumbaSchedule();
@@ -95,25 +109,31 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function isSameDate(date1, date2) {
-    return date1.getDate() === date2.getDate() &&
-           date1.getMonth() === date2.getMonth() &&
-           date1.getFullYear() === date2.getFullYear();
+    return (
+      date1.getDate() === date2.getDate() &&
+      date1.getMonth() === date2.getMonth() &&
+      date1.getFullYear() === date2.getFullYear()
+    );
   }
 
   function updateAvailableTimeSlots() {
     if (!selectedDate) return;
 
-    const dateStr = `${months[selectedDate.month]} ${selectedDate.day}, ${selectedDate.year}`;
+    const dateStr = `${months[selectedDate.month]} ${selectedDate.day}, ${
+      selectedDate.year
+    }`;
 
     timeSlots.forEach((slot) => {
-      const timeStr = slot.nextElementSibling.textContent.replace(/ \(Already Booked\)/g, "").trim();
-      const isBooked = bookedSlots.some(booking => 
-        booking.date === dateStr && booking.time === timeStr
+      const timeStr = slot.nextElementSibling.textContent
+        .replace(/ \(Already Booked\)/g, "")
+        .trim();
+      const isBooked = bookedSlots.some(
+        (booking) => booking.date === dateStr && booking.time === timeStr
       );
 
       slot.disabled = isBooked;
       slot.checked = false;
-      
+
       if (isBooked) {
         slot.nextElementSibling.innerHTML = `${timeStr} <span class="text-red-500">(Already Booked)</span>`;
       } else {
@@ -125,9 +145,11 @@ document.addEventListener("DOMContentLoaded", () => {
   // Add updateZumbaSchedule function
   function updateZumbaSchedule() {
     const zumbaScheduleDiv = document.getElementById("zumba-schedule");
-    
+
     if (selectedDate) {
-      const dateStr = `${months[selectedDate.month]} ${selectedDate.day}, ${selectedDate.year}`;
+      const dateStr = `${months[selectedDate.month]} ${selectedDate.day}, ${
+        selectedDate.year
+      }`;
       const timeStr = "7:00 AM - 8:00 AM";
       zumbaScheduleDiv.innerHTML = `${dateStr}<br>${timeStr}`;
     } else {
@@ -167,23 +189,27 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    const dateStr = `${months[selectedDate.month]} ${selectedDate.day}, ${selectedDate.year}`;
+    const dateStr = `${months[selectedDate.month]} ${selectedDate.day}, ${
+      selectedDate.year
+    }`;
     const timeStr = selectedTime.nextElementSibling.textContent.trim();
     const zumbaTimeStr = "7:00 AM - 8:00 AM";
 
     // Get the mma-zumba popup from popup container
-    const popup = document.getElementById('mma-zumba');
+    const popup = document.getElementById("mma-zumba");
     if (!popup) return;
 
     // Update booking details
-    const bookingDetails = document.querySelector('#mma-zumba .booking-details');
+    const bookingDetails = document.querySelector(
+      "#mma-zumba .booking-details"
+    );
     if (bookingDetails) {
       bookingDetails.innerHTML = `MMA Training: ${dateStr}, ${timeStr}<br>Zumba Session: ${dateStr}, ${zumbaTimeStr}`;
     }
 
     // Show popup
-    popup.classList.remove('opacity-0', 'pointer-events-none');
-    document.querySelector('.overlay')?.classList.remove('hidden');
+    popup.classList.remove("opacity-0", "pointer-events-none");
+    document.querySelector(".overlay")?.classList.remove("hidden");
   });
 
   // Cancel button handler - Return to MMA page

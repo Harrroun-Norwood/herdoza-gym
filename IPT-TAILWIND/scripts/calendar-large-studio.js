@@ -5,12 +5,22 @@ document.addEventListener("DOMContentLoaded", () => {
   const okButton = document.querySelector(".ok-btn");
   const cancelButton = document.querySelector(".cancel-btn");
   const timeSlots = document.querySelectorAll('input[name="time-slot"]');
-  const peopleInput = document.querySelector('#numberOfPeople');
-  const priceDisplay = document.querySelector('.price-display');
-  
+  const peopleInput = document.querySelector("#numberOfPeople");
+  const priceDisplay = document.querySelector(".price-display");
+
   const months = [
-    "January", "February", "March", "April", "May", "June",
-    "July", "August", "September", "October", "November", "December"
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
   ];
 
   // State variables
@@ -19,12 +29,16 @@ document.addEventListener("DOMContentLoaded", () => {
   let year = date.getFullYear();
   let selectedDate = null;
   let selectedTime = null;
-  let bookedSlots = JSON.parse(localStorage.getItem("largeStudioBookings") || "[]");
+  let bookedSlots = JSON.parse(
+    localStorage.getItem("largeStudioBookings") || "[]"
+  );
 
   function isSameDate(date1, date2) {
-    return date1.getFullYear() === date2.getFullYear() &&
+    return (
+      date1.getFullYear() === date2.getFullYear() &&
       date1.getMonth() === date2.getMonth() &&
-      date1.getDate() === date2.getDate();
+      date1.getDate() === date2.getDate()
+    );
   }
 
   function renderCalendar() {
@@ -62,12 +76,14 @@ document.addEventListener("DOMContentLoaded", () => {
       else if (isSameDate(currentDate, today)) {
         className = "today";
       }
-      
+
       // Check if this is the selected date
-      if (selectedDate &&
-          selectedDate.day === i &&
-          selectedDate.month === month &&
-          selectedDate.year === year) {
+      if (
+        selectedDate &&
+        selectedDate.day === i &&
+        selectedDate.month === month &&
+        selectedDate.year === year
+      ) {
         className = "selected";
       }
 
@@ -82,7 +98,7 @@ document.addEventListener("DOMContentLoaded", () => {
         selectedDate = {
           day: parseInt(day.dataset.day),
           month: parseInt(day.dataset.month),
-          year: parseInt(day.dataset.year)
+          year: parseInt(day.dataset.year),
         };
         updateAvailableTimeSlots();
         renderCalendar();
@@ -98,13 +114,18 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function updateAvailableTimeSlots() {
     timeSlots.forEach((slot) => {
-      let isSlotBooked = bookedSlots.some(booking =>
-        booking.date === `${selectedDate?.day}/${selectedDate?.month + 1}/${selectedDate?.year}` &&
-        booking.time === slot.value
+      let isSlotBooked = bookedSlots.some(
+        (booking) =>
+          booking.date ===
+            `${selectedDate?.day}/${selectedDate?.month + 1}/${
+              selectedDate?.year
+            }` && booking.time === slot.value
       );
 
       slot.disabled = isSlotBooked;
-      const slotLabel = slot.nextElementSibling.textContent.replace(/ \(Already Booked\)/g, "").trim();
+      const slotLabel = slot.nextElementSibling.textContent
+        .replace(/ \(Already Booked\)/g, "")
+        .trim();
       if (isSlotBooked) {
         slot.checked = false;
         slot.nextElementSibling.innerHTML = `${slotLabel} <span class="text-red-500">(Already Booked)</span>`;
@@ -171,14 +192,21 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!numberOfPeople) {
       alert("Please enter number of people");
       return;
-    }    const dateStr = `${months[selectedDate.month]} ${selectedDate.day}, ${selectedDate.year}`;
+    }
+    const dateStr = `${months[selectedDate.month]} ${selectedDate.day}, ${
+      selectedDate.year
+    }`;
     const timeStr = selectedTime.nextElementSibling.textContent
       .replace(" (Already Booked)", "")
       .trim();
 
     // Show warning if less than 4 people
     if (numberOfPeople > 0 && numberOfPeople < 4) {
-      if (!confirm("For groups with less than 4 people, please use the Solo/Small Group option. Would you like to go back to the studio selection page?")) {
+      if (
+        !confirm(
+          "For groups with less than 4 people, please use the Solo/Small Group option. Would you like to go back to the studio selection page?"
+        )
+      ) {
         return;
       }
       window.location.href = "dance-studio.html";
@@ -190,16 +218,16 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    // Show centralized payment popup 
+    // Show centralized payment popup
     window.openPaymentPopup({
       ...window.paymentConfigs.studio.large,
       date: dateStr,
       time: timeStr,
       extras: {
-        numberOfPeople,  
+        numberOfPeople,
       },
       price: numberOfPeople * window.paymentConfigs.studio.large.pricePerPerson,
-      redirectUrl: 'user-schedule-studio.html'
+      redirectUrl: "user-schedule-studio.html",
     });
   });
 
@@ -214,7 +242,9 @@ document.addEventListener("DOMContentLoaded", () => {
       slot.checked = false;
       const label = slot.nextElementSibling;
       if (label) {
-        label.innerHTML = label.textContent.replace(" (Already Booked)", "").trim();
+        label.innerHTML = label.textContent
+          .replace(" (Already Booked)", "")
+          .trim();
       }
     });
 

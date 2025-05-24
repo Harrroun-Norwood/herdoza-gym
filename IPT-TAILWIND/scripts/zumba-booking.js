@@ -10,10 +10,10 @@ window.showZumbaModal = function (event) {
   }
 
   // Check if the session is already booked using booking API
-  const userBookings = window.bookingApi.getUserBookings().then(bookings => {
+  const userBookings = window.bookingApi.getUserBookings().then((bookings) => {
     const zumbaBookings = bookings.zumba || [];
-    const isBooked = zumbaBookings.some(booking => 
-      booking.date === selectedTime
+    const isBooked = zumbaBookings.some(
+      (booking) => booking.date === selectedTime
     );
 
     if (isBooked) {
@@ -27,7 +27,7 @@ window.showZumbaModal = function (event) {
       date: selectedTime,
       time: "7:00 AM - 8:00 AM",
       sessionType: "zumba",
-      redirectUrl: 'user-schedule-zumba.html'
+      redirectUrl: "user-schedule-zumba.html",
     });
   });
 };
@@ -36,9 +36,9 @@ document.addEventListener("DOMContentLoaded", () => {
   // Elements for booking UI
   const desktopSelect = document.getElementById("selected_time_date_zumba");
   const mobileSelect = document.getElementById("mobile_time_date_zumba");
-  
+
   // Initialize from bookingApi
-  window.bookingApi.getUserBookings().then(bookings => {
+  window.bookingApi.getUserBookings().then((bookings) => {
     const zumbaBookings = bookings.zumba || [];
 
     function updateBookedSessionsUI() {
@@ -46,9 +46,9 @@ document.addEventListener("DOMContentLoaded", () => {
         if (!select) return;
 
         select.querySelectorAll("option").forEach((option) => {
-          const isBooked = zumbaBookings.some(booking => 
-            booking.date === option.value && 
-            booking.status !== 'cancelled'
+          const isBooked = zumbaBookings.some(
+            (booking) =>
+              booking.date === option.value && booking.status !== "cancelled"
           );
 
           if (isBooked && option.value) {
@@ -59,7 +59,7 @@ document.addEventListener("DOMContentLoaded", () => {
           }
         });
       });
-    }    // Initialize UI
+    } // Initialize UI
     updateBookedSessionsUI();
   });
 });

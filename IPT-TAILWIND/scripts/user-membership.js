@@ -1,5 +1,5 @@
 // Membership management script
-import MembershipStatusManager from './membership-status-manager.js';
+import MembershipStatusManager from "./membership-status-manager.js";
 
 document.addEventListener("DOMContentLoaded", function () {
   // Get DOM elements
@@ -14,7 +14,8 @@ document.addEventListener("DOMContentLoaded", function () {
     if (!userEmail) return;
 
     // Get membership data
-    let membershipData = MembershipStatusManager.getUserMembershipData(userEmail);
+    let membershipData =
+      MembershipStatusManager.getUserMembershipData(userEmail);
     if (!membershipData) {
       // Try to get from local storage
       const storedData = localStorage.getItem(`membershipData_${userEmail}`);
@@ -39,7 +40,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Update next payment date
     if (nextPaymentElement) {
-      nextPaymentElement.textContent = membershipData.nextPaymentDate || "No active membership";
+      nextPaymentElement.textContent =
+        membershipData.nextPaymentDate || "No active membership";
     }
 
     // Update fee display
@@ -89,7 +91,8 @@ document.addEventListener("DOMContentLoaded", function () {
         localStorage.setItem("membershipRenewal", "true");
 
         // Get current membership type and redirect accordingly
-        const membershipData = MembershipStatusManager.getUserMembershipData(userEmail);
+        const membershipData =
+          MembershipStatusManager.getUserMembershipData(userEmail);
         const membershipType = membershipData?.type?.toLowerCase() || "gym";
 
         let redirectPage;
@@ -114,21 +117,22 @@ document.addEventListener("DOMContentLoaded", function () {
   updateMembershipUI();
 
   // Listen for membership status updates
-  window.addEventListener('membershipStatusUpdated', function(e) {
-    if (e.detail.email === localStorage.getItem('userEmail')) {
+  window.addEventListener("membershipStatusUpdated", function (e) {
+    if (e.detail.email === localStorage.getItem("userEmail")) {
       updateMembershipUI();
     }
   });
 
   // Listen for storage changes
   window.addEventListener("storage", function (e) {
-    if (e.key && (
-      e.key.includes('membershipData') || 
-      e.key === 'members' || 
-      e.key.includes('members-data') ||
-      e.key === 'userEmail' ||
-      e.key === 'userStatus'
-    )) {
+    if (
+      e.key &&
+      (e.key.includes("membershipData") ||
+        e.key === "members" ||
+        e.key.includes("members-data") ||
+        e.key === "userEmail" ||
+        e.key === "userStatus")
+    ) {
       updateMembershipUI();
     }
   });

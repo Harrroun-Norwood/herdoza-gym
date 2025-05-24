@@ -176,7 +176,9 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    const dateStr = `${months[selectedDate.month]} ${selectedDate.day}, ${selectedDate.year}`;
+    const dateStr = `${months[selectedDate.month]} ${selectedDate.day}, ${
+      selectedDate.year
+    }`;
     const timeStr = selectedTime.nextElementSibling.textContent
       .replace(" (Already Booked)", "")
       .trim();
@@ -196,7 +198,10 @@ document.addEventListener("DOMContentLoaded", () => {
     timeSlots.forEach((slot) => {
       slot.checked = false;
       const label = slot.nextElementSibling;
-      if (label) {        label.innerHTML = `<span class="time-label">${label.textContent.replace(/ \(Already Booked\)/g, "").trim()}</span>`;
+      if (label) {
+        label.innerHTML = `<span class="time-label">${label.textContent
+          .replace(/ \(Already Booked\)/g, "")
+          .trim()}</span>`;
         label.style.color = "";
       }
     });
