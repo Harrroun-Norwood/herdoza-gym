@@ -125,33 +125,38 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   });
 
-  // Handle drag functionality
+  // Function to update panel position
   function updatePanelPosition(immediate = false) {
-    if (immediate) {
-      notification.style.transition = "none";
-      panel.style.transition = "none";
-    } else {
-      notification.style.transition = "transform 0.3s cubic-bezier(.4,2,.6,1)";
-      panel.style.transition = "transform 0.3s cubic-bezier(.4,2,.6,1)";
-    }
+    const transition = "transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)";
+    notification.style.transition = immediate ? "none" : transition;
 
-    if (side === "right") {
-      notification.style.right = "0";
-      notification.style.left = "auto";
-      panel.style.transform = isOpen ? "translateX(0)" : "translateX(100%)";
-    } else {
-      notification.style.left = "0";
-      notification.style.right = "auto";
-      panel.style.transform = isOpen ? "translateX(0)" : "translateX(-100%)";
-    }
+    // Use transform for smooth animation
+    const transform = isOpen
+      ? "translateX(0)"
+      : side === "right"
+      ? "translateX(16rem)"
+      : "translateX(-16rem)";
+    notification.style.transform = transform;
+
+    // Set initial position
+    notification.style[side] = "0";
+    notification.style[side === "right" ? "left" : "right"] = "auto";
   }
 
+  // Toggle panel visibility
   function togglePanel() {
     isOpen = !isOpen;
     localStorage.setItem("notificationOpen", isOpen);
     updatePanelPosition();
   }
 
+  // Expose toggle function to window for close button
+  window.toggleMembershipPanel = togglePanel;
+
+  // Add click handler to pull tab
+  pullTab.addEventListener("click", togglePanel);
+
+  // Handle drag functionality
   function handleDragStart(e) {
     if (e.target.id === "notification-handle") {
       isDragging = true;
@@ -159,7 +164,6 @@ document.addEventListener("DOMContentLoaded", function () {
       currentX = startX;
 
       notification.style.transition = "none";
-      panel.style.transition = "none";
       notification.classList.add("dragging");
     }
   }
@@ -173,7 +177,7 @@ document.addEventListener("DOMContentLoaded", function () {
     currentX = x;
 
     if ((side === "right" && dx < 0) || (side === "left" && dx > 0)) {
-      panel.style.transform = `translateX(${dx}px)`;
+      notification.style.transform = `translateX(${dx}px)`;
     }
   }
 
@@ -184,10 +188,11 @@ document.addEventListener("DOMContentLoaded", function () {
     notification.classList.remove("dragging");
 
     const threshold = panel.offsetWidth / 2;
-    const transform = new WebKitCSSMatrix(
-      window.getComputedStyle(panel).transform
+    const transform = notification.style.transform;
+    const matrix = new WebKitCSSMatrix(
+      window.getComputedStyle(notification).transform
     );
-    const finalPosition = transform.m41;
+    const finalPosition = matrix.m41;
 
     if (Math.abs(finalPosition) > threshold) {
       if (
@@ -206,7 +211,7 @@ document.addEventListener("DOMContentLoaded", function () {
     updatePanelPosition();
   }
 
-  // Add event listeners
+  // Add event listeners for dragging
   handle.addEventListener("mousedown", handleDragStart);
   handle.addEventListener("touchstart", handleDragStart);
   document.addEventListener("mousemove", handleDragMove);
