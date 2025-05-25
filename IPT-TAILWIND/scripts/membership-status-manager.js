@@ -19,141 +19,110 @@ const MembershipStatusManager = {
       return null;
     }
   },
+  _isUpdating: false,
 
   // Synchronize membership status
-  synchronizeStatus(email) {
-    if (!email) return;
+  synchronizeStatus(email, silent = false) {
+    // Guard against recursive calls
+    if (this._isUpdating || !email) return;
 
-    // Get member from database
-    const member = this.getMember(email);
+    this._isUpdating = true;
 
-    // Get user's membership data
-    const membershipData = this.getUserMembershipData(email);
+    try {
+      // Get member from database
+      const member = this.getMember(email);
 
-    // If neither exists, nothing to sync
-    if (!member && !membershipData) return;
+      // Get user's membership data
+      const membershipData = this.getUserMembershipData(email);
 
-    // Determine the correct status by checking expiration and current status
-    let currentStatus = "pending";
-    let expirationDate = null;
-    if (member) {
-      const expDate = new Date(member.dateOfExpiration);
-      if (!isNaN(expDate.getTime())) {
-        expirationDate = expDate;
-        if (expirationDate < new Date()) {
-          currentStatus = "expired";
-        } else {
-          currentStatus = member.status;
-        }
+      // If neither exists, nothing to sync
+      if (!member && !membershipData) {
+        this._isUpdating = false;
+        return;
       }
-    } else if (membershipData) {
-      currentStatus = membershipData.status;
-      if (membershipData.nextPaymentDate) {
-        const paymentDate = new Date(membershipData.nextPaymentDate);
-        if (!isNaN(paymentDate.getTime())) {
-          expirationDate = paymentDate;
+
+      // Track if status actually changed
+      let statusChanged = false;
+
+      // Determine the correct status by checking expiration and current status
+      let currentStatus = "pending";
+      let expirationDate = null;
+      if (member) {
+        const expDate = new Date(member.dateOfExpiration);
+        if (!isNaN(expDate.getTime())) {
+          expirationDate = expDate;
           if (expirationDate < new Date()) {
             currentStatus = "expired";
+          } else {
+            currentStatus = "active";
+          }
+        }
+      } else if (membershipData) {
+        currentStatus = membershipData.status;
+        if (membershipData.nextPaymentDate) {
+          const paymentDate = new Date(membershipData.nextPaymentDate);
+          if (!isNaN(paymentDate.getTime())) {
+            expirationDate = paymentDate;
+            if (expirationDate < new Date()) {
+              currentStatus = "expired";
+            }
           }
         }
       }
-    }
 
-    // Update member database
-    if (member) {
-      const members = JSON.parse(localStorage.getItem("members") || "[]");
-      const memberIndex = members.findIndex((m) => m.email === email);
-      if (memberIndex !== -1) {
-        members[memberIndex].status = currentStatus;
-        if (expirationDate) {
-          members[memberIndex].dateOfExpiration = expirationDate.toISOString();
+      // Update member database
+      if (member) {
+        const members = JSON.parse(localStorage.getItem("members") || "[]");
+        const memberIndex = members.findIndex((m) => m.email === email);
+        if (memberIndex !== -1) {
+          members[memberIndex].status = currentStatus;
+          if (expirationDate) {
+            members[memberIndex].dateOfExpiration =
+              expirationDate.toISOString();
+          }
+          localStorage.setItem("members", JSON.stringify(members));
         }
-        localStorage.setItem("members", JSON.stringify(members));
       }
-    }
 
-    // Update user membership data
-    if (membershipData) {
-      membershipData.status = currentStatus;
-      localStorage.setItem(
-        `membershipData_${email}`,
-        JSON.stringify(membershipData)
+      // Update user membership data
+      if (membershipData) {
+        membershipData.status = currentStatus;
+        localStorage.setItem(
+          `membershipData_${email}`,
+          JSON.stringify(membershipData)
+        );
+      }
+
+      // Update global user status
+      if (email === localStorage.getItem("userEmail")) {
+        localStorage.setItem("userStatus", currentStatus);
+      }
+
+      // Update global membership data
+      const membersData = JSON.parse(
+        localStorage.getItem("members-data") || "{}"
       );
-    }
+      if (membersData[email]) {
+        statusChanged = membersData[email].status !== currentStatus;
+        membersData[email].status = currentStatus;
+        localStorage.setItem("members-data", JSON.stringify(membersData));
 
-    // Update global user status
-    if (email === localStorage.getItem("userEmail")) {
-      localStorage.setItem("userStatus", currentStatus);
+        // Only dispatch event if status actually changed and not in silent mode
+        if (statusChanged && !silent) {
+          window.dispatchEvent(
+            new CustomEvent("membershipStatusUpdated", {
+              detail: { email, status: currentStatus },
+            })
+          );
+        }
+      }
+    } catch (error) {
+      console.error("Error synchronizing status:", error);
+    } finally {
+      this._isUpdating = false;
     }
-
-    // Update global membership data
-    const membersData = JSON.parse(
-      localStorage.getItem("members-data") || "{}"
-    );
-    if (membersData[email]) {
-      membersData[email].status = currentStatus;
-      localStorage.setItem("members-data", JSON.stringify(membersData));
-    }
-
-    // Dispatch event to notify other components
-    window.dispatchEvent(
-      new CustomEvent("membershipStatusUpdated", {
-        detail: { email, status: currentStatus },
-      })
-    );
   },
 
-  // Calculate days left in membership
-  updateMembershipDays(email) {
-    if (!email) return;
-
-    // Get member's data
-    const membershipData = this.getUserMembershipData(email);
-    if (!membershipData) return;
-
-    // Get member record
-    const member = this.getMember(email);
-
-    // Use expiration date from member record or membership data
-    let expirationDate;
-    if (member && member.dateOfExpiration) {
-      expirationDate = new Date(member.dateOfExpiration);
-    } else if (membershipData.nextPaymentDate) {
-      expirationDate = new Date(membershipData.nextPaymentDate);
-    }
-
-    if (!expirationDate || isNaN(expirationDate.getTime())) {
-      // Handle invalid date by setting status to pending
-      membershipData.status = "pending";
-      membershipData.daysLeft = 0;
-    } else {
-      // Calculate days remaining
-      const today = new Date();
-      const timeDiff = expirationDate.getTime() - today.getTime();
-      const daysLeft = Math.ceil(timeDiff / (1000 * 3600 * 24));
-
-      membershipData.daysLeft = Math.max(0, daysLeft);
-      membershipData.status = daysLeft > 0 ? "active" : "expired";
-    }
-
-    // Update storage
-    localStorage.setItem(
-      `membershipData_${email}`,
-      JSON.stringify(membershipData)
-    );
-
-    // Update global membership data
-    const membersData = JSON.parse(
-      localStorage.getItem("members-data") || "{}"
-    );
-    if (membersData[email]) {
-      membersData[email].daysLeft = membershipData.daysLeft;
-      membersData[email].status = membershipData.status;
-      localStorage.setItem("members-data", JSON.stringify(membersData));
-    }
-
-    return membershipData.daysLeft;
-  },
   calculateDaysLeft(expirationDate) {
     if (!expirationDate) return 0;
     const expiry = new Date(expirationDate);
@@ -165,8 +134,11 @@ const MembershipStatusManager = {
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
     return Math.max(0, diffDays);
   },
+
   // Update membership days
   updateMembershipDays(email) {
+    if (!email) return;
+
     const member = this.getMember(email);
     let membershipData = this.getUserMembershipData(email);
 

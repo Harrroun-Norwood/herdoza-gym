@@ -40,20 +40,17 @@ function initializeMembershipNotification() {
     // Show notification for logged in users
     notification.classList.remove("hidden");
 
-    // Get synchronized membership status and update days
-    MembershipStatusManager.synchronizeStatus(userEmail);
-    MembershipStatusManager.updateMembershipDays(userEmail);
-
-    // Get membership data with fallback
-    const membershipData = MembershipStatusManager.getUserMembershipData(
-      userEmail
-    ) ||
-      JSON.parse(localStorage.getItem(`membershipData_${userEmail}`)) || {
-        type: "Gym Fitness",
-        status: "pending",
-        daysLeft: 0,
-        nextPaymentDate: "Not available",
-      };
+    // Get membership data
+    let membershipData =
+      MembershipStatusManager.getUserMembershipData(userEmail);
+    if (!membershipData) {
+      // Try to get from local storage
+      const storedData = localStorage.getItem(`membershipData_${userEmail}`);
+      if (storedData) {
+        membershipData = JSON.parse(storedData);
+      }
+    }
+    if (!membershipData) return;
 
     // Update welcome message
     if (userNameElement) {
@@ -66,10 +63,10 @@ function initializeMembershipNotification() {
       const status =
         membershipData.status === "active"
           ? "Active"
-          : membershipData.status === "pending"
-          ? "Pending"
-          : "Expired";
-      typeElement.textContent = `${status} ${membershipData.type} Membership`;
+          : membershipData.status === "expired"
+          ? "Expired"
+          : "Pending";
+      typeElement.textContent = `${membershipData.type} Membership - ${status}`;
 
       // Update color based on status
       const statusColor =
@@ -112,7 +109,7 @@ function initializeMembershipNotification() {
     }
   });
 
-  // Re-initialize when storage changes
+  // Listen for storage changes
   window.addEventListener("storage", function (e) {
     if (
       e.key &&
@@ -226,18 +223,27 @@ function initializeMembershipNotification() {
       updatePanelPosition(true);
     }
   });
-
   // Initialize panel position
   updatePanelPosition(true);
 
-  // Cleanup on page unload
-  window.addEventListener("unload", () => {
+  // Cleanup on page exit - using beforeunload which is the recommended event
+  const cleanupEventListeners = () => {
     handle.removeEventListener("mousedown", handleDragStart);
     handle.removeEventListener("touchstart", handleDragStart);
     document.removeEventListener("mousemove", handleDragMove);
     document.removeEventListener("touchmove", handleDragMove);
     document.removeEventListener("mouseup", handleDragEnd);
     document.removeEventListener("touchend", handleDragEnd);
+  };
+
+  // Use beforeunload for cleanup
+  window.addEventListener("beforeunload", cleanupEventListeners);
+
+  // Also cleanup on visibility change to handle tab/window closing
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "hidden") {
+      cleanupEventListeners();
+    }
   });
 }
 
