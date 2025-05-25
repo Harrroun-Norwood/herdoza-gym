@@ -31,18 +31,29 @@ document.addEventListener("DOMContentLoaded", async function () {
  * @returns {Promise} - Promise that resolves with booking data
  */
 async function fetchUserBookings() {
-  try {
-    // Try to get bookings from backend first
-    const response = await fetch("http://localhost:3000/api/user/bookings", {
-      headers: { "Content-Type": "application/json" },
-    });
+  // Check if we're in development (using Live Server)
+  const isDevelopment = window.location.origin.includes("127.0.0.1:5500");
 
-    if (response.ok) {
-      const bookings = await response.json();
-      return bookings;
+  if (!isDevelopment) {
+    try {
+      const config = await import("./config.js");
+      const API_URL = config.default.apiUrl;
+
+      const response = await fetch(`${API_URL}/user/bookings`, {
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        credentials: "include",
+      });
+
+      if (response.ok) {
+        const bookings = await response.json();
+        return bookings;
+      }
+    } catch (error) {
+      console.log("Using local storage for development");
     }
-  } catch (error) {
-    console.warn("Failed to fetch from backend, using localStorage:", error);
   }
 
   // Fallback to localStorage if backend fails
@@ -51,13 +62,17 @@ async function fetchUserBookings() {
       localStorage.getItem("mmaPerSessionBookings") || "[]"
     ),
     mmaBulkSession: JSON.parse(
-      localStorage.getItem("mma25SessionUserBookings") || "[]"
+      localStorage.getItem("mma25SessionBookings") || "[]"
     ),
     mmaZumba: JSON.parse(localStorage.getItem("mmaZumbaBookings") || "[]"),
     zumba: JSON.parse(localStorage.getItem("zumbaBookings") || "[]"),
     studio: [
-      ...JSON.parse(localStorage.getItem("smallStudioBookings") || "[]"),
-      ...JSON.parse(localStorage.getItem("largeStudioBookings") || "[]"),
+      ...JSON.parse(localStorage.getItem("smallStudioBookings") || "[]").map(
+        (b) => ({ ...b, sessionType: "smallStudio" })
+      ),
+      ...JSON.parse(localStorage.getItem("largeStudioBookings") || "[]").map(
+        (b) => ({ ...b, sessionType: "largeStudio" })
+      ),
     ],
   };
 }
@@ -210,19 +225,21 @@ function createBookingElement(booking, type) {
         </div>
       `;
       break;
-
     case "studio":
       content = `
         <div class="flex justify-between items-center">
           <div>
-            <div class="font-bold">Dance Studio ${
-              booking.studioType === "small"
+            <div class="font-bold">${
+              booking.sessionType === "smallStudio"
                 ? "Solo/Small Group"
-                : "Large Group"
+                : "Group Practice"
             }</div>
-            <div class="text-sm text-gray-400">${booking.date}</div>
+            <div class="text-sm text-gray-400">${date}</div>
             <div class="text-sm">Time: ${booking.time}</div>
-            <div class="text-sm">People: ${booking.numberOfPeople}</div>
+            <div class="text-sm">Number of People: ${
+              booking.numberOfPeople ||
+              (booking.sessionType === "smallStudio" ? "1-3" : "4+")
+            }</div>
           </div>
           <div class="text-sm ${statusColor} capitalize">${status}</div>
         </div>

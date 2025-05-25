@@ -28,17 +28,24 @@ const paymentConfigs = {
     },
   },
   mma: {
-    single: { title: "MMA Single Session", price: 150, requiresCalendar: true },
+    single: {
+      title: "MMA Single Session",
+      price: 150,
+      requiresCalendar: true,
+      description: "One MMA training session",
+    },
     package25: {
       title: "MMA 25 Sessions",
       price: 2500,
       requiresCalendar: true,
+      description: "25 MMA training sessions package",
     },
     zumba: {
       title: "MMA + Zumba Package",
-      description: "MMA training session + Zumba class on the same day",
+      description: "One MMA session and one Zumba session on the same day",
       price: 200,
       requiresCalendar: true,
+      type: "mma-zumba",
     },
   },
   studio: {
@@ -46,11 +53,15 @@ const paymentConfigs = {
       title: "Dance Studio - Solo/Small Group (1-3 people)",
       price: 100,
       requiresCalendar: true,
+      type: "small-studio",
+      description: "Solo or small group dance studio session",
     },
     large: {
       title: "Dance Studio - Large Group (4+ people)",
       pricePerPerson: 25,
       requiresCalendar: true,
+      type: "large-studio",
+      description: "Large group dance studio session",
     },
   },
   zumba: {
@@ -156,6 +167,14 @@ function createPaymentPopupHTML(details) {
             <div class="booking-time text-gray-300 font-medium">${
               details.time ? `Time: ${details.time}` : ""
             }</div>
+            ${
+              details.extras?.numberOfPeople
+                ? `
+            <div class="text-gray-300 font-medium">Number of People: ${details.extras.numberOfPeople}</div>
+            <div class="text-gray-300 font-medium">Price per Person: ₱${details.extras.pricePerPerson}</div>
+            `
+                : ""
+            }
             ${
               details.extras?.zumbaTime
                 ? `<div class="text-gray-300 font-medium">Zumba Time: ${details.extras.zumbaTime}</div>`
@@ -279,12 +298,10 @@ function setupPaymentHandlers(container, details) {
         alert("Please log in to continue");
         window.location.href = "login.html";
         return;
-      }
-
-      // Create booking object
+      } // Create booking object
       const booking = {
         id: "booking_" + Date.now(),
-        type: details.title,
+        type: details.type || details.title,
         date: details.date,
         time: details.time,
         paymentMethod: selectedPayment.value,
@@ -295,8 +312,23 @@ function setupPaymentHandlers(container, details) {
             ? "pending_verification"
             : "pending_payment",
         timestamp: new Date().toISOString(),
+        description: details.description,
+        // Special handling for MMA + Zumba
+        mmaTime: details.time,
+        zumbaTime: details.extras?.zumbaTime,
         ...details.extras,
       };
+
+      // If this is an MMA + Zumba booking, ensure we have all the required info
+      if (details.title === "MMA + Zumba Package") {
+        if (!details.date || !details.time || !details.extras?.zumbaTime) {
+          alert(
+            "Missing booking details. Please try selecting your schedule again."
+          );
+          closePaymentPopup();
+          return;
+        }
+      }
 
       // Save membership data for gym passes
       if (
@@ -356,23 +388,30 @@ function setupPaymentHandlers(container, details) {
           "paymentVerifications",
           JSON.stringify(verifications)
         );
-      }
-
-      // Show appropriate message
+      } // Show appropriate message
       const message =
         selectedPayment.value === "Gcash"
           ? "Your booking will be confirmed after GCash payment verification.\nPlease send your payment using the provided QR code."
           : "Your booking will be confirmed after payment at the gym.\nPlease visit our reception to complete your payment.";
 
-      alert(
+      // Build confirmation message
+      let confirmationMessage =
         `✅ Booking Successful!\n\n` +
-          `📅 Type: ${booking.type}\n` +
-          `${booking.date ? `Date: ${booking.date}\n` : ""}` +
-          `${booking.time ? `⏰ Time: ${booking.time}\n` : ""}` +
-          `💳 Payment Method: ${booking.paymentMethod}\n\n` +
-          `${message}\n\n` +
-          `You can view your schedule and payment status in your dashboard.`
-      );
+        `📅 Type: ${booking.type}\n` +
+        `${booking.date ? `Date: ${booking.date}\n` : ""}` +
+        `${booking.time ? `⏰ Time: ${booking.time}\n` : ""}`;
+
+      // Add Zumba time if it's a combined package
+      if (booking.type === "MMA + Zumba Package" && booking.zumbaTime) {
+        confirmationMessage += `🎵 Zumba Time: ${booking.zumbaTime}\n`;
+      }
+
+      confirmationMessage +=
+        `💳 Payment Method: ${booking.paymentMethod}\n\n` +
+        `${message}\n\n` +
+        `You can view your schedule and payment status in your dashboard.`;
+
+      alert(confirmationMessage);
 
       // Close popup and redirect
       closePaymentPopup();
@@ -416,8 +455,10 @@ function getBookingStorageKey(bookingType) {
     return "mmaPerSessionBookings";
   } else if (type.includes("zumba")) {
     return "zumbaBookings";
-  } else if (type.includes("studio")) {
-    return "studioBookings";
+  } else if (type.includes("solo") || type.includes("small group")) {
+    return "smallStudioBookings";
+  } else if (type.includes("large group")) {
+    return "largeStudioBookings";
   } else {
     return "gymBookings";
   }

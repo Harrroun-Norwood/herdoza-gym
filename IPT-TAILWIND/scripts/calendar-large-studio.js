@@ -5,8 +5,11 @@ document.addEventListener("DOMContentLoaded", () => {
   const okButton = document.querySelector(".ok-btn");
   const cancelButton = document.querySelector(".cancel-btn");
   const timeSlots = document.querySelectorAll('input[name="time-slot"]');
-  const peopleInput = document.querySelector("#numberOfPeople");
-  const priceDisplay = document.querySelector(".price-display");
+  const peopleInput = document.getElementById("people-quantity");
+  const pricePerPersonDisplay = document.getElementById("price-per-person");
+
+  let selectedDate = null;
+  let selectedTime = null;
 
   const months = [
     "January",
@@ -27,8 +30,6 @@ document.addEventListener("DOMContentLoaded", () => {
   let date = new Date();
   let month = date.getMonth();
   let year = date.getFullYear();
-  let selectedDate = null;
-  let selectedTime = null;
   let bookedSlots = JSON.parse(
     localStorage.getItem("largeStudioBookings") || "[]"
   );
@@ -158,19 +159,27 @@ document.addEventListener("DOMContentLoaded", () => {
       updateAvailableTimeSlots();
     });
   });
-  // Handle people input changes
+
+  // Update price display when number of people changes
   peopleInput?.addEventListener("input", () => {
     const numberOfPeople = parseInt(peopleInput.value) || 0;
     const pricePerPerson = window.paymentConfigs.studio.large.pricePerPerson;
     const totalPrice = numberOfPeople * pricePerPerson;
 
-    if (priceDisplay) {
+    if (pricePerPersonDisplay) {
       if (numberOfPeople >= 4 && numberOfPeople <= 30) {
-        priceDisplay.textContent = `₱ ${totalPrice}`;
-        priceDisplay.classList.remove("opacity-50");
+        pricePerPersonDisplay.textContent = `Total Price: ₱${totalPrice} (₱${pricePerPerson} per person × ${numberOfPeople} people)`;
+        pricePerPersonDisplay.classList.remove("text-red-500");
+        pricePerPersonDisplay.classList.add("text-white");
+      } else if (numberOfPeople > 0) {
+        pricePerPersonDisplay.textContent =
+          numberOfPeople < 4
+            ? "Please select at least 4 people for large group booking"
+            : "Maximum group size is 30 people";
+        pricePerPersonDisplay.classList.remove("text-white");
+        pricePerPersonDisplay.classList.add("text-red-500");
       } else {
-        priceDisplay.textContent = "---";
-        priceDisplay.classList.add("opacity-50");
+        pricePerPersonDisplay.textContent = "";
       }
     }
   });
@@ -193,40 +202,25 @@ document.addEventListener("DOMContentLoaded", () => {
       alert("Please enter number of people");
       return;
     }
+
     const dateStr = `${months[selectedDate.month]} ${selectedDate.day}, ${
       selectedDate.year
     }`;
     const timeStr = selectedTime.nextElementSibling.textContent
       .replace(" (Already Booked)", "")
-      .trim();
-
-    // Show warning if less than 4 people
-    if (numberOfPeople > 0 && numberOfPeople < 4) {
-      if (
-        !confirm(
-          "For groups with less than 4 people, please use the Solo/Small Group option. Would you like to go back to the studio selection page?"
-        )
-      ) {
-        return;
-      }
-      window.location.href = "dance-studio.html";
-      return;
-    }
-
-    if (numberOfPeople > 30) {
-      alert("Maximum group size is 30 people");
-      return;
-    }
-
-    // Show centralized payment popup
+      .trim(); // Handle payment popup directly
     window.openPaymentPopup({
       ...window.paymentConfigs.studio.large,
       date: dateStr,
       time: timeStr,
-      extras: {
-        numberOfPeople,
-      },
+      type: "large-studio",
+      description: `Dance Studio Large Group (${numberOfPeople} people)`,
       price: numberOfPeople * window.paymentConfigs.studio.large.pricePerPerson,
+      extras: {
+        numberOfPeople: numberOfPeople,
+        studioType: "large",
+        pricePerPerson: window.paymentConfigs.studio.large.pricePerPerson,
+      },
       redirectUrl: "user-schedule-studio.html",
     });
   });
@@ -249,9 +243,9 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     // Reset price display
-    if (priceDisplay) {
-      priceDisplay.textContent = "---";
-      priceDisplay.classList.add("opacity-50");
+    if (pricePerPersonDisplay) {
+      pricePerPersonDisplay.textContent = "---";
+      pricePerPersonDisplay.classList.add("opacity-50");
     }
 
     updateAvailableTimeSlots();

@@ -36,20 +36,25 @@ const MembershipStatusManager = {
     // Determine the correct status by checking expiration and current status
     let currentStatus = "pending";
     let expirationDate = null;
-
     if (member) {
-      expirationDate = new Date(member.dateOfExpiration);
-      if (expirationDate < new Date()) {
-        currentStatus = "expired";
-      } else {
-        currentStatus = member.status;
+      const expDate = new Date(member.dateOfExpiration);
+      if (!isNaN(expDate.getTime())) {
+        expirationDate = expDate;
+        if (expirationDate < new Date()) {
+          currentStatus = "expired";
+        } else {
+          currentStatus = member.status;
+        }
       }
     } else if (membershipData) {
       currentStatus = membershipData.status;
       if (membershipData.nextPaymentDate) {
-        expirationDate = new Date(membershipData.nextPaymentDate);
-        if (expirationDate < new Date()) {
-          currentStatus = "expired";
+        const paymentDate = new Date(membershipData.nextPaymentDate);
+        if (!isNaN(paymentDate.getTime())) {
+          expirationDate = paymentDate;
+          if (expirationDate < new Date()) {
+            currentStatus = "expired";
+          }
         }
       }
     }
@@ -99,6 +104,56 @@ const MembershipStatusManager = {
   },
 
   // Calculate days left in membership
+  updateMembershipDays(email) {
+    if (!email) return;
+
+    // Get member's data
+    const membershipData = this.getUserMembershipData(email);
+    if (!membershipData) return;
+
+    // Get member record
+    const member = this.getMember(email);
+
+    // Use expiration date from member record or membership data
+    let expirationDate;
+    if (member && member.dateOfExpiration) {
+      expirationDate = new Date(member.dateOfExpiration);
+    } else if (membershipData.nextPaymentDate) {
+      expirationDate = new Date(membershipData.nextPaymentDate);
+    }
+
+    if (!expirationDate || isNaN(expirationDate.getTime())) {
+      // Handle invalid date by setting status to pending
+      membershipData.status = "pending";
+      membershipData.daysLeft = 0;
+    } else {
+      // Calculate days remaining
+      const today = new Date();
+      const timeDiff = expirationDate.getTime() - today.getTime();
+      const daysLeft = Math.ceil(timeDiff / (1000 * 3600 * 24));
+
+      membershipData.daysLeft = Math.max(0, daysLeft);
+      membershipData.status = daysLeft > 0 ? "active" : "expired";
+    }
+
+    // Update storage
+    localStorage.setItem(
+      `membershipData_${email}`,
+      JSON.stringify(membershipData)
+    );
+
+    // Update global membership data
+    const membersData = JSON.parse(
+      localStorage.getItem("members-data") || "{}"
+    );
+    if (membersData[email]) {
+      membersData[email].daysLeft = membershipData.daysLeft;
+      membersData[email].status = membershipData.status;
+      localStorage.setItem("members-data", JSON.stringify(membersData));
+    }
+
+    return membershipData.daysLeft;
+  },
   calculateDaysLeft(expirationDate) {
     if (!expirationDate) return 0;
     const expiry = new Date(expirationDate);

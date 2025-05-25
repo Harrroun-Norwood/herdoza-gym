@@ -91,6 +91,9 @@ async function loadMembers(filter = "all") {
     // Update localStorage with validated members
     localStorage.setItem("members", JSON.stringify(members));
 
+    // Update dashboard stats with the latest data
+    updateDashboardStats();
+
     // Filter and display members
     const filteredMembers = filterMembers(members, filter);
     displayMembers(filteredMembers);
@@ -336,6 +339,7 @@ async function removeMember(memberId) {
   try {
     await window.adminApi.removeMember(memberId);
     await loadMembers(document.getElementById("statusFilter").value);
+    updateDashboardStats(); // Update stats after removing member
     showNotification("Member removed successfully");
   } catch (error) {
     console.error("Error removing member:", error);
@@ -450,6 +454,8 @@ async function handleMemberFormSubmit(e) {
       document.getElementById("statusFilter").value || "all";
     await loadMembers(currentFilter);
 
+    updateDashboardStats(); // Update stats after adding member
+
     // Close the modal and show success message
     closeModal();
     showNotification("Member added successfully", "success");
@@ -470,6 +476,7 @@ async function handleRenewalFormSubmit(e) {
   try {
     await window.adminApi.renewMembership(memberId, duration, paymentMethod);
     await loadMembers(document.getElementById("statusFilter").value);
+    updateDashboardStats(); // Update stats after renewing membership
     closeRenewalModal();
     showNotification("Membership renewed successfully", "success");
   } catch (error) {
@@ -484,6 +491,7 @@ async function cancelMembership(memberId) {
   try {
     await window.adminApi.cancelMembership(memberId);
     await loadMembers(document.getElementById("statusFilter").value);
+    updateDashboardStats(); // Update stats after cancelling membership
     showNotification("Membership cancelled successfully", "success");
   } catch (error) {
     console.error("Error cancelling membership:", error);
@@ -491,11 +499,25 @@ async function cancelMembership(memberId) {
   }
 }
 
-// Utility functions
-function calculateExpirationDate(months) {
-  const expirationDate = new Date();
-  expirationDate.setMonth(expirationDate.getMonth() + months);
-  return expirationDate.toISOString();
+function updateDashboardStats() {
+  const members = window.adminApi.getMembers();
+  const registrations = JSON.parse(
+    localStorage.getItem("registrations") || "[]"
+  );
+
+  const stats = {
+    newMembers: members.filter((m) => {
+      const membershipDate = new Date(m.dateOfMembership);
+      const thirtyDaysAgo = new Date();
+      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+      return membershipDate >= thirtyDaysAgo;
+    }).length,
+    pendingApproval: registrations.filter((r) => r.status === "pending").length,
+    activeMembers: members.filter((m) => m.status === "active").length,
+    expiredMembers: members.filter((m) => m.status === "expired").length,
+  };
+
+  localStorage.setItem("stats", JSON.stringify(stats));
 }
 
 // Make functions available globally

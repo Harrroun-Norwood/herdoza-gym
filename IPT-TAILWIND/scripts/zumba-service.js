@@ -2,10 +2,8 @@
 window.showZumbaModal = function (event) {
   event.preventDefault();
 
-  // Get selected time from either desktop or mobile select
-  const desktopSelect = document.getElementById("selected_time_date_zumba");
-  const mobileSelect = document.getElementById("mobile_time_date_zumba");
-  const select = event.target.closest(".zumba-card").querySelector("select");
+  // Get selected time from the closest select element
+  const select = event.target.closest(".zumba-card")?.querySelector("select");
   const selectedDay = select?.value;
 
   if (!selectedDay) {
@@ -13,11 +11,15 @@ window.showZumbaModal = function (event) {
     return;
   }
 
-  // Show centralized payment popup
+  // Show payment popup
   window.openPaymentPopup({
-    ...window.paymentConfigs.zumba.single,
+    title: "Zumba Fitness Group Class",
+    description:
+      "Join our energetic group fitness class led by professional Zumba instructors",
+    price: 150,
     date: selectedDay,
     time: "7:00 AM - 8:00 AM",
     redirectUrl: "user-schedule-zumba.html",
+    requiresCalendar: false,
   });
 };

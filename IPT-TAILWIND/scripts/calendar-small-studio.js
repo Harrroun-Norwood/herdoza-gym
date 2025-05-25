@@ -191,8 +191,11 @@ document.addEventListener("DOMContentLoaded", () => {
       ...window.paymentConfigs.studio.small,
       date: dateStr,
       time: timeStr,
+      type: "small-studio",
+      description: `Dance Studio Solo/Small Group (${peopleStr})`,
       extras: {
-        people: peopleStr,
+        numberOfPeople: peopleStr,
+        studioType: "small",
       },
       redirectUrl: "user-schedule-studio.html",
     });

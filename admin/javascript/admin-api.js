@@ -165,9 +165,9 @@ function isAdminLoggedIn() {
 // Mock data for demo/presentation mode
 const demoData = {
   stats: {
-    newMembers: 15,
+    newMembers: 5,
     pendingApproval: 8,
-    activeMembers: 156,
+    activeMembers: 65,
     expiredMembers: 12,
   },
   registrations: [

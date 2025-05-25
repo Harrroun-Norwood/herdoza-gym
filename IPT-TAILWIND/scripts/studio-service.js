@@ -11,15 +11,37 @@ window.openSmallStudioPayment = function (date, time) {
 };
 
 // Function to open large group studio payment popup
-window.openLargeStudioPayment = function (date, time, numberOfPeople) {
-  const price =
-    numberOfPeople * window.paymentConfigs.studio.large.pricePerPerson;
+window.openLargeStudioPayment = function (date, time, numberOfPeople = 4) {
+  // Validate number of people
+  if (numberOfPeople < 4) {
+    if (
+      confirm(
+        "For groups with less than 4 people, please use the Solo/Small Group option. Would you like to go back to the studio selection page?"
+      )
+    ) {
+      window.location.href = "dance-studio.html";
+    }
+    return;
+  }
+
+  if (numberOfPeople > 30) {
+    alert("Maximum group size is 30 people");
+    return;
+  }
+
+  const basePrice = window.paymentConfigs.studio.large.pricePerPerson;
+  const totalPrice = numberOfPeople * basePrice;
+
   window.openPaymentPopup({
     ...window.paymentConfigs.studio.large,
     date,
     time,
-    price,
-    numberOfPeople,
+    price: totalPrice,
+    extras: {
+      numberOfPeople,
+      pricePerPerson: basePrice,
+    },
+    description: `Dance studio session for ${numberOfPeople} people (₱${basePrice} per person)`,
     redirectUrl: "user-schedule-studio.html",
   });
 };

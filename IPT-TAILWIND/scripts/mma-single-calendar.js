@@ -181,33 +181,18 @@ document.addEventListener("DOMContentLoaded", () => {
     }`;
     const timeStr = selectedTime.nextElementSibling.textContent
       .replace(" (Already Booked)", "")
-      .trim();
-
-    // Show centralized payment popup
-    window.openMmaSingle({
+      .trim(); // Show centralized payment popup
+    window.openPaymentPopup({
+      ...window.paymentConfigs.mma.single,
       date: dateStr,
       time: timeStr,
+      redirectUrl: "user-schedule-mma.html",
     });
   });
 
-  // Cancel button - Reset selections
+  // Cancel button - Return to MMA page
   cancelButton.addEventListener("click", () => {
-    selectedDate = null;
-    selectedTime = null;
-
-    timeSlots.forEach((slot) => {
-      slot.checked = false;
-      const label = slot.nextElementSibling;
-      if (label) {
-        label.innerHTML = `<span class="time-label">${label.textContent
-          .replace(/ \(Already Booked\)/g, "")
-          .trim()}</span>`;
-        label.style.color = "";
-      }
-    });
-
-    updateAvailableTimeSlots();
-    renderCalendar();
+    window.location.href = "./mixed-martial-arts.html";
   });
 
   renderCalendar();

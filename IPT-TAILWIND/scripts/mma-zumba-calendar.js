@@ -195,26 +195,24 @@ document.addEventListener("DOMContentLoaded", () => {
     const timeStr = selectedTime.nextElementSibling.textContent.trim();
     const zumbaTimeStr = "7:00 AM - 8:00 AM";
 
-    // Get the mma-zumba popup from popup container
-    const popup = document.getElementById("mma-zumba");
-    if (!popup) return;
-
-    // Update booking details
-    const bookingDetails = document.querySelector(
-      "#mma-zumba .booking-details"
-    );
-    if (bookingDetails) {
-      bookingDetails.innerHTML = `MMA Training: ${dateStr}, ${timeStr}<br>Zumba Session: ${dateStr}, ${zumbaTimeStr}`;
-    }
-
-    // Show popup
-    popup.classList.remove("opacity-0", "pointer-events-none");
-    document.querySelector(".overlay")?.classList.remove("hidden");
+    // Show payment popup with all the details
+    const type = "MMA + Zumba Package";
+    window.openPaymentPopup({
+      ...window.paymentConfigs.mma.zumba,
+      title: type,
+      date: dateStr,
+      time: timeStr,
+      extras: {
+        zumbaTime: zumbaTimeStr,
+      },
+      type: "mma-zumba",
+      description: "MMA training session + Zumba class on the same day",
+      redirectUrl: "user-schedule-mma-zumba.html",
+    });
   });
-
   // Cancel button handler - Return to MMA page
   cancelButton.addEventListener("click", () => {
-    window.location.href = "mixed-martial-arts.html";
+    window.location.href = "./mixed-martial-arts.html";
   });
 
   // Initialize calendar and available time slots

@@ -284,10 +284,9 @@ document.addEventListener("DOMContentLoaded", () => {
       redirectUrl: "user-schedule-mma.html",
     });
   });
-
   // Cancel button handler - Return to MMA page
   cancelButton.addEventListener("click", () => {
-    window.location.href = "mixed-martial-arts.html";
+    window.location.href = "./mixed-martial-arts.html";
   });
 
   // Initialize calendar and available time slots

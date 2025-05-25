@@ -12,6 +12,7 @@
     />
     <link rel="stylesheet" href="./src/mystyles.css" />
     <script type="module" src="./scripts/auth-api.js"></script>
+    <script type="module" src="./scripts/user-storage-manager.js"></script>
     <style>
       /* Background styles */
       body {
@@ -268,45 +269,12 @@
         </form>
       </div>
     </div>
-    <!-- Pin Verification Modal -->
-    <div id="pinVerificationModal" class="modal hidden">
-      <div class="modal-content">
-        <h2 class="text-xl font-bold mb-4 text-center text-white">
-          Pin Verification
-        </h2>
-        <p class="text-sm text-gray-400 mb-4 text-center">
-          Enter the 4-digit pin to verify your identity
-        </p>
-        <input
-          type="number"
-          id="pin"
-          class="w-full px-4 py-3 text-center text-2xl tracking-widest font-mono bg-white text-black border border-gray-700 rounded-md focus:ring-2 focus:ring-red-500 focus:border-red-500 mb-4 otp-input"
-          placeholder="Enter PIN"
-          min="0"
-          max="9999"
-          oninput="if(this.value.length > 4) this.value=this.value.slice(0,4)"
-        />
-        <div id="pinError" class="text-red-500 text-sm mb-4 hidden"></div>
-        <div class="flex gap-2">
-          <button
-            id="verifyPin"
-            class="bg-red-600 flex-1 py-2 rounded-lg hover:bg-red-700 transition text-white font-bold"
-          >
-            Verify PIN
-          </button>
-          <button
-            onclick="closePinVerificationModal()"
-            class="bg-gray-600 flex-1 py-2 rounded-lg hover:bg-gray-700 transition text-white font-bold"
-          >
-            Cancel
-          </button>
-        </div>
-      </div>
-    </div>
 
-    <script>
+    <script type="module">
+      import UserStorageManager from "./scripts/user-storage-manager.js";
+
       // Add password visibility toggle function
-      function togglePasswordVisibility(fieldId) {
+      window.togglePasswordVisibility = function (fieldId) {
         const passwordField = document.getElementById(fieldId);
         const toggleIcon = document.getElementById(`${fieldId}-toggle-icon`);
         if (passwordField.type === "password") {
@@ -318,34 +286,21 @@
           toggleIcon.classList.remove("bi-eye");
           toggleIcon.classList.add("bi-eye-slash");
         }
-      }
+      };
 
       // Forgot Password Modal Functions
-      function showForgotPasswordModal() {
+      window.showForgotPasswordModal = function () {
         document
           .getElementById("forgotPasswordModal")
           .classList.remove("hidden");
         document.getElementById("resetEmail").value = "";
         document.getElementById("resetError").classList.add("hidden");
         document.getElementById("resetSuccess").classList.add("hidden");
-      }
+      };
 
-      function closeForgotPasswordModal() {
+      window.closeForgotPasswordModal = function () {
         document.getElementById("forgotPasswordModal").classList.add("hidden");
-      }
-
-      // Pin Verification Modal Functions
-      function showPinVerificationModal() {
-        document.getElementById("pinVerificationModal").classList.add("show");
-        document.getElementById("pin").value = "";
-        document.getElementById("pinError").classList.add("hidden");
-      }
-
-      function closePinVerificationModal() {
-        document
-          .getElementById("pinVerificationModal")
-          .classList.remove("show");
-      }
+      };
 
       document.addEventListener("DOMContentLoaded", function () {
         const loginForm = document.getElementById("loginForm");
@@ -377,141 +332,120 @@
           .querySelector('a[href="#"]')
           ?.addEventListener("click", function (e) {
             e.preventDefault();
-            showForgotPasswordModal();
+            window.showForgotPasswordModal();
           });
+
         loginForm?.addEventListener("submit", async function (e) {
           e.preventDefault();
 
-          // Show pin verification first
-          showPinVerificationModal();
+          const email = emailInput.value?.trim();
+          const password = passwordInput.value;
+          const errorElement = document.getElementById("login-error");
 
-          // The actual login will happen after pin verification
-          document
-            .getElementById("verifyPin")
-            .addEventListener("click", async function verifyAndLogin() {
-              const pin = document.getElementById("pin").value;
-              const pinError = document.getElementById("pinError");
+          errorElement.classList.add("hidden");
 
-              if (!pin || pin.length !== 4) {
-                pinError.textContent = pin
-                  ? "PIN must be 4 digits"
-                  : "Please enter the PIN";
-                pinError.classList.remove("hidden");
-                return;
-              }
-
-              // After pin verification, proceed with login
-              const email = emailInput.value?.trim();
-              const password = passwordInput.value;
-              const errorElement = document.getElementById("login-error");
-
-              errorElement.classList.add("hidden");
-
-              // Admin login check
-              if (
-                email === "admin@herdoza-fitness.com" &&
-                password === "admin123!@#"
-              ) {
-                if (rememberMeCheckbox.checked) {
-                  localStorage.setItem(
-                    "rememberedCredentials",
-                    JSON.stringify({ email, password })
-                  );
-                }
-
-                showToast("Successfully logged in!");
-
-                const sessionData = {
-                  timestamp: Date.now(),
-                  expiresIn: 24 * 60 * 60 * 1000, // 24 hours
-                };
-
-                localStorage.setItem("adminLoggedIn", "true");
-                localStorage.setItem("adminName", "Admin");
-                localStorage.setItem("adminEmail", email);
-                localStorage.setItem(
-                  "adminToken",
-                  "admin-session-" + Date.now()
-                );
-                localStorage.setItem(
-                  "adminSession",
-                  JSON.stringify(sessionData)
-                );
-
-                setTimeout(() => {
-                  window.location.href = "../admin/admin_dashboard.html";
-                }, 1000);
-                return;
-              }
-
-              // Regular user login
-              const registrations = JSON.parse(
-                localStorage.getItem("registrations") || "[]"
-              );
-              const user = registrations.find(
-                (r) => r.email === email && r.password === password
-              );
-
-              if (!user) {
-                errorElement.textContent = "Invalid email or password";
-                errorElement.classList.remove("hidden");
-                showToast("Invalid email or password", "error");
-                return;
-              }
-
-              if (rememberMeCheckbox.checked) {
-                localStorage.setItem(
-                  "rememberedCredentials",
-                  JSON.stringify({ email, password })
-                );
-              }
-
-              // Get user's membership data
-              const membershipData = JSON.parse(
-                localStorage.getItem(`membershipData_${email}`) || "null"
-              );
-              const userSessionData = {
-                email: user.email,
-                name: user.name,
-                contact: user.contact,
-                type: user.type || "Gym Fitness",
-                token:
-                  user.status === "pending" ? "new-member" : "active-member",
-                status: user.status,
-                membershipExpiry:
-                  membershipData?.membershipExpiry ||
-                  user.membershipExpiry ||
-                  null,
-                timestamp: Date.now(),
-                expiresIn: 24 * 60 * 60 * 1000, // 24 hours
-              };
-
-              // Store essential user data
-              localStorage.setItem("userEmail", user.email);
-              localStorage.setItem("userName", user.name);
-              localStorage.setItem("userToken", userSessionData.token);
-              localStorage.setItem("userStatus", user.status);
+          // Admin login check
+          if (
+            email === "admin@herdoza-fitness.com" &&
+            password === "admin123!@#"
+          ) {
+            if (rememberMeCheckbox.checked) {
               localStorage.setItem(
-                "userSession",
-                JSON.stringify(userSessionData)
+                "rememberedCredentials",
+                JSON.stringify({ email, password })
               );
-              localStorage.setItem("userContact", user.contact);
+            }
 
-              if (membershipData) {
-                localStorage.setItem("membershipType", membershipData.type);
-                localStorage.setItem("membershipStatus", membershipData.status);
-              }
+            showToast("Successfully logged in!");
 
-              showToast("Successfully logged in!");
-              setTimeout(() => {
-                window.location.href = "index.html";
-              }, 1000);
+            const sessionData = {
+              timestamp: Date.now(),
+              expiresIn: 24 * 60 * 60 * 1000, // 24 hours
+            };
 
-              // Remove the verification listener to prevent duplicate handlers
-              document
-                .getElementById("verifyPin")
-                .removeEventListener("click", verifyAndLogin);
-            });
+            localStorage.setItem("adminLoggedIn", "true");
+            localStorage.setItem("adminName", "Admin");
+            localStorage.setItem("adminEmail", email);
+            localStorage.setItem("adminToken", "admin-session-" + Date.now());
+            localStorage.setItem("adminSession", JSON.stringify(sessionData));
+
+            setTimeout(() => {
+              window.location.href = "../admin/admin_dashboard.html";
+            }, 1000);
+            return;
+          }
+
+          // Regular user login
+          const registrations = JSON.parse(
+            localStorage.getItem("registrations") || "[]"
+          );
+          const members = JSON.parse(localStorage.getItem("members") || "[]");
+
+          // Try to find user in either registrations or members
+          const user =
+            registrations.find(
+              (r) =>
+                r.email.toLowerCase() === email.toLowerCase() &&
+                r.password === password
+            ) ||
+            members.find(
+              (m) =>
+                m.email.toLowerCase() === email.toLowerCase() &&
+                m.password === password
+            );
+
+          if (!user) {
+            errorElement.textContent = "Invalid email or password";
+            errorElement.classList.remove("hidden");
+            showToast("Invalid email or password", "error");
+            return;
+          }
+
+          if (rememberMeCheckbox.checked) {
+            localStorage.setItem(
+              "rememberedCredentials",
+              JSON.stringify({ email, password })
+            );
+          }
+
+          try {
+            // Clean up any old session data while preserving email-specific data
+            await UserStorageManager.cleanupUserData(true);
+
+            // Handle login
+            const userData = {
+              email: user.email,
+              firstName: user.firstName,
+              lastName: user.lastName,
+              contactNumber: user.contactNumber,
+              type: user.type || "Gym Fitness",
+              status: user.status || "Active",
+            };
+
+            // Re-initialize user session
+            await UserStorageManager.initializeNewUser(userData);
+
+            // Get existing membership data if any
+            const membershipData =
+              await UserStorageManager.getUserMembershipData(email);
+            if (membershipData) {
+              await UserStorageManager.updateUserMembership(email, {
+                ...membershipData,
+                status: user.status,
+              });
+            }
+
+            showToast("Successfully logged in!");
+            setTimeout(() => {
+              window.location.href = "index.html";
+            }, 1000);
+          } catch (error) {
+            console.error("Login error:", error);
+            errorElement.textContent =
+              "An error occurred during login. Please try again.";
+            errorElement.classList.remove("hidden");
+            showToast("Login failed", "error");
+          }
         });
 
         // Check for remembered credentials
@@ -523,26 +457,6 @@
           emailInput.value = email;
           passwordInput.value = password;
           rememberMeCheckbox.checked = true;
-        } // We don't need the default pin verification handler anymore since it's handled in the form submit
-
-        // Handle keypress in pin input
-        const pinInput = document.getElementById("pin");
-        pinInput?.addEventListener("keypress", function (e) {
-          if (e.key === "Enter") {
-            document.getElementById("verifyPin").click();
-          }
-        });
-
-        // Ensure pin input always has correct styling
-        pinInput?.addEventListener("input", function () {
-          this.style.color = "black";
-          this.style.backgroundColor = "white";
-        });
-
-        // Set initial styling
-        if (pinInput) {
-          pinInput.style.color = "black";
-          pinInput.style.backgroundColor = "white";
         }
       });
     </script>

@@ -31,8 +31,36 @@
       input[type="text"],
       input[type="email"],
       input[type="tel"],
-      input[type="password"] {
+      input[type="password"],
+      input[type="number"] {
         color: black !important;
+        background-color: white !important;
+      }
+
+      /* Force input text color for PIN input in all browsers */
+      #pin,
+      #pin.otp-input,
+      input#pin[type="number"] {
+        color: #111 !important;
+        background: #fff !important;
+        -webkit-text-fill-color: #111 !important;
+        caret-color: #111 !important;
+      }
+      #pin:-webkit-autofill,
+      #pin:-webkit-autofill:focus,
+      #pin:-webkit-autofill:hover {
+        -webkit-text-fill-color: #111 !important;
+        box-shadow: 0 0 0 1000px #fff inset !important;
+        background: #fff !important;
+        color: #111 !important;
+      }
+      .modal-content input#pin[type="number"] {
+        color: #111 !important;
+        background: #fff !important;
+      }
+      .otp-input {
+        color: #111 !important;
+        background: #fff !important;
       }
 
       /* Toast Notification Styles */
@@ -333,30 +361,163 @@
       </div>
     </div>
 
+    <!-- Pin Verification Modal -->
+    <div id="pinVerificationModal" class="modal">
+      <div class="modal-content">
+        <h2 class="text-xl font-bold mb-4 text-center text-white">
+          Pin Verification
+        </h2>
+        <p class="text-sm text-gray-400 mb-4 text-center">
+          Enter the 4-digit pin to verify your identity
+        </p>
+        <input
+          type="number"
+          id="pin"
+          class="w-full px-4 py-3 text-center text-2xl tracking-widest font-mono bg-white text-black border border-gray-700 rounded-md focus:ring-2 focus:ring-red-500 focus:border-red-500 mb-4 otp-input"
+          placeholder="Enter PIN"
+          style="color: black !important; background-color: white !important"
+          min="0"
+          max="9999"
+          oninput="if(this.value.length > 4) this.value=this.value.slice(0,4)"
+        />
+        <div id="pinError" class="text-red-500 text-sm mb-4 hidden"></div>
+        <div class="flex gap-2">
+          <button
+            id="verifyPin"
+            class="bg-red-600 flex-1 py-2 rounded-lg hover:bg-red-700 transition text-white font-bold"
+          >
+            Verify PIN
+          </button>
+          <button
+            onclick="closePinVerificationModal()"
+            class="bg-gray-600 flex-1 py-2 rounded-lg hover:bg-gray-700 transition text-white font-bold"
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+    </div>
+
     <!-- Import scripts -->
     <script type="module" src="./scripts/config.js"></script>
     <script type="module" src="./scripts/api-client.js"></script>
     <script type="module" src="./scripts/auth-api.js"></script>
+    <script>
+      // PIN Verification Modal Functions
+      function openPinVerificationModal() {
+        const modal = document.getElementById("pinVerificationModal");
+        modal.classList.add("show");
+      }
+
+      function closePinVerificationModal() {
+        const modal = document.getElementById("pinVerificationModal");
+        modal.classList.remove("show");
+        document.getElementById("pin").value = "";
+        document.getElementById("pinError").classList.add("hidden");
+      }
+
+      function generatePIN() {
+        return Math.floor(1000 + Math.random() * 9000);
+      }
+
+      function showError(message) {
+        const errorDiv = document.getElementById("pinError");
+        errorDiv.textContent = message;
+        errorDiv.classList.remove("hidden");
+      }
+
+      function showToast(message, type = "success") {
+        const toast = document.createElement("div");
+        const baseClasses = "toast-notification flex items-center gap-2";
+        toast.className = `${baseClasses} ${
+          type === "success" ? "bg-green-500" : "bg-red-500"
+        }`;
+        toast.innerHTML = `
+          <i class="bi bi-${
+            type === "success" ? "check-circle" : "exclamation-circle"
+          } text-xl"></i>
+          <span>${message}</span>
+        `;
+        document.body.appendChild(toast);
+
+        setTimeout(() => {
+          toast.remove();
+        }, 3000);
+      }
+
+      // Handle PIN verification
+      document
+        .getElementById("verifyPin")
+        .addEventListener("click", function () {
+          const pin = document.getElementById("pin").value;
+          const email = document.getElementById("email").value.toLowerCase();
+          const registrations = JSON.parse(
+            localStorage.getItem("registrations") || "[]"
+          );
+
+          const registration = registrations.find(
+            (r) => r.email.toLowerCase() === email
+          );
+
+          if (!registration) {
+            showError("Registration not found");
+            return;
+          }
+
+          if (pin === registration.pin.toString()) {
+            // Update registration to verified
+            registration.verified = true; // Move to members and store user data
+            const members = JSON.parse(localStorage.getItem("members") || "[]");
+            const { pin, verified, ...memberData } = registration;
+            members.push(memberData);
+            localStorage.setItem("members", JSON.stringify(members));
+
+            // Store user session data
+            localStorage.setItem("userToken", `user-session-${Date.now()}`);
+            localStorage.setItem("userEmail", memberData.email);
+            localStorage.setItem(
+              "userName",
+              `${memberData.firstName} ${memberData.lastName}`
+            );
+            localStorage.setItem("userContact", memberData.contactNumber);
+
+            // Remove from registrations
+            const updatedRegistrations = registrations.filter(
+              (r) => r.email.toLowerCase() !== email
+            );
+            localStorage.setItem(
+              "registrations",
+              JSON.stringify(updatedRegistrations)
+            );
+            // Show success message and redirect
+            showToast("Registration successful! Redirecting to Home...");
+            setTimeout(() => {
+              window.location.href = "index.html";
+            }, 2000);
+          } else {
+            showError("Invalid PIN");
+          }
+        });
+
+      // Password visibility toggle
+      window.togglePasswordVisibility = function (fieldId) {
+        const passwordField = document.getElementById(fieldId);
+        const toggleIcon = document.getElementById(`${fieldId}-toggle-icon`);
+        if (passwordField.type === "password") {
+          passwordField.type = "text";
+          toggleIcon.classList.remove("bi-eye-slash");
+          toggleIcon.classList.add("bi-eye");
+        } else {
+          passwordField.type = "password";
+          toggleIcon.classList.remove("bi-eye");
+          toggleIcon.classList.add("bi-eye-slash");
+        }
+      };
+    </script>
 
     <script type="module">
       document.addEventListener("DOMContentLoaded", function () {
         const form = document.getElementById("signupForm");
-
-        function showToast(message, type = "success") {
-          const toast = document.createElement("div");
-          toast.className = "toast-notification flex items-center gap-2";
-          toast.innerHTML = `
-            <i class="bi bi-${
-              type === "success" ? "check-circle" : "exclamation-circle"
-            } text-xl"></i>
-            <span>${message}</span>
-          `;
-          document.body.appendChild(toast);
-
-          setTimeout(() => {
-            toast.remove();
-          }, 3000);
-        }
 
         if (form) {
           form.addEventListener("submit", async function (e) {
@@ -371,7 +532,10 @@
               document.getElementById("confirm-password").value;
             const firstName = document.getElementById("firstName").value;
             const lastName = document.getElementById("lastName").value;
-            const email = document.getElementById("email").value;
+            const email = document
+              .getElementById("email")
+              .value.trim()
+              .toLowerCase();
             const contact = document.getElementById("contactNumber").value;
 
             // Validate passwords match
@@ -393,13 +557,14 @@
               return;
             }
 
-            // Create user data
+            // Initialize new user data
             const userData = {
               id: Date.now().toString(),
-              name: `${firstName} ${lastName}`,
-              email: email,
-              contact: contact,
-              password: password,
+              email,
+              firstName,
+              lastName,
+              password,
+              contactNumber: contact,
               type: "Gym Fitness",
               membershipDuration: "1",
               paymentMethod: "Cash",
@@ -408,82 +573,60 @@
               paymentStatus: "pending",
             };
 
-            // Store in registrations for admin approval
+            // Check email against all possible sources
+            if (email === "admin@herdoza-fitness.com") {
+              errorElement.textContent =
+                "This email cannot be used for registration.";
+              errorElement.classList.remove("hidden");
+              return;
+            }
+
+            // Get existing data
             const registrations = JSON.parse(
               localStorage.getItem("registrations") || "[]"
             );
+            const members = JSON.parse(localStorage.getItem("members") || "[]");
 
-            // Check if email already exists
-            if (registrations.some((r) => r.email === userData.email)) {
+            // Case-insensitive email checks
+            const existingRegistration = registrations.find(
+              (r) => r.email.toLowerCase() === email
+            );
+            const existingMember = members.find(
+              (m) => m.email.toLowerCase() === email
+            );
+
+            if (existingRegistration || existingMember) {
               errorElement.textContent =
                 "Email already registered. Please use a different email.";
               errorElement.classList.remove("hidden");
               return;
             }
 
-            registrations.push(userData);
-            localStorage.setItem(
-              "registrations",
-              JSON.stringify(registrations)
-            );
+            // If we get here, email is unique - proceed with registration
+            try {
+              // Generate verification PIN and add to user data
+              const verificationPin = generatePIN();
+              userData.pin = verificationPin;
+              userData.verified = false;
 
-            // Initialize user-specific membership data
-            const initialMembershipData = {
-              daysLeft: 0,
-              nextPaymentDate: null,
-              fee: 0,
-              purchaseDate: null,
-              originalDuration: 0,
-              type: "Gym Fitness",
-              status: "pending",
-              sessions: [],
-              membershipId: "mem_" + Date.now().toString(),
-            };
+              // Add to registrations
+              registrations.push(userData);
+              localStorage.setItem(
+                "registrations",
+                JSON.stringify(registrations)
+              );
 
-            // Store user data in a consistent format
-            const userSessionData = {
-              email: email,
-              name: `${firstName} ${lastName}`,
-              type: "Gym Fitness",
-              token: "new-member",
-              status: "pending",
-              membershipExpiry: new Date(
-                Date.now() + 30 * 24 * 60 * 60 * 1000
-              ).toISOString(),
-              timestamp: Date.now(),
-              expiresIn: 24 * 60 * 60 * 1000, // 24 hours
-            };
-
-            // Store essential user data
-            localStorage.setItem("userEmail", email);
-            localStorage.setItem("userName", userSessionData.name);
-            localStorage.setItem("userStatus", "pending");
-            localStorage.setItem("userToken", "new-member");
-            localStorage.setItem("userContact", contact);
-            localStorage.setItem(
-              `membershipData_${email}`,
-              JSON.stringify(initialMembershipData)
-            );
-            localStorage.setItem(
-              "userSession",
-              JSON.stringify(userSessionData)
-            );
-
-            // Clean up any old data
-            localStorage.removeItem("selectedService");
-            localStorage.removeItem("bookingData");
-            localStorage.removeItem("selectedTimeSlots");
-            localStorage.removeItem("selectedDates");
-            localStorage.removeItem("hasMembership");
-            localStorage.removeItem("membershipData");
-            localStorage.removeItem("membershipType");
-            localStorage.removeItem("membershipStatus");
-
-            // Show success toast and redirect
-            showToast("Signup successful! Welcome to Herdoza Fitness!");
-            setTimeout(() => {
-              window.location.href = "login.html";
-            }, 2000);
+              // Show PIN to user and open verification modal
+              alert(
+                `Your PIN is: ${verificationPin}\nPlease remember this PIN for verification.`
+              );
+              openPinVerificationModal();
+            } catch (error) {
+              console.error("Registration error:", error);
+              errorElement.textContent =
+                "Registration failed. Please try again.";
+              errorElement.classList.remove("hidden");
+            }
           });
         }
 
@@ -496,21 +639,6 @@
               .getElementById("terms-checkbox-container")
               .classList.remove("checkbox-error");
           });
-
-        // Make password toggle function globally accessible
-        window.togglePasswordVisibility = function (fieldId) {
-          const passwordField = document.getElementById(fieldId);
-          const toggleIcon = document.getElementById(`${fieldId}-toggle-icon`);
-          if (passwordField.type === "password") {
-            passwordField.type = "text";
-            toggleIcon.classList.remove("bi-eye-slash");
-            toggleIcon.classList.add("bi-eye");
-          } else {
-            passwordField.type = "password";
-            toggleIcon.classList.remove("bi-eye");
-            toggleIcon.classList.add("bi-eye-slash");
-          }
-        };
       });
     </script>
   </body>

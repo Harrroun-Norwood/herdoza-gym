@@ -1,7 +1,8 @@
 // Initialize or get membership data from localStorage
 import MembershipStatusManager from "./membership-status-manager.js";
 
-document.addEventListener("DOMContentLoaded", function () {
+// Function to initialize membership notification functionality
+function initializeMembershipNotification() {
   const notification = document.getElementById("membership-notification");
   const pullTab = document.getElementById("notification-pull-tab");
   const panel = document.getElementById("notification-panel");
@@ -238,4 +239,19 @@ document.addEventListener("DOMContentLoaded", function () {
     document.removeEventListener("mouseup", handleDragEnd);
     document.removeEventListener("touchend", handleDragEnd);
   });
-})();
+}
+
+// Initialize when DOM is ready
+function initMembershipUI() {
+  if (document.readyState === "loading") {
+    document.addEventListener(
+      "DOMContentLoaded",
+      initializeMembershipNotification
+    );
+  } else {
+    initializeMembershipNotification();
+  }
+}
+
+// Call initialization
+initMembershipUI();
