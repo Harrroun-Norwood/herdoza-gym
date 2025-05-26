@@ -4,12 +4,9 @@ services:
     env: node
     rootDirectory: .
     buildCommand: |
-      npm ci 
-      cd IPT-TAILWIND 
-      npm ci 
-      npm run build 
-      cd ../backend 
-      npm ci
+      npm run build:deps
+      npm run build:frontend
+      npm run build:backend
     startCommand: cd backend && node server.js
     envVars:
       - key: NODE_ENV
