@@ -15,12 +15,24 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 // Production specific middleware
+// Routes setup
+app.use("/api/registration", require("./routes/registration"));
+app.use("/api/admin", require("./routes/admin"));
+app.use("/api/members", require("./routes/members"));
+app.use("/api/booking", require("./routes/booking"));
+
+// Production configuration
 if (process.env.NODE_ENV === "production") {
   // Trust proxy (important for secure cookies behind a proxy)
   app.set("trust proxy", 1);
 
   // Serve static files from the frontend build
   app.use(express.static(path.join(__dirname, "../IPT-TAILWIND/dist")));
+
+  // Handle client-side routing - must be after API routes
+  app.get("*", (req, res) => {
+    res.sendFile(path.resolve(__dirname, "../IPT-TAILWIND/dist/index.html"));
+  });
 }
 
 // Security headers
@@ -48,21 +60,35 @@ connectDB()
 
 // CORS configuration
 const corsOptions = {
-  origin:
-    process.env.NODE_ENV === "production"
-      ? ["https://herdoza-gym.onrender.com"]
-      : [
-          "http://localhost:5173", // Vite frontend default
-          "http://localhost:5174", // Potential secondary Vite port
-          "http://localhost:3000", // Local backend
-          "http://localhost:3001", // Static admin panel
-          "http://127.0.0.1:5173",
-          "http://127.0.0.1:5174",
-          "http://127.0.0.1:5000",
-          "http://127.0.0.1:5500", // VS Code Live Server
-          "http://127.0.0.1:3000",
-          "http://127.0.0.1:3001",
-        ],
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps, curl, Postman)
+    if (!origin) return callback(null, true);
+
+    const allowedOrigins =
+      process.env.NODE_ENV === "production"
+        ? [
+            "https://herdoza-gym.onrender.com",
+            "https://herdoza-fitness-api.onrender.com",
+          ]
+        : [
+            "http://localhost:5173", // Vite frontend default
+            "http://localhost:5174", // Potential secondary Vite port
+            "http://localhost:3000", // Local backend
+            "http://localhost:3001", // Static admin panel
+            "http://127.0.0.1:5173",
+            "http://127.0.0.1:5174",
+            "http://127.0.0.1:5000",
+            "http://127.0.0.1:5500", // VS Code Live Server
+            "http://127.0.0.1:3000",
+            "http://127.0.0.1:3001",
+          ];
+
+    if (allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
   credentials: true,
   optionsSuccessStatus: 200,
 };
