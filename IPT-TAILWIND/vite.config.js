@@ -1,5 +1,10 @@
-import { defineConfig } from "vite";
+import { defineConfig } from "file:///opt/render/project/src/IPT-TAILWIND/node_modules/vite/dist/node/index.js";
 import { resolve } from "path";
+import { fileURLToPath } from "url";
+import { dirname } from "path";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 export default defineConfig({
   build: {
