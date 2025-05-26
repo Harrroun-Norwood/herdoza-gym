@@ -2,9 +2,15 @@
 const mongoose = require("mongoose");
 const { MongoClient, ServerApiVersion } = require("mongodb");
 
-// MongoDB Atlas connection string
-const mongoURI =
-  process.env.MONGODB_URI || "mongodb://localhost:27017/herdoza_fitness";
+// MongoDB Atlas connection string with environment checks
+const mongoURI = process.env.MONGODB_URI;
+
+if (!mongoURI) {
+  console.error(
+    "No MongoDB URI provided. Set MONGODB_URI in environment variables."
+  );
+  process.exit(1);
+}
 
 // Connect to MongoDB function
 const connectDB = async () => {

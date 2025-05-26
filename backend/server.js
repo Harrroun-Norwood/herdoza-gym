@@ -2,7 +2,6 @@ require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const helmet = require("helmet");
-const { doubleCsrf } = require("csrf-csrf");
 const session = require("express-session");
 const MongoStore = require("connect-mongo");
 const passport = require("passport");
@@ -14,79 +13,43 @@ const path = require("path");
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Trust proxy in production for secure cookies behind a reverse proxy
+// Trust proxy in production
 if (process.env.NODE_ENV === "production") {
   app.set("trust proxy", 1);
 }
 
-// Security headers
+// Security headers with correct CSP for images and assets
 app.use(
   helmet({
-    contentSecurityPolicy: false, // Disable CSP for development, configure properly in production
-    crossOriginEmbedderPolicy: false, // Allow loading resources from different origins
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'"],
+        styleSrc: ["'self'", "'unsafe-inline'"],
+        imgSrc: ["'self'", "data:", "blob:", "*"],
+        connectSrc: ["'self'", "https:", "wss:"],
+        fontSrc: ["'self'", "https:", "data:"],
+        mediaSrc: ["'self'"],
+        objectSrc: ["'none'"],
+        frameAncestors: ["'none'"],
+      },
+    },
+    crossOriginEmbedderPolicy: false,
   })
 );
-
-// Serve static files from the frontend build directory
-app.use(express.static(path.join(__dirname, "../IPT-TAILWIND/dist")));
-
-// Serve admin static files
-app.use("/admin", express.static(path.join(__dirname, "../admin")));
-
-// Serve the frontend for all non-API routes
-app.get("*", (req, res) => {
-  // Don't interfere with API or admin routes
-  if (!req.path.startsWith("/api") && !req.path.startsWith("/admin")) {
-    res.sendFile(path.join(__dirname, "../IPT-TAILWIND/dist/index.html"));
-  }
-});
-
-// CSRF Protection
-const { generateToken, doubleCsrfProtection } = doubleCsrf({
-  getSecret: () => process.env.CSRF_SECRET || "your-secret-key",
-  cookieName: "x-csrf-token",
-  cookieOptions: {
-    secure: process.env.NODE_ENV === "production",
-    sameSite: process.env.NODE_ENV === "production" ? "strict" : "lax",
-  },
-  size: 64,
-  ignoredMethods: ["GET", "HEAD", "OPTIONS"],
-});
-
-// Connect to MongoDB
-connectDB()
-  .then(() => console.log("Database connection established"))
-  .catch((err) => {
-    console.error("Database connection error:", err);
-    process.exit(1);
-  });
 
 // CORS configuration
 const corsOptions = {
   origin: function (origin, callback) {
-    // Allow requests with no origin (like mobile apps, curl, Postman)
-    if (!origin) return callback(null, true);
+    const allowedOrigins = [
+      "https://herdoza-fitness-gym.onrender.com",
+      "https://herdoza-gym.onrender.com",
+      "http://localhost:5173",
+      "http://localhost:3000",
+      "http://localhost:3001",
+    ];
 
-    const allowedOrigins =
-      process.env.NODE_ENV === "production"
-        ? [
-            "https://herdoza-gym.onrender.com",
-            "https://herdoza-fitness-api.onrender.com",
-          ]
-        : [
-            "http://localhost:5173", // Vite frontend default
-            "http://localhost:5174", // Potential secondary Vite port
-            "http://localhost:3000", // Local backend
-            "http://localhost:3001", // Static admin panel
-            "http://127.0.0.1:5173",
-            "http://127.0.0.1:5174",
-            "http://127.0.0.1:5000",
-            "http://127.0.0.1:5500", // VS Code Live Server
-            "http://127.0.0.1:3000",
-            "http://127.0.0.1:3001",
-          ];
-
-    if (allowedOrigins.indexOf(origin) !== -1) {
+    if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
       callback(new Error("Not allowed by CORS"));
@@ -96,95 +59,80 @@ const corsOptions = {
   optionsSuccessStatus: 200,
 };
 
-// Middleware
 app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Session configuration
+// Static file serving with caching
+const cacheTime = process.env.NODE_ENV === "production" ? 86400000 : 0; // 1 day in production
+const staticOptions = {
+  maxAge: cacheTime,
+  etag: true,
+};
+
+// Serve frontend static files
 app.use(
-  session({
-    secret: process.env.SESSION_SECRET || "your-secret-key",
-    resave: false,
-    saveUninitialized: false,
-    store: MongoStore.create({
-      mongoUrl:
-        process.env.MONGODB_URI || "mongodb://localhost:27017/herdoza_fitness",
-      ttl: 24 * 60 * 60, // Session TTL in seconds (1 day)
-      touchAfter: 24 * 3600, // Time period in seconds between session updates
-      collectionName: "sessions",
-      autoRemove: "disabled", // Disable automatic removal
-      crypto: {
-        secret: false, // Disable crypto since we're using express-session's secret
-      },
-      autoCreate: false, // Don't automatically create indexes
-    }),
-    cookie: {
-      secure: process.env.NODE_ENV === "production",
-      httpOnly: true,
-      sameSite: process.env.NODE_ENV === "production" ? "strict" : "lax",
-      maxAge: 24 * 60 * 60 * 1000, // 24 hours
-    },
-  })
+  express.static(path.join(__dirname, "../IPT-TAILWIND/dist"), staticOptions)
+);
+app.use(
+  "/assets",
+  express.static(
+    path.join(__dirname, "../IPT-TAILWIND/dist/assets"),
+    staticOptions
+  )
 );
 
-// Initialize passport
-app.use(passport.initialize());
-app.use(passport.session());
-require("./config/passport");
+// Serve admin static files
+app.use(
+  "/admin",
+  express.static(path.join(__dirname, "../admin/dist"), staticOptions)
+);
+app.use(
+  "/admin/assets",
+  express.static(path.join(__dirname, "../admin/dist/assets"), staticOptions)
+);
+app.use(
+  "/admin/style",
+  express.static(path.join(__dirname, "../admin/dist/style"), staticOptions)
+);
+app.use(
+  "/admin/javascript",
+  express.static(
+    path.join(__dirname, "../admin/dist/javascript"),
+    staticOptions
+  )
+);
 
-// Add CSRF protection after session middleware
-app.use(doubleCsrfProtection);
-
-// Generate CSRF token endpoint
-app.get("/api/csrf-token", (req, res) => {
-  res.json({ token: generateToken(req, res) });
-});
-
-// Health check endpoint for Render
-app.get("/health", (req, res) => {
-  res
-    .status(200)
-    .json({ status: "healthy", environment: process.env.NODE_ENV });
-});
-
-// Apply rate limiting to different route groups
-app.use("/api/auth", limiters.auth);
-app.use("/api/admin", limiters.admin);
-app.use("/api", limiters.api);
-
-// Routes
+// API routes
 app.use("/api/auth", require("./routes/auth"));
-app.use("/api/user", require("./routes/user"));
-app.use("/api/registration", require("./routes/registration"));
 app.use("/api/admin", require("./routes/admin"));
+app.use("/api/bookings", require("./routes/booking"));
 app.use("/api/members", require("./routes/members"));
-app.use("/api/booking", require("./routes/booking"));
+app.use("/api/registrations", require("./routes/registration"));
+app.use("/api/users", require("./routes/user"));
 
-// Handle client-side routing - place after API routes
-if (process.env.NODE_ENV === "production") {
-  // Admin routes should serve admin/index.html
-  app.get("/admin/*", (req, res) => {
-    res.sendFile(path.join(__dirname, "../admin/admin_dashboard.html"));
-  });
-
-  // All other routes serve the main app's index.html
-  app.get("*", (req, res) => {
-    res.sendFile(path.join(__dirname, "../IPT-TAILWIND/dist/index.html"));
-  });
-}
-
-// Error handling middleware
-app.use((err, req, res, next) => {
-  console.error("Server error:", err.stack);
-  res.status(500).json({
-    status: "error",
-    message:
-      process.env.NODE_ENV === "development"
-        ? err.message
-        : "Internal server error",
-  });
+// Admin routes
+app.get(["/admin", "/admin/*"], (req, res) => {
+  res.sendFile(
+    path.join(__dirname, "../admin/dist/admin_login_interface.html")
+  );
 });
+
+// Frontend routes - serve index.html for client-side routing
+app.get("*", (req, res) => {
+  if (req.path.startsWith("/api")) {
+    return; // Let API routes handle themselves
+  }
+  res.sendFile(path.join(__dirname, "../IPT-TAILWIND/dist/index.html"));
+});
+
+// Connect to MongoDB
+connectDB()
+  .then(() => console.log("Database connection established"))
+  .catch((err) => {
+    console.error("Database connection error:", err);
+    process.exit(1);
+  });
 
 // Start server
 app.listen(PORT, () => {
