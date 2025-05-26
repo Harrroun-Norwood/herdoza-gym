@@ -45,7 +45,6 @@ class UserStorageManager {
       }
     }
   }
-
   static async initializeNewUser(userData) {
     if (!userData.email) {
       throw new Error("Email is required");
@@ -60,6 +59,29 @@ class UserStorageManager {
     );
     localStorage.setItem("userStatus", userData.status || "Active");
     localStorage.setItem("userType", userData.type || "Gym Fitness");
+
+    // Initialize empty bookings for new user
+    const emptyBookings = {
+      mmaPerSession: [],
+      mmaBulkSession: [],
+      mmaZumba: [],
+      zumba: [],
+      studio: [],
+      gym: [],
+    };
+
+    // Save empty bookings to storage
+    Object.entries({
+      mmaPerSessionBookings: emptyBookings.mmaPerSession,
+      mma25SessionUserBookings: emptyBookings.mmaBulkSession,
+      mmaZumbaBookings: emptyBookings.mmaZumba,
+      zumbaBookings: emptyBookings.zumba,
+      smallStudioBookings: emptyBookings.studio,
+      largeStudioBookings: emptyBookings.studio,
+      gymMembershipBookings: emptyBookings.gym,
+    }).forEach(([key, value]) => {
+      localStorage.setItem(`${key}_${userData.email}`, JSON.stringify(value));
+    });
 
     // Create session data
     const userSessionData = {

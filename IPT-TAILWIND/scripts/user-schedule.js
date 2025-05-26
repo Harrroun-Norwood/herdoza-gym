@@ -55,24 +55,38 @@ async function fetchUserBookings() {
       console.log("Using local storage for development");
     }
   }
-
   // Fallback to localStorage if backend fails
+  const userEmail = localStorage.getItem("userEmail");
+  if (!userEmail) {
+    return {
+      mmaPerSession: [],
+      mmaBulkSession: [],
+      mmaZumba: [],
+      zumba: [],
+      studio: [],
+    };
+  }
+
   return {
     mmaPerSession: JSON.parse(
-      localStorage.getItem("mmaPerSessionBookings") || "[]"
+      localStorage.getItem(`mmaPerSessionBookings_${userEmail}`) || "[]"
     ),
     mmaBulkSession: JSON.parse(
-      localStorage.getItem("mma25SessionBookings") || "[]"
+      localStorage.getItem(`mma25SessionUserBookings_${userEmail}`) || "[]"
     ),
-    mmaZumba: JSON.parse(localStorage.getItem("mmaZumbaBookings") || "[]"),
-    zumba: JSON.parse(localStorage.getItem("zumbaBookings") || "[]"),
+    mmaZumba: JSON.parse(
+      localStorage.getItem(`mmaZumbaBookings_${userEmail}`) || "[]"
+    ),
+    zumba: JSON.parse(
+      localStorage.getItem(`zumbaBookings_${userEmail}`) || "[]"
+    ),
     studio: [
-      ...JSON.parse(localStorage.getItem("smallStudioBookings") || "[]").map(
-        (b) => ({ ...b, sessionType: "smallStudio" })
-      ),
-      ...JSON.parse(localStorage.getItem("largeStudioBookings") || "[]").map(
-        (b) => ({ ...b, sessionType: "largeStudio" })
-      ),
+      ...JSON.parse(
+        localStorage.getItem(`smallStudioBookings_${userEmail}`) || "[]"
+      ).map((b) => ({ ...b, sessionType: "smallStudio" })),
+      ...JSON.parse(
+        localStorage.getItem(`largeStudioBookings_${userEmail}`) || "[]"
+      ).map((b) => ({ ...b, sessionType: "largeStudio" })),
     ],
   };
 }

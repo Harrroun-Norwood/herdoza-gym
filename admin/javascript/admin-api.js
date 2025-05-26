@@ -468,7 +468,11 @@ const adminApi = {
 
   // Get all members
   getMembers() {
-    return JSON.parse(localStorage.getItem("members") || "[]");
+    const members = JSON.parse(localStorage.getItem("members") || "[]");
+    return members.filter((member) => {
+      // Filter out invalid member entries
+      return member && typeof member === "object" && member.id && member.name;
+    });
   },
 
   // Add new member
@@ -485,15 +489,16 @@ const adminApi = {
       throw new Error("A member with this email already exists");
     }
 
+    const now = new Date();
     // Ensure consistent data structure
     const newMember = {
       id: Date.now().toString(),
-      name: memberData.name,
-      email: memberData.email,
-      contact: memberData.contact,
+      name: memberData.name.trim(),
+      email: memberData.email.trim().toLowerCase(),
+      contact: memberData.contact.trim(),
       membershipType: memberData.membershipType || "Gym Fitness",
       membershipDuration: memberData.membershipDuration || "1",
-      dateOfMembership: new Date().toISOString(),
+      dateOfMembership: now.toISOString(),
       dateOfExpiration: this.calculateExpirationDate(
         memberData.membershipDuration || "1"
       ),
@@ -502,9 +507,45 @@ const adminApi = {
       paymentStatus: "paid",
     };
 
+    // Synchronize with other storage
+    this.syncMemberData(newMember);
+
     members.push(newMember);
     localStorage.setItem("members", JSON.stringify(members));
     return newMember;
+  },
+
+  // Sync member data across storage
+  syncMemberData(member) {
+    if (!member || !member.email) return;
+
+    // Update membershipData store
+    const membershipData = {
+      daysLeft: this.calculateDaysLeft(member.dateOfExpiration),
+      nextPaymentDate: member.dateOfExpiration,
+      type: member.membershipType,
+      status: member.status,
+    };
+    localStorage.setItem(
+      `membershipData_${member.email}`,
+      JSON.stringify(membershipData)
+    );
+
+    // Update members-data store
+    const membersData = JSON.parse(
+      localStorage.getItem("members-data") || "{}"
+    );
+    membersData[member.email] = membershipData;
+    localStorage.setItem("members-data", JSON.stringify(membersData));
+  },
+
+  // Calculate days left until expiration
+  calculateDaysLeft(expirationDate) {
+    const now = new Date();
+    const expDate = new Date(expirationDate);
+    const diffTime = expDate - now;
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    return Math.max(0, diffDays);
   },
 
   // Renew membership
@@ -539,6 +580,19 @@ const adminApi = {
     if (memberIndex !== -1) {
       members[memberIndex].status = "expired";
       members[memberIndex].dateOfExpiration = new Date().toISOString();
+      localStorage.setItem("members", JSON.stringify(members));
+      return members[memberIndex];
+    }
+    return null;
+  },
+
+  // Update member contact
+  updateMemberContact(memberId, contact) {
+    const members = this.getMembers();
+    const memberIndex = members.findIndex((m) => m.id === memberId);
+
+    if (memberIndex !== -1) {
+      members[memberIndex].contact = contact;
       localStorage.setItem("members", JSON.stringify(members));
       return members[memberIndex];
     }
@@ -548,109 +602,16 @@ const adminApi = {
   // Remove member
   removeMember(memberId) {
     const members = this.getMembers();
-    const updatedMembers = members.filter((m) => m.id !== memberId);
-    localStorage.setItem("members", JSON.stringify(updatedMembers));
-    return true;
-  },
-
-  // Update member contact
-  updateMemberContact(memberId, contact) {
-    const members = this.getMembers();
     const memberIndex = members.findIndex((m) => m.id === memberId);
 
     if (memberIndex !== -1) {
-      members[memberIndex].contact = contact;
+      members.splice(memberIndex, 1);
       localStorage.setItem("members", JSON.stringify(members));
-      return members[memberIndex];
+      return true;
     }
-    return null;
-  },
-  // Add new member
-  addMember(memberData) {
-    const members = this.getMembers();
-
-    // Validate required fields
-    if (!memberData.name || !memberData.email || !memberData.contact) {
-      throw new Error("Missing required member information");
-    }
-
-    // Check for duplicate email
-    if (members.some((m) => m.email === memberData.email)) {
-      throw new Error("A member with this email already exists");
-    }
-
-    // Ensure consistent data structure
-    const newMember = {
-      id: Date.now().toString(),
-      name: memberData.name,
-      email: memberData.email,
-      contact: memberData.contact,
-      membershipType: memberData.membershipType || "Gym Fitness",
-      membershipDuration: memberData.membershipDuration || "1",
-      dateOfMembership: new Date().toISOString(),
-      dateOfExpiration: this.calculateExpirationDate(
-        memberData.membershipDuration || "1"
-      ),
-      status: "active",
-      paymentMethod: memberData.paymentMethod || "Cash",
-      paymentStatus: "paid",
-    };
-
-    members.push(newMember);
-    localStorage.setItem("members", JSON.stringify(members));
-    return newMember;
+    return false;
   },
 
-  // Renew membership
-  renewMembership(memberId, duration) {
-    const members = this.getMembers();
-    const memberIndex = members.findIndex((m) => m.id === memberId);
-
-    if (memberIndex !== -1) {
-      const currentExpiration = new Date(members[memberIndex].dateOfExpiration);
-      const newExpiration = new Date(
-        currentExpiration.getTime() + duration * 30 * 24 * 60 * 60 * 1000
-      );
-
-      members[memberIndex] = {
-        ...members[memberIndex],
-        dateOfExpiration: newExpiration.toISOString(),
-        status: "active",
-        lastRenewal: new Date().toISOString(),
-      };
-
-      localStorage.setItem("members", JSON.stringify(members));
-      return members[memberIndex];
-    }
-    return null;
-  },
-
-  // Cancel membership
-  cancelMembership(memberId) {
-    const members = this.getMembers();
-    const memberIndex = members.findIndex((m) => m.id === memberId);
-
-    if (memberIndex !== -1) {
-      members[memberIndex].status = "expired";
-      members[memberIndex].dateOfExpiration = new Date().toISOString();
-      localStorage.setItem("members", JSON.stringify(members));
-      return members[memberIndex];
-    }
-    return null;
-  },
-
-  // Update member contact
-  updateMemberContact(memberId, contact) {
-    const members = this.getMembers();
-    const memberIndex = members.findIndex((m) => m.id === memberId);
-
-    if (memberIndex !== -1) {
-      members[memberIndex].contact = contact;
-      localStorage.setItem("members", JSON.stringify(members));
-      return members[memberIndex];
-    }
-    return null;
-  },
   // Calculate expiration date
   calculateExpirationDate(months) {
     const expirationDate = new Date();

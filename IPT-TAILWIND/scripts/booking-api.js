@@ -97,36 +97,15 @@ function handlePayment(bookingData) {
  */
 async function getUserBookings() {
   try {
-    const userToken = localStorage.getItem("userToken");
+    const userEmail = localStorage.getItem("userEmail");
     const userId = localStorage.getItem("userId");
 
-    if (!userId) {
-      console.error("No user ID found");
-      return getEmptyBookings();
-    }
-
-    // Try API first
-    if (userToken) {
-      try {
-        const response = await fetch(`${API_URL}/booking/bookings`, {
-          headers: {
-            Authorization: `Bearer ${userToken}`,
-          },
-        });
-
-        if (response.ok) {
-          const data = await response.json();
-          return data.bookings;
-        }
-      } catch (apiError) {
-        console.log("API not available, using localStorage");
-      }
-    }
-
-    // Fallback to localStorage
-    const now = new Date();
+    // Filter function for valid bookings
     const filterValid = (booking) => {
-      // For bulk sessions, check end date
+      if (!booking.userId === userId) return false;
+
+      const now = new Date();
+      // For packages with end dates
       if (booking.endDate) {
         const endDate = new Date(booking.endDate);
         return endDate >= now && booking.userId === userId;
@@ -136,26 +115,31 @@ async function getUserBookings() {
       return bookingDate >= now && booking.userId === userId;
     };
 
-    // Get all bookings from localStorage
+    // Get all bookings from localStorage with user-specific keys
+    const storagePrefix = userEmail ? `_${userEmail}` : "";
     const bookings = {
       mmaPerSession: JSON.parse(
-        localStorage.getItem("mmaPerSessionBookings") || "[]"
+        localStorage.getItem(`mmaPerSessionBookings${storagePrefix}`) || "[]"
       ).filter(filterValid),
       mmaBulkSession: JSON.parse(
-        localStorage.getItem("mma25SessionUserBookings") || "[]"
+        localStorage.getItem(`mma25SessionUserBookings${storagePrefix}`) || "[]"
       ).filter(filterValid),
       mmaZumba: JSON.parse(
-        localStorage.getItem("mmaZumbaBookings") || "[]"
+        localStorage.getItem(`mmaZumbaBookings${storagePrefix}`) || "[]"
       ).filter(filterValid),
-      zumba: JSON.parse(localStorage.getItem("zumbaBookings") || "[]").filter(
-        filterValid
-      ),
+      zumba: JSON.parse(
+        localStorage.getItem(`zumbaBookings${storagePrefix}`) || "[]"
+      ).filter(filterValid),
       studio: [
-        ...JSON.parse(localStorage.getItem("smallStudioBookings") || "[]"),
-        ...JSON.parse(localStorage.getItem("largeStudioBookings") || "[]"),
+        ...JSON.parse(
+          localStorage.getItem(`smallStudioBookings${storagePrefix}`) || "[]"
+        ),
+        ...JSON.parse(
+          localStorage.getItem(`largeStudioBookings${storagePrefix}`) || "[]"
+        ),
       ].filter(filterValid),
       gym: JSON.parse(
-        localStorage.getItem("gymMembershipBookings") || "[]"
+        localStorage.getItem(`gymMembershipBookings${storagePrefix}`) || "[]"
       ).filter(filterValid),
     };
 
@@ -197,8 +181,14 @@ function storeBookingInLocalStorage(booking) {
       return;
     }
 
+    // Get user email
+    const userEmail = localStorage.getItem("userEmail");
+    const userStorageKey = userEmail
+      ? `${storageKey}_${userEmail}`
+      : storageKey;
+
     // Get existing bookings
-    const bookings = JSON.parse(localStorage.getItem(storageKey) || "[]");
+    const bookings = JSON.parse(localStorage.getItem(userStorageKey) || "[]");
 
     // Add new booking, ensuring no duplicates by ID
     const bookingIndex = bookings.findIndex((b) => b.id === booking.id);
@@ -209,7 +199,7 @@ function storeBookingInLocalStorage(booking) {
     }
 
     // Save back to localStorage
-    localStorage.setItem(storageKey, JSON.stringify(bookings));
+    localStorage.setItem(userStorageKey, JSON.stringify(bookings));
 
     // Update admin bookings as well
     const adminBookings = JSON.parse(

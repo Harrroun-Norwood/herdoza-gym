@@ -62,31 +62,49 @@ async function loadMembers(filter = "all") {
     let members = await window.adminApi.getMembers();
 
     // Validate member data structure and fix if necessary
-    members = members.map((member) => {
-      // Ensure all required fields are present
-      const validatedMember = {
-        id: member.id || Date.now().toString(),
-        name: member.name || "Unknown Member",
-        email: member.email || "",
-        contact: member.contact || "",
-        membershipType: member.membershipType || "Gym Fitness",
-        membershipDuration: member.membershipDuration || "1",
-        dateOfMembership: member.dateOfMembership || new Date().toISOString(),
-        dateOfExpiration: member.dateOfExpiration || new Date().toISOString(),
-        status: member.status || "active",
-        paymentMethod: member.paymentMethod || "Cash",
-        paymentStatus: member.paymentStatus || "paid",
-      };
+    members = members
+      .map((member) => {
+        // Check if member object exists and has minimum required data
+        if (!member || !member.name || !member.id) {
+          return null;
+        }
 
-      // Check for expired membership
-      const now = new Date();
-      const expirationDate = new Date(validatedMember.dateOfExpiration);
-      if (expirationDate < now && validatedMember.status === "active") {
-        validatedMember.status = "expired";
-      }
+        // Ensure all required fields are present with proper defaults
+        const validatedMember = {
+          id: member.id,
+          name: member.name.trim() || "Unknown Member",
+          email: member.email ? member.email.trim() : "",
+          contact: member.contact ? member.contact.trim() : "",
+          membershipType: member.membershipType || "Gym Fitness",
+          membershipDuration: member.membershipDuration || "1",
+          dateOfMembership: member.dateOfMembership || new Date().toISOString(),
+          dateOfExpiration: member.dateOfExpiration || new Date().toISOString(),
+          status: member.status || "active",
+          paymentMethod: member.paymentMethod || "Cash",
+          paymentStatus: member.paymentStatus || "paid",
+        };
 
-      return validatedMember;
-    });
+        // Validate dates
+        const now = new Date();
+        const expirationDate = new Date(validatedMember.dateOfExpiration);
+        const membershipDate = new Date(validatedMember.dateOfMembership);
+
+        // Fix invalid dates
+        if (isNaN(expirationDate.getTime())) {
+          validatedMember.dateOfExpiration = now.toISOString();
+        }
+        if (isNaN(membershipDate.getTime())) {
+          validatedMember.dateOfMembership = now.toISOString();
+        }
+
+        // Check for expired membership
+        if (expirationDate < now && validatedMember.status === "active") {
+          validatedMember.status = "expired";
+        }
+
+        return validatedMember;
+      })
+      .filter((member) => member !== null); // Remove any invalid members
 
     // Update localStorage with validated members
     localStorage.setItem("members", JSON.stringify(members));
@@ -123,15 +141,25 @@ function displayMembers(members) {
   const tableBody = document.getElementById("memberTableBody");
   if (!tableBody) return;
 
-  if (!members.length) {
+  if (!Array.isArray(members) || members.length === 0) {
     tableBody.innerHTML =
       '<tr><td colspan="7" class="text-center py-4 text-gray-500">No members found</td></tr>';
     return;
   }
 
   tableBody.innerHTML = members
-    .map(
-      (member) => `
+    .map((member) => {
+      if (!member || !member.id || !member.name) return "";
+
+      const memberStatus = member.status || "unknown";
+      const statusClass =
+        memberStatus === "active"
+          ? "bg-green-100 text-green-800"
+          : memberStatus === "expired"
+          ? "bg-red-100 text-red-800"
+          : "bg-gray-100 text-gray-800";
+
+      return `
     <tr class="border-b hover:bg-gray-50" data-member-id="${member.id}">
       <td class="py-4">
         <div class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center">
@@ -146,7 +174,9 @@ function displayMembers(members) {
       </td>
       <td class="py-4">
         <div class="contact-row">
-          <span class="contact-display">${member.contact}</span>
+          <span class="contact-display">${
+            member.contact || "No contact provided"
+          }</span>
           <button onclick="editContact('${
             member.id
           }')" class="edit-btn ml-2" data-tooltip="Edit contact info">
@@ -154,7 +184,7 @@ function displayMembers(members) {
           </button>
           <div class="edit-form hidden">
             <input type="text" value="${
-              member.contact
+              member.contact || ""
             }" class="border px-2 py-1 w-32" 
                    onkeydown="if(event.key === 'Enter') saveContact('${
                      member.id
@@ -176,24 +206,24 @@ function displayMembers(members) {
         </div>
       </td>
       <td class="py-4">
-        <div class="text-sm">${formatDate(member.dateOfMembership)}</div>
+        <div class="text-sm">${
+          formatDate(member.dateOfMembership) || "Unknown"
+        }</div>
       </td>
       <td class="py-4">
-        <div class="text-sm">${formatDate(member.dateOfExpiration)}</div>
+        <div class="text-sm">${
+          formatDate(member.dateOfExpiration) || "Unknown"
+        }</div>
       </td>
       <td class="py-4">
-        <span class="px-2 py-1 text-xs rounded-full ${
-          member.status === "active"
-            ? "bg-green-100 text-green-800"
-            : "bg-red-100 text-red-800"
-        }">
-          ${capitalizeFirst(member.status)}
+        <span class="px-2 py-1 text-xs rounded-full ${statusClass}">
+          ${capitalizeFirst(memberStatus)}
         </span>
       </td>
       <td class="py-4">
         <div class="flex items-center space-x-2">
           ${
-            member.status === "active"
+            memberStatus === "active"
               ? `
             <button onclick="showRenewalModal('${member.id}')" class="text-blue-600 hover:text-blue-800" data-tooltip="Renew membership">
               <i class="ri-refresh-line"></i>
@@ -216,8 +246,8 @@ function displayMembers(members) {
         </div>
       </td>
     </tr>
-  `
-    )
+  `;
+    })
     .join("");
 }
 

@@ -466,7 +466,50 @@
 
           if (pin === registration.pin.toString()) {
             // Update registration to verified
-            registration.verified = true; // Move to members and store user data
+            registration.verified = true;
+
+            // Initialize empty bookings arrays first with user email
+            const storagePrefix = `_${email}`;
+            const emptyBookings = {
+              mmaPerSession: [],
+              mmaBulkSession: [],
+              mmaZumba: [],
+              zumba: [],
+              studio: [],
+              gym: [],
+            };
+
+            // Save empty bookings to storage with user email
+            localStorage.setItem(
+              `mmaPerSessionBookings${storagePrefix}`,
+              JSON.stringify(emptyBookings.mmaPerSession)
+            );
+            localStorage.setItem(
+              `mma25SessionUserBookings${storagePrefix}`,
+              JSON.stringify(emptyBookings.mmaBulkSession)
+            );
+            localStorage.setItem(
+              `mmaZumbaBookings${storagePrefix}`,
+              JSON.stringify(emptyBookings.mmaZumba)
+            );
+            localStorage.setItem(
+              `zumbaBookings${storagePrefix}`,
+              JSON.stringify(emptyBookings.zumba)
+            );
+            localStorage.setItem(
+              `smallStudioBookings${storagePrefix}`,
+              JSON.stringify(emptyBookings.studio)
+            );
+            localStorage.setItem(
+              `largeStudioBookings${storagePrefix}`,
+              JSON.stringify(emptyBookings.studio)
+            );
+            localStorage.setItem(
+              `gymBookings${storagePrefix}`,
+              JSON.stringify(emptyBookings.gym)
+            );
+
+            // Move to members and store user data
             const members = JSON.parse(localStorage.getItem("members") || "[]");
             const { pin, verified, ...memberData } = registration;
             members.push(memberData);
@@ -571,6 +614,14 @@
               status: "pending",
               timestamp: new Date().toISOString(),
               paymentStatus: "pending",
+              schedules: {
+                mmaPerSession: [],
+                mmaBulkSession: [],
+                mmaZumba: [],
+                zumba: [],
+                studio: [],
+                gym: [],
+              },
             };
 
             // Check email against all possible sources

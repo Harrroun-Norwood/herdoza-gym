@@ -447,20 +447,23 @@ function setupPaymentHandlers(container, details) {
 // Helper function to determine booking storage key
 function getBookingStorageKey(bookingType) {
   const type = bookingType.toLowerCase();
+  const userEmail = localStorage.getItem("userEmail");
+  const storagePrefix = userEmail ? `_${userEmail}` : "";
+
   if (type.includes("mma") && type.includes("zumba")) {
-    return "mmaZumbaBookings";
+    return `mmaZumbaBookings${storagePrefix}`;
   } else if (type.includes("mma") && type.includes("25")) {
-    return "mma25SessionBookings";
+    return `mma25SessionBookings${storagePrefix}`;
   } else if (type.includes("mma")) {
-    return "mmaPerSessionBookings";
+    return `mmaPerSessionBookings${storagePrefix}`;
   } else if (type.includes("zumba")) {
-    return "zumbaBookings";
+    return `zumbaBookings${storagePrefix}`;
   } else if (type.includes("solo") || type.includes("small group")) {
-    return "smallStudioBookings";
+    return `smallStudioBookings${storagePrefix}`;
   } else if (type.includes("large group")) {
-    return "largeStudioBookings";
+    return `largeStudioBookings${storagePrefix}`;
   } else {
-    return "gymBookings";
+    return `gymBookings${storagePrefix}`;
   }
 }
 
