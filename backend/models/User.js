@@ -1,51 +1,57 @@
 const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
 
-const userSchema = new mongoose.Schema({
-  firstName: {
-    type: String,
-    required: true,
-    trim: true,
+const userSchema = new mongoose.Schema(
+  {
+    firstName: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    lastName: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    email: {
+      type: String,
+      required: true,
+      trim: true,
+      lowercase: true,
+    },
+    password: {
+      type: String,
+      required: true,
+      minlength: 7,
+    },
+    role: {
+      type: String,
+      enum: ["user", "admin"],
+      default: "user",
+    },
+    contactNumber: {
+      type: String,
+      trim: true,
+    },
+    profilePicture: {
+      type: String,
+      default: "/assets/profile-icon.png",
+    },
+    membershipData: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Membership",
+    },
+    createdAt: {
+      type: Date,
+      default: Date.now,
+    },
   },
-  lastName: {
-    type: String,
-    required: true,
-    trim: true,
-  },
-  email: {
-    type: String,
-    required: true,
-    trim: true,
-    lowercase: true,
-    index: { unique: true },
-  },
-  password: {
-    type: String,
-    required: true,
-    minlength: 7,
-  },
-  role: {
-    type: String,
-    enum: ["user", "admin"],
-    default: "user",
-  },
-  contactNumber: {
-    type: String,
-    trim: true,
-  },
-  profilePicture: {
-    type: String,
-    default: "/assets/profile-icon.png",
-  },
-  membershipData: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Membership",
-  },
-  createdAt: {
-    type: Date,
-    default: Date.now,
-  },
-});
+  {
+    timestamps: true,
+    // Add indexes at the schema level
+    indexes: [{ email: 1 }, { role: 1 }],
+  }
+);
 
 // Hash password before saving
 userSchema.pre("save", async function (next) {

@@ -1,26 +1,20 @@
 // Database connection configuration
 const mongoose = require("mongoose");
+const { MongoClient, ServerApiVersion } = require("mongodb");
 
 // MongoDB Atlas connection string
 const mongoURI =
-  process.env.MONGODB_URI || "mongodb://localhost:27017/herdoza_fitness";
+  "mongodb+srv://Harroun:nuorrah77@herdozafitnessgym.7cgyvgr.mongodb.net/?retryWrites=true&w=majority&appName=HerdozaFitnessGym";
 
 // Connect to MongoDB function
 const connectDB = async () => {
   try {
-    // Ensure MONGODB_URI starts with mongodb:// or mongodb+srv://
-    if (
-      process.env.MONGODB_URI &&
-      !process.env.MONGODB_URI.match(/^mongodb(\+srv)?:\/\//)
-    ) {
-      throw new Error("Invalid MongoDB connection string format");
-    }
-
     const options = {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-      serverSelectionTimeoutMS: 5000,
-      socketTimeoutMS: 45000,
+      serverApi: {
+        version: ServerApiVersion.v1,
+        strict: true,
+        deprecationErrors: true,
+      },
     };
 
     const conn = await mongoose.connect(mongoURI, options);
