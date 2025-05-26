@@ -10,12 +10,18 @@ export default defineConfig({
     rollupOptions: {
       input: {
         main: resolve(__dirname, "index.html"),
+        "dance-studio": resolve(__dirname, "dance-studio.html"),
+        "gym-fitness": resolve(__dirname, "gym-fitness.html"),
+        login: resolve(__dirname, "login.html"),
+        "mixed-martial-arts": resolve(__dirname, "mixed-martial-arts.html"),
+        "sign-up": resolve(__dirname, "sign-up.html"),
+        // Add other HTML files as needed
       },
     },
   },
   css: {
     postcss: {
-      plugins: [require("tailwindcss"), require("autoprefixer")],
+      plugins: [tailwindcss, autoprefixer],
     },
   },
   optimizeDeps: {

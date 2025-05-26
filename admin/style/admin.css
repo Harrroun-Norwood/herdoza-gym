@@ -16,6 +16,15 @@ body {
   color: white;
 }
 
+/* Icon Styles */
+[class^="ri-"],
+[class*=" ri-"] {
+  font-family: "RemixIcon" !important;
+  font-style: normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
 /* Scrollbar Styles */
 ::-webkit-scrollbar {
   height: 6px;
