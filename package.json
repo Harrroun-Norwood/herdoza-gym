@@ -16,7 +16,7 @@
     "build": "cd IPT-TAILWIND && vite build && cd ../backend && npm install",
     "preview": "cd IPT-TAILWIND && vite preview",
     "create-admin": "cd backend && node scripts/create-admin.js",
-    "start": "cd backend && node server.js",
+    "start": "node server.js",
     "test": "cd backend && npm test"
   },
   "dependencies": {
