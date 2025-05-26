@@ -4,7 +4,7 @@ const { MongoClient, ServerApiVersion } = require("mongodb");
 
 // MongoDB Atlas connection string
 const mongoURI =
-  "mongodb+srv://Harroun:nuorrah77@herdozafitnessgym.7cgyvgr.mongodb.net/?retryWrites=true&w=majority&appName=HerdozaFitnessGym";
+  process.env.MONGODB_URI || "mongodb://localhost:27017/herdoza_fitness";
 
 // Connect to MongoDB function
 const connectDB = async () => {
