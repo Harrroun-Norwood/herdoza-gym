@@ -48,18 +48,21 @@ connectDB()
 
 // CORS configuration
 const corsOptions = {
-  origin: [
-    "http://localhost:5173", // Vite frontend default
-    "http://localhost:5174", // Potential secondary Vite port
-    "http://localhost:3000", // Local backend
-    "http://localhost:3001", // Static admin panel
-    "http://127.0.0.1:5173",
-    "http://127.0.0.1:5174",
-    "http://127.0.0.1:5000",
-    "http://127.0.0.1:5500", // VS Code Live Server
-    "http://127.0.0.1:3000",
-    "http://127.0.0.1:3001",
-  ],
+  origin:
+    process.env.NODE_ENV === "production"
+      ? ["https://herdoza-gym.onrender.com"]
+      : [
+          "http://localhost:5173", // Vite frontend default
+          "http://localhost:5174", // Potential secondary Vite port
+          "http://localhost:3000", // Local backend
+          "http://localhost:3001", // Static admin panel
+          "http://127.0.0.1:5173",
+          "http://127.0.0.1:5174",
+          "http://127.0.0.1:5000",
+          "http://127.0.0.1:5500", // VS Code Live Server
+          "http://127.0.0.1:3000",
+          "http://127.0.0.1:3001",
+        ],
   credentials: true,
   optionsSuccessStatus: 200,
 };
@@ -81,11 +84,11 @@ app.use(
       ttl: 24 * 60 * 60, // Session TTL in seconds (1 day)
       touchAfter: 24 * 3600, // Time period in seconds between session updates
       collectionName: "sessions",
-      autoRemove: "native", // Use MongoDB's TTL index
+      autoRemove: "disabled", // Disable automatic removal
       crypto: {
         secret: false, // Disable crypto since we're using express-session's secret
       },
-      autoCreate: true, // Automatically create the sessions collection
+      autoCreate: false, // Don't automatically create indexes
     }),
     cookie: {
       secure: process.env.NODE_ENV === "production",

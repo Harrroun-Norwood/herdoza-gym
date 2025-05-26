@@ -8,10 +8,7 @@ const mongoURI =
 // Connect to MongoDB function
 const connectDB = async () => {
   try {
-    const conn = await mongoose.connect(mongoURI, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    });
+    const conn = await mongoose.connect(mongoURI);
     console.log(`MongoDB Atlas Connected: ${conn.connection.host}`);
     return conn;
   } catch (error) {
