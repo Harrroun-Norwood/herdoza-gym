@@ -8,7 +8,22 @@ const mongoURI =
 // Connect to MongoDB function
 const connectDB = async () => {
   try {
-    const conn = await mongoose.connect(mongoURI);
+    // Ensure MONGODB_URI starts with mongodb:// or mongodb+srv://
+    if (
+      process.env.MONGODB_URI &&
+      !process.env.MONGODB_URI.match(/^mongodb(\+srv)?:\/\//)
+    ) {
+      throw new Error("Invalid MongoDB connection string format");
+    }
+
+    const options = {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+      serverSelectionTimeoutMS: 5000,
+      socketTimeoutMS: 45000,
+    };
+
+    const conn = await mongoose.connect(mongoURI, options);
     console.log(`MongoDB Atlas Connected: ${conn.connection.host}`);
     return conn;
   } catch (error) {
