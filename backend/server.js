@@ -68,18 +68,29 @@ const cacheTime = process.env.NODE_ENV === "production" ? 86400000 : 0; // 1 day
 const staticOptions = {
   maxAge: cacheTime,
   etag: true,
+  setHeaders: (res, path) => {
+    if (path.endsWith(".css")) {
+      res.setHeader("Content-Type", "text/css");
+    }
+    if (path.endsWith(".js")) {
+      res.setHeader("Content-Type", "application/javascript");
+    }
+  },
 };
 
 // Serve frontend static files
 app.use(
   express.static(path.join(__dirname, "../IPT-TAILWIND/dist"), staticOptions)
 );
+
+// Serve frontend assets with proper MIME types
 app.use(
   "/assets",
-  express.static(
-    path.join(__dirname, "../IPT-TAILWIND/dist/assets"),
-    staticOptions
-  )
+  express.static(path.join(__dirname, "../IPT-TAILWIND/dist/assets"), {
+    ...staticOptions,
+    index: false,
+    extensions: ["html", "css", "js", "png", "jpg", "jpeg", "gif"],
+  })
 );
 
 // Serve admin static files
