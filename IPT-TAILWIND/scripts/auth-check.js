@@ -21,11 +21,13 @@ document.addEventListener("DOMContentLoaded", function () {
   // Replace their onclick handlers with auth check
   priceButtons.forEach((button) => {
     const originalOnclick = button.getAttribute("onclick");
+    const popupId = originalOnclick.match(/openPopup\(['"]([^'"]+)['"]\)/)?.[1];
+
     button.onclick = function (e) {
       e.preventDefault();
-      if (checkGuestUser()) {
-        // If authenticated, execute original onclick
-        eval(originalOnclick);
+      if (checkGuestUser() && popupId) {
+        // If authenticated, open the popup directly without using eval
+        window.openPopup?.(popupId);
       }
     };
   });

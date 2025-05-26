@@ -25,13 +25,14 @@ app.use(
       directives: {
         defaultSrc: ["'self'"],
         scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'"],
-        styleSrc: ["'self'", "'unsafe-inline'"],
-        imgSrc: ["'self'", "data:", "blob:", "*"],
-        connectSrc: ["'self'", "https:", "wss:"],
-        fontSrc: ["'self'", "https:", "data:"],
+        styleSrc: ["'self'", "'unsafe-inline'", "https:", "http:"],
+        imgSrc: ["'self'", "data:", "blob:", "https:", "http:", "*"],
+        connectSrc: ["'self'", "https:", "http:", "wss:"],
+        fontSrc: ["'self'", "https:", "http:", "data:"],
         mediaSrc: ["'self'"],
         objectSrc: ["'none'"],
         frameAncestors: ["'none'"],
+        baseUri: ["'self'"],
       },
     },
     crossOriginEmbedderPolicy: false,
@@ -68,6 +69,7 @@ const cacheTime = process.env.NODE_ENV === "production" ? 86400000 : 0; // 1 day
 const staticOptions = {
   maxAge: cacheTime,
   etag: true,
+  index: false,
   setHeaders: (res, path) => {
     if (path.endsWith(".css")) {
       res.setHeader("Content-Type", "text/css");
@@ -75,22 +77,29 @@ const staticOptions = {
     if (path.endsWith(".js")) {
       res.setHeader("Content-Type", "application/javascript");
     }
+    if (path.endsWith(".png")) {
+      res.setHeader("Content-Type", "image/png");
+    }
+    if (path.endsWith(".jpg") || path.endsWith(".jpeg")) {
+      res.setHeader("Content-Type", "image/jpeg");
+    }
+    if (path.endsWith(".svg")) {
+      res.setHeader("Content-Type", "image/svg+xml");
+    }
   },
 };
 
-// Serve frontend static files
+// Serve frontend static files and assets
 app.use(
+  "/",
   express.static(path.join(__dirname, "../IPT-TAILWIND/dist"), staticOptions)
 );
-
-// Serve frontend assets with proper MIME types
 app.use(
   "/assets",
-  express.static(path.join(__dirname, "../IPT-TAILWIND/dist/assets"), {
-    ...staticOptions,
-    index: false,
-    extensions: ["html", "css", "js", "png", "jpg", "jpeg", "gif"],
-  })
+  express.static(
+    path.join(__dirname, "../IPT-TAILWIND/dist/assets"),
+    staticOptions
+  )
 );
 
 // Serve admin static files

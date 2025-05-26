@@ -1,19 +1,20 @@
-@import "tailwindcss/preflight";
-@tailwind utilities;
-
 /* Custom styles */
-@layer base {
+@layer components {
   html {
     scroll-behavior: smooth;
   }
-}
 
-@layer components {
   .btn-primary {
-    @apply bg-primary text-white px-4 py-2 rounded hover:bg-red-700 transition-colors;
+    @apply bg-primary text-white px-4 py-2 rounded transition-colors duration-200;
+  }
+  .btn-primary:hover {
+    @apply bg-red-700;
   }
 
   .btn-secondary {
-    @apply bg-secondary text-white px-4 py-2 rounded hover:bg-gray-700 transition-colors;
+    @apply bg-secondary text-white px-4 py-2 rounded transition-colors duration-200;
+  }
+  .btn-secondary:hover {
+    @apply bg-gray-700;
   }
 }

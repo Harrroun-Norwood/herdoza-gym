@@ -1,4 +1,13 @@
-@import "mystyles.css";
-@import "output.css";
+@import "./mystyles.css";
 
-/* Add any additional global styles here */
+/* Tailwind directives */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom styles */
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+}
