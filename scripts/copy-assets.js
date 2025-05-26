@@ -36,14 +36,14 @@ async function copyAssets() {
       path.join(__dirname, "../admin/dist/assets"),
       { overwrite: true }
     );
-    console.log("✅ Admin assets copied");
-
-    // Copy admin HTML files
+    console.log("✅ Admin assets copied"); // Copy admin HTML files
     const adminHtmlFiles = [
       "admin_dashboard.html",
       "admin_login_interface.html",
       "admin_members_database.html",
       "admin_registration.html",
+      "login.html",
+      "sign-up.html",
     ];
 
     for (const file of adminHtmlFiles) {
