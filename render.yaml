@@ -3,7 +3,7 @@ services:
     name: herdoza-fitness-gym
     env: node
     rootDirectory: .
-    buildCommand: NODE_ENV=production npm run build
+    buildCommand: npm run build
     startCommand: cd backend && node server.js
     autoDeploy: true
     envVars:
