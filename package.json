@@ -7,7 +7,8 @@
     "backend",
     "IPT-TAILWIND",
     "admin"
-  ],  "scripts": {
+  ],
+  "scripts": {
     "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\" \"npm run dev:admin\"",
     "dev:backend": "cd backend && nodemon server.js",
     "dev:frontend": "cd IPT-TAILWIND && vite",
