@@ -42,8 +42,6 @@ async function copyAssets() {
       "admin_login_interface.html",
       "admin_members_database.html",
       "admin_registration.html",
-      "login.html",
-      "sign-up.html",
     ];
 
     for (const file of adminHtmlFiles) {

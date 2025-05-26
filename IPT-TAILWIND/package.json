@@ -18,11 +18,14 @@
     "css": "tailwindcss -i ./src/main.css -o ./dist/output.css",
     "css:watch": "tailwindcss -i ./src/main.css -o ./dist/output.css --watch",
     "dev": "npm run css && vite",
-    "build": "npm run css && NODE_ENV=production vite build",
+    "build": "npm run css && cross-env NODE_ENV=production vite build",
     "preview": "vite preview"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "description": ""
+  "description": "",
+  "dependencies": {
+    "cross-env": "^7.0.3"
+  }
 }
