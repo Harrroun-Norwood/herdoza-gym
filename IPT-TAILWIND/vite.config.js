@@ -1,4 +1,4 @@
-import { defineConfig } from "file:///opt/render/project/src/IPT-TAILWIND/node_modules/vite/dist/node/index.js";
+import { defineConfig } from "vite";
 import { resolve } from "path";
 import { fileURLToPath } from "url";
 import { dirname } from "path";
