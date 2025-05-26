@@ -27,6 +27,20 @@ app.use(
   })
 );
 
+// Serve static files from the frontend build directory
+app.use(express.static(path.join(__dirname, "../IPT-TAILWIND/dist")));
+
+// Serve admin static files
+app.use("/admin", express.static(path.join(__dirname, "../admin")));
+
+// Serve the frontend for all non-API routes
+app.get("*", (req, res) => {
+  // Don't interfere with API or admin routes
+  if (!req.path.startsWith("/api") && !req.path.startsWith("/admin")) {
+    res.sendFile(path.join(__dirname, "../IPT-TAILWIND/dist/index.html"));
+  }
+});
+
 // CSRF Protection
 const { generateToken, doubleCsrfProtection } = doubleCsrf({
   getSecret: () => process.env.CSRF_SECRET || "your-secret-key",
@@ -122,12 +136,6 @@ require("./config/passport");
 // Add CSRF protection after session middleware
 app.use(doubleCsrfProtection);
 
-// Static file serving - place before API routes
-if (process.env.NODE_ENV === "production") {
-  // Serve static files from the React frontend app
-  app.use(express.static(path.join(__dirname, "../IPT-TAILWIND/dist")));
-}
-
 // Generate CSRF token endpoint
 app.get("/api/csrf-token", (req, res) => {
   res.json({ token: generateToken(req, res) });
@@ -155,7 +163,12 @@ app.use("/api/booking", require("./routes/booking"));
 
 // Handle client-side routing - place after API routes
 if (process.env.NODE_ENV === "production") {
-  // Serve the index.html file for any unknown routes
+  // Admin routes should serve admin/index.html
+  app.get("/admin/*", (req, res) => {
+    res.sendFile(path.join(__dirname, "../admin/admin_dashboard.html"));
+  });
+
+  // All other routes serve the main app's index.html
   app.get("*", (req, res) => {
     res.sendFile(path.join(__dirname, "../IPT-TAILWIND/dist/index.html"));
   });

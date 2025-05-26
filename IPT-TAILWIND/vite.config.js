@@ -1,12 +1,15 @@
 const { defineConfig } = require("vite");
+const { resolve } = require("path");
 
 module.exports = defineConfig({
+  base: "/",
   css: {
     postcss: "./postcss.config.js",
   },
   build: {
     outDir: "dist",
     assetsDir: "assets",
+    emptyOutDir: true,
     rollupOptions: {
       input: {
         main: "./index.html",

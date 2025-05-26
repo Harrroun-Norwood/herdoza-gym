@@ -17,10 +17,10 @@
     "dev:frontend": "cd IPT-TAILWIND && vite",
     "dev:admin": "cd admin && npx serve -s .",
     "setup": "npm install && npm run create-admin",
-    "build": "npm install && cd IPT-TAILWIND && npm install && npm run build && cd ../backend && npm install",
+    "build": "npm install && cd IPT-TAILWIND && npm install && npm run build && cd ../admin && npm install && npx tailwindcss -i ./style/tailwind.css -o ./style/output.css --minify && cd ../backend && npm install",
+    "start": "cd backend && node server.js",
     "preview": "cd IPT-TAILWIND && vite preview",
     "create-admin": "cd backend && node scripts/create-admin.js",
-    "start": "cd backend && node server.js",
     "test": "cd backend && npm test"
   },
   "dependencies": {

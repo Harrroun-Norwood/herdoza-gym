@@ -19,11 +19,7 @@ services:
         sync: false
       - key: JWT_SECRET
         sync: false
-      # Database configuration
-      - key: DB_NAME
-        value: herdoza_fitness
-      # Security and access control
-      - key: ADMIN_EMAIL
-        value: admin@herdoza-fitness.com
-      - key: CORS_ORIGIN
-        value: https://herdoza-gym.onrender.com
+      - key: ADMIN_URL
+        value: "https://herdoza-fitness-gym.onrender.com/admin"
+      - key: FRONTEND_URL
+        value: "https://herdoza-fitness-gym.onrender.com"
