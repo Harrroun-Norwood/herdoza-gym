@@ -28,28 +28,14 @@ app.use(
           "'self'",
           "'unsafe-inline'",
           "'unsafe-eval'",
-          "https://cdnjs.cloudflare.com",
-          "https://cdn.jsdelivr.net",
-          "https://cdn.remixicon.com",
+          "'unsafe-hashes'",
+          "*",
         ],
-        styleSrc: [
-          "'self'",
-          "'unsafe-inline'",
-          "https:",
-          "http:",
-          "https://cdn.jsdelivr.net",
-          "https://fonts.googleapis.com",
-        ],
-        imgSrc: ["'self'", "data:", "blob:", "https:", "http:", "*"],
-        connectSrc: ["'self'", "https:", "http:", "wss:"],
-        fontSrc: [
-          "'self'",
-          "https:",
-          "http:",
-          "data:",
-          "https://fonts.gstatic.com",
-          "https://cdn.jsdelivr.net",
-        ],
+        scriptSrcAttr: ["'unsafe-inline'", "'unsafe-hashes'"],
+        styleSrc: ["'self'", "'unsafe-inline'", "*"],
+        imgSrc: ["'self'", "data:", "blob:", "*"],
+        fontSrc: ["'self'", "data:", "*"],
+        connectSrc: ["'self'", "*"],
         mediaSrc: ["'self'"],
         objectSrc: ["'none'"],
         frameAncestors: ["'none'"],
@@ -112,7 +98,6 @@ const staticOptions = {
 
 // Serve frontend static files and assets
 app.use(
-  "/",
   express.static(path.join(__dirname, "../IPT-TAILWIND/dist"), staticOptions)
 );
 app.use(
@@ -123,25 +108,53 @@ app.use(
   )
 );
 
-// Serve admin static files
+// Serve admin files
 app.use(
   "/admin",
+  express.static(path.join(__dirname, "../admin"), staticOptions)
+);
+app.use(
+  "/admin/dist",
   express.static(path.join(__dirname, "../admin/dist"), staticOptions)
 );
 app.use(
-  "/admin/assets",
-  express.static(path.join(__dirname, "../admin/dist/assets"), staticOptions)
-);
-app.use(
   "/admin/style",
-  express.static(path.join(__dirname, "../admin/dist/style"), staticOptions)
+  express.static(path.join(__dirname, "../admin/style"), staticOptions)
 );
 app.use(
   "/admin/javascript",
-  express.static(
-    path.join(__dirname, "../admin/dist/javascript"),
-    staticOptions
-  )
+  express.static(path.join(__dirname, "../admin/javascript"), staticOptions)
+);
+app.use(
+  "/admin/assets",
+  express.static(path.join(__dirname, "../admin/assets"), staticOptions)
+);
+
+// Set proper MIME types
+app.use(
+  express.static("public", {
+    setHeaders: (res, path) => {
+      if (path.endsWith(".js") || path.endsWith(".mjs")) {
+        res.setHeader("Content-Type", "application/javascript");
+      } else if (path.endsWith(".css")) {
+        res.setHeader("Content-Type", "text/css");
+      }
+    },
+  })
+);
+
+// Serve admin static files with proper MIME types
+app.use(
+  "/admin",
+  express.static("admin", {
+    setHeaders: (res, path) => {
+      if (path.endsWith(".js") || path.endsWith(".mjs")) {
+        res.setHeader("Content-Type", "application/javascript");
+      } else if (path.endsWith(".css")) {
+        res.setHeader("Content-Type", "text/css");
+      }
+    },
+  })
 );
 
 // API routes
@@ -159,10 +172,22 @@ app.get(["/admin", "/admin/*"], (req, res) => {
   );
 });
 
+// Admin routes
+app.get(["/admin", "/admin/*"], (req, res) => {
+  if (
+    req.path.startsWith("/admin/javascript/") ||
+    req.path.startsWith("/admin/style/") ||
+    req.path.startsWith("/admin/assets/")
+  ) {
+    return; // Let static routes handle themselves
+  }
+  res.sendFile(path.join(__dirname, "../admin/admin_login_interface.html"));
+});
+
 // Frontend routes - serve index.html for client-side routing
 app.get("*", (req, res) => {
-  if (req.path.startsWith("/api")) {
-    return; // Let API routes handle themselves
+  if (req.path.startsWith("/api") || req.path.startsWith("/admin")) {
+    return; // Let API and admin routes handle themselves
   }
   res.sendFile(path.join(__dirname, "../IPT-TAILWIND/dist/index.html"));
 });
