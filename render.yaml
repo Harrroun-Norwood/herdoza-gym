@@ -1,9 +1,9 @@
-servi    buildCommand: npm install && cd backend && npm install && cd ../IPT-TAILWIND && npm install && cd .. && npm run buildes:
+services:
   - type: web
     name: herdoza-fitness-gym
     env: node
     rootDirectory: .
-    buildCommand:npm install && npm run build
+    buildCommand: npm install && npm run build
     startCommand: node server.js
     envVars:
       - key: NODE_ENV

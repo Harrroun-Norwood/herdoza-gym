@@ -14,29 +14,18 @@ const path = require("path");
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Production specific middleware
-// Routes setup
-app.use("/api/registration", require("./routes/registration"));
-app.use("/api/admin", require("./routes/admin"));
-app.use("/api/members", require("./routes/members"));
-app.use("/api/booking", require("./routes/booking"));
-
-// Production configuration
+// Trust proxy in production for secure cookies behind a reverse proxy
 if (process.env.NODE_ENV === "production") {
-  // Trust proxy (important for secure cookies behind a proxy)
   app.set("trust proxy", 1);
-
-  // Serve static files from the frontend build
-  app.use(express.static(path.join(__dirname, "../IPT-TAILWIND/dist")));
-
-  // Handle client-side routing - must be after API routes
-  app.get("*", (req, res) => {
-    res.sendFile(path.resolve(__dirname, "../IPT-TAILWIND/dist/index.html"));
-  });
 }
 
 // Security headers
-app.use(helmet());
+app.use(
+  helmet({
+    contentSecurityPolicy: false, // Disable CSP for development, configure properly in production
+    crossOriginEmbedderPolicy: false, // Allow loading resources from different origins
+  })
+);
 
 // CSRF Protection
 const { generateToken, doubleCsrfProtection } = doubleCsrf({
@@ -133,6 +122,12 @@ require("./config/passport");
 // Add CSRF protection after session middleware
 app.use(doubleCsrfProtection);
 
+// Static file serving - place before API routes
+if (process.env.NODE_ENV === "production") {
+  // Serve static files from the React frontend app
+  app.use(express.static(path.join(__dirname, "../IPT-TAILWIND/dist")));
+}
+
 // Generate CSRF token endpoint
 app.get("/api/csrf-token", (req, res) => {
   res.json({ token: generateToken(req, res) });
@@ -151,10 +146,20 @@ app.use("/api/admin", limiters.admin);
 app.use("/api", limiters.api);
 
 // Routes
+app.use("/api/auth", require("./routes/auth"));
+app.use("/api/user", require("./routes/user"));
 app.use("/api/registration", require("./routes/registration"));
 app.use("/api/admin", require("./routes/admin"));
 app.use("/api/members", require("./routes/members"));
 app.use("/api/booking", require("./routes/booking"));
+
+// Handle client-side routing - place after API routes
+if (process.env.NODE_ENV === "production") {
+  // Serve the index.html file for any unknown routes
+  app.get("*", (req, res) => {
+    res.sendFile(path.join(__dirname, "../IPT-TAILWIND/dist/index.html"));
+  });
+}
 
 // Error handling middleware
 app.use((err, req, res, next) => {
