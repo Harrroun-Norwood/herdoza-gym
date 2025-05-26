@@ -1,8 +1,8 @@
-import tailwindcss from "tailwindcss";
-import postcssImport from "postcss-import";
-import postcssNesting from "postcss-nesting";
-import autoprefixer from "autoprefixer";
-
-export default {
-  plugins: [postcssImport(), tailwindcss(), postcssNesting(), autoprefixer()],
+module.exports = {
+  plugins: {
+    "postcss-import": {},
+    "@tailwindcss/nesting": "postcss-nesting",
+    tailwindcss: {},
+    autoprefixer: {},
+  },
 };
