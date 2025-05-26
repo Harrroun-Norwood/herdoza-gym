@@ -1,6 +1,7 @@
 {
   "name": "ipt-tailwind",
   "version": "1.0.0",
+  "type": "module",
   "main": "tailwind.config.js",
   "dependencies": {
     "@tailwindcss/forms": "^0.5.7"
