@@ -1,9 +1,9 @@
 services:
   - type: web
     name: herdoza-fitness-gym
-    env: node
-    buildCommand: npm install && npm run build
-    startCommand: node server.jsenvVars:
+    env: node    buildCommand: npm install && npm run build
+    startCommand: node server.js
+    envVars:
       - key: NODE_ENV
         value: production
       - key: PORT

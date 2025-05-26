@@ -1,8 +1,10 @@
-{
-  "name": "herdoza-fitness-gym",
+{  "name": "herdoza-fitness-gym",
   "version": "1.0.0",
   "description": "Herdoza Fitness Center Management System",
   "private": true,
+  "engines": {
+    "node": ">=18.0.0"
+  },
   "workspaces": [
     "backend",
     "IPT-TAILWIND",

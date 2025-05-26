@@ -2,19 +2,14 @@
 const mongoose = require("mongoose");
 
 // MongoDB Atlas connection string
-const mongoURI =
-  process.env.MONGODB_URI ||
-  "mongodb://atlas-sql-6800b0407bd8bb4c0bb13529-1kan3.a.query.mongodb.net/herdoza_fitness?ssl=true&authSource=admin";
+const mongoURI = process.env.MONGODB_URI || "mongodb://localhost:27017/herdoza_fitness";
 
-// Connect to MongoDB function with Atlas-specific configuration
+// Connect to MongoDB function
 const connectDB = async () => {
   try {
     const conn = await mongoose.connect(mongoURI, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
-      ssl: true,
-      retryWrites: true,
-      w: "majority",
     });
     console.log(`MongoDB Atlas Connected: ${conn.connection.host}`);
     return conn;

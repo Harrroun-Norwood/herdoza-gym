@@ -66,16 +66,22 @@ app.use(
     resave: false,
     saveUninitialized: false,
     store: MongoStore.create({
-      mongoUrl:
-        process.env.MONGODB_URI || "mongodb://localhost:27017/herdoza-gym",
+      mongoUrl: process.env.MONGODB_URI || "mongodb://localhost:27017/herdoza_fitness",
+      ttl: 24 * 60 * 60, // Session TTL in seconds (1 day)
+      touchAfter: 24 * 3600, // Time period in seconds between session updates
       collectionName: "sessions",
+      autoRemove: "native", // Use MongoDB's TTL index
+      crypto: {
+        secret: false // Disable crypto since we're using express-session's secret
+      },
+      autoCreate: true // Automatically create the sessions collection
     }),
     cookie: {
       secure: process.env.NODE_ENV === "production",
       httpOnly: true,
       sameSite: process.env.NODE_ENV === "production" ? "strict" : "lax",
-      maxAge: 24 * 60 * 60 * 1000, // 24 hours
-    },
+      maxAge: 24 * 60 * 60 * 1000 // 24 hours
+    }
   })
 );
 
