@@ -2,7 +2,8 @@
 const mongoose = require("mongoose");
 
 // MongoDB Atlas connection string
-const mongoURI = process.env.MONGODB_URI || "mongodb://localhost:27017/herdoza_fitness";
+const mongoURI =
+  process.env.MONGODB_URI || "mongodb://localhost:27017/herdoza_fitness";
 
 // Connect to MongoDB function
 const connectDB = async () => {

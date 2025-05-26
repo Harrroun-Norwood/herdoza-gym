@@ -9,9 +9,19 @@ const passport = require("passport");
 const { connectDB } = require("./config/db");
 const { logger } = require("./utils/logger");
 const limiters = require("./middleware/rateLimiter");
+const path = require("path");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+// Production specific middleware
+if (process.env.NODE_ENV === "production") {
+  // Trust proxy (important for secure cookies behind a proxy)
+  app.set("trust proxy", 1);
+
+  // Serve static files from the frontend build
+  app.use(express.static(path.join(__dirname, "../IPT-TAILWIND/dist")));
+}
 
 // Security headers
 app.use(helmet());
@@ -66,22 +76,23 @@ app.use(
     resave: false,
     saveUninitialized: false,
     store: MongoStore.create({
-      mongoUrl: process.env.MONGODB_URI || "mongodb://localhost:27017/herdoza_fitness",
+      mongoUrl:
+        process.env.MONGODB_URI || "mongodb://localhost:27017/herdoza_fitness",
       ttl: 24 * 60 * 60, // Session TTL in seconds (1 day)
       touchAfter: 24 * 3600, // Time period in seconds between session updates
       collectionName: "sessions",
       autoRemove: "native", // Use MongoDB's TTL index
       crypto: {
-        secret: false // Disable crypto since we're using express-session's secret
+        secret: false, // Disable crypto since we're using express-session's secret
       },
-      autoCreate: true // Automatically create the sessions collection
+      autoCreate: true, // Automatically create the sessions collection
     }),
     cookie: {
       secure: process.env.NODE_ENV === "production",
       httpOnly: true,
       sameSite: process.env.NODE_ENV === "production" ? "strict" : "lax",
-      maxAge: 24 * 60 * 60 * 1000 // 24 hours
-    }
+      maxAge: 24 * 60 * 60 * 1000, // 24 hours
+    },
   })
 );
 
@@ -100,7 +111,9 @@ app.get("/api/csrf-token", (req, res) => {
 
 // Health check endpoint for Render
 app.get("/health", (req, res) => {
-  res.status(200).json({ status: "ok" });
+  res
+    .status(200)
+    .json({ status: "healthy", environment: process.env.NODE_ENV });
 });
 
 // Apply rate limiting to different route groups

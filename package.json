@@ -1,4 +1,5 @@
-{  "name": "herdoza-fitness-gym",
+{
+  "name": "herdoza-fitness-gym",
   "version": "1.0.0",
   "description": "Herdoza Fitness Center Management System",
   "private": true,
