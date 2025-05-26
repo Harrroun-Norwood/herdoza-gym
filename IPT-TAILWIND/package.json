@@ -1,5 +1,9 @@
 {
-  "name": "ipt-tailwind",
+  "name": "ipt-  "scripts": {
+    "dev": "npx vite",
+    "build": "npx vite build",
+    "preview": "npx vite preview"
+  },ind",
   "version": "1.0.0",
   "type": "module",
   "main": "tailwind.config.js",
@@ -17,7 +21,7 @@
   },
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "npx vite build",
     "preview": "vite preview"
   },
   "keywords": [],

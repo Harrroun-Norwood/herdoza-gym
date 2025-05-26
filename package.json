@@ -17,8 +17,8 @@
     "dev:frontend": "cd IPT-TAILWIND && vite",
     "dev:admin": "cd admin && npx serve -s .",
     "build": "npm run install-all && npm run build-frontend && npm run build-admin && npm run copy-assets",
-    "install-all": "cd backend && npm ci --no-audit && cd ../IPT-TAILWIND && npm ci --include=dev --no-audit && cd ../admin && npm ci --no-audit",
-    "build-frontend": "cd IPT-TAILWIND && npm run build",
+    "install-all": "cd backend && npm ci --no-audit && cd ../IPT-TAILWIND && npm i --include=dev && cd ../admin && npm ci --no-audit",
+    "build-frontend": "cd IPT-TAILWIND && npm i vite --save-dev && npx vite build",
     "build-admin": "cd admin && npx tailwindcss -i ./style/tailwind.css -o ./style/output.css --minify && mkdir -p dist && cp -r assets dist/ && cp -r style dist/",
     "copy-assets": "node scripts/copy-assets.js",
     "start": "cd backend && node server.js",
@@ -37,8 +37,7 @@
     "passport": "^0.6.0",
     "passport-google-oauth20": "^2.0.0",
     "serve": "^14.2.1"
-  },
-  "devDependencies": {
+  },  "devDependencies": {
     "@tailwindcss/forms": "^0.5.7",
     "@vitejs/plugin-react": "^4.2.1",
     "autoprefixer": "^10.4.17",
