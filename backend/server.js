@@ -23,18 +23,19 @@ app.use(
   helmet({
     contentSecurityPolicy: {
       directives: {
-        defaultSrc: ["'self'"],
+        defaultSrc: ["'self'", "cdn.jsdelivr.net", "cdnjs.cloudflare.com"],
         scriptSrc: [
           "'self'",
           "'unsafe-inline'",
           "'unsafe-eval'",
           "'unsafe-hashes'",
-          "*",
+          "cdn.jsdelivr.net",
+          "cdnjs.cloudflare.com",
         ],
-        scriptSrcAttr: ["'unsafe-inline'", "'unsafe-hashes'"],
-        styleSrc: ["'self'", "'unsafe-inline'", "*"],
+        scriptSrcAttr: ["'unsafe-inline'", "'unsafe-hashes'", "'self'"],
+        styleSrc: ["'self'", "'unsafe-inline'", "cdn.jsdelivr.net", "*"],
         imgSrc: ["'self'", "data:", "blob:", "*"],
-        fontSrc: ["'self'", "data:", "*"],
+        fontSrc: ["'self'", "data:", "cdn.jsdelivr.net", "*"],
         connectSrc: ["'self'", "*"],
         mediaSrc: ["'self'"],
         objectSrc: ["'none'"],
@@ -45,6 +46,26 @@ app.use(
     crossOriginEmbedderPolicy: false,
   })
 );
+
+// Serve static files with proper MIME types
+const serveStaticWithMime = (directory) => {
+  return express.static(path.join(__dirname, "..", directory), {
+    setHeaders: (res, filePath) => {
+      if (filePath.endsWith(".js") || filePath.endsWith(".mjs")) {
+        res.setHeader("Content-Type", "application/javascript; charset=UTF-8");
+      } else if (filePath.endsWith(".css")) {
+        res.setHeader("Content-Type", "text/css; charset=UTF-8");
+      }
+    },
+  });
+};
+
+// Serve static files for main site and admin
+app.use("/", serveStaticWithMime("IPT-TAILWIND"));
+app.use("/dist", serveStaticWithMime("IPT-TAILWIND/dist"));
+app.use("/assets", serveStaticWithMime("IPT-TAILWIND/assets"));
+app.use("/scripts", serveStaticWithMime("IPT-TAILWIND/scripts"));
+app.use("/admin", serveStaticWithMime("admin"));
 
 // CORS configuration
 const corsOptions = {
@@ -78,84 +99,34 @@ const staticOptions = {
   etag: true,
   index: false,
   setHeaders: (res, path) => {
-    if (path.endsWith(".css")) {
-      res.setHeader("Content-Type", "text/css");
-    }
+    // Set proper MIME types for JavaScript modules
     if (path.endsWith(".js")) {
-      res.setHeader("Content-Type", "application/javascript");
+      res.setHeader("Content-Type", "application/javascript; charset=utf-8");
     }
-    if (path.endsWith(".png")) {
+    // CSS files
+    else if (path.endsWith(".css")) {
+      res.setHeader("Content-Type", "text/css; charset=utf-8");
+    }
+    // Images
+    else if (path.endsWith(".png")) {
       res.setHeader("Content-Type", "image/png");
-    }
-    if (path.endsWith(".jpg") || path.endsWith(".jpeg")) {
+    } else if (path.endsWith(".jpg") || path.endsWith(".jpeg")) {
       res.setHeader("Content-Type", "image/jpeg");
-    }
-    if (path.endsWith(".svg")) {
+    } else if (path.endsWith(".svg")) {
       res.setHeader("Content-Type", "image/svg+xml");
     }
+
+    // Set caching headers
+    res.setHeader("Cache-Control", "public, max-age=31536000");
   },
 };
 
-// Serve frontend static files and assets
-app.use(
-  express.static(path.join(__dirname, "../IPT-TAILWIND/dist"), staticOptions)
-);
-app.use(
-  "/assets",
-  express.static(
-    path.join(__dirname, "../IPT-TAILWIND/dist/assets"),
-    staticOptions
-  )
-);
-
-// Serve admin files
-app.use(
-  "/admin",
-  express.static(path.join(__dirname, "../admin"), staticOptions)
-);
-app.use(
-  "/admin/dist",
-  express.static(path.join(__dirname, "../admin/dist"), staticOptions)
-);
-app.use(
-  "/admin/style",
-  express.static(path.join(__dirname, "../admin/style"), staticOptions)
-);
-app.use(
-  "/admin/javascript",
-  express.static(path.join(__dirname, "../admin/javascript"), staticOptions)
-);
-app.use(
-  "/admin/assets",
-  express.static(path.join(__dirname, "../admin/assets"), staticOptions)
-);
-
-// Set proper MIME types
-app.use(
-  express.static("public", {
-    setHeaders: (res, path) => {
-      if (path.endsWith(".js") || path.endsWith(".mjs")) {
-        res.setHeader("Content-Type", "application/javascript");
-      } else if (path.endsWith(".css")) {
-        res.setHeader("Content-Type", "text/css");
-      }
-    },
-  })
-);
-
-// Serve admin static files with proper MIME types
-app.use(
-  "/admin",
-  express.static("admin", {
-    setHeaders: (res, path) => {
-      if (path.endsWith(".js") || path.endsWith(".mjs")) {
-        res.setHeader("Content-Type", "application/javascript");
-      } else if (path.endsWith(".css")) {
-        res.setHeader("Content-Type", "text/css");
-      }
-    },
-  })
-);
+// Serve IPT-TAILWIND static files
+app.use("/IPT-TAILWIND", serveStaticWithMime("IPT-TAILWIND"));
+app.use("/admin", serveStaticWithMime("admin"));
+app.use("/assets", serveStaticWithMime("IPT-TAILWIND/assets"));
+app.use("/scripts", serveStaticWithMime("IPT-TAILWIND/scripts"));
+app.use("/dist", serveStaticWithMime("IPT-TAILWIND/dist"));
 
 // API routes
 app.use("/api/auth", require("./routes/auth"));

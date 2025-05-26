@@ -17,8 +17,8 @@
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/remixicon@4.1.0/fonts/remixicon.css"
     />
-    <link rel="stylesheet" href="./dist/output.css" />
-    <script type="module" src="./src/main.js"></script>
+    <link rel="stylesheet" href="./src/output.css" />
+    <link rel="stylesheet" href="./src/mystyles.css" />
   </head>
   <body>
     <nav
@@ -115,10 +115,9 @@
         <div class="mt-8 pb-20 flex gap-4">
           <button
             class="bg-red-600 px-4 py-2.5 md:px-8 md:py-3 rounded-lg hover:bg-red-700 transition text-white"
+            onclick="document.getElementById('service-section').scrollIntoView({ behavior: 'smooth' })"
           >
-            <a href="gym-fitness.html" class="text-sm md:text-lg font-bold"
-              >Join Memberships</a
-            >
+            <span class="text-sm md:text-lg font-bold">Join Memberships</span>
           </button>
           <button
             class="bg-white px-4 py-2.5 md:px-8 md:py-3 rounded-lg hover:bg-gray-300 transition"
@@ -291,10 +290,11 @@
                 <li>No Time Limit</li>
               </ul>
               <button
-                onclick="window.checkGuestUser() && (window.location.href='gym-fitness.html')"
                 class="join-btn w-full bg-red-600 py-2 mb-5 mt-2 rounded-lg font-bold text-lg cursor-pointer hover:bg-red-800"
               >
-                Join Now
+                <a href="gym-fitness.html" class="block w-full text-white"
+                  >Join Now</a
+                >
               </button>
             </div>
           </div>
@@ -312,10 +312,13 @@
                 <li>No Time Limit</li>
               </ul>
               <button
-                onclick="window.checkGuestUser() && (window.location.href='mixed-martial-arts.html')"
                 class="join-btn w-full bg-red-600 py-2 mb-5 mt-2 rounded-lg font-bold text-lg cursor-pointer hover:bg-red-800"
               >
-                Join Now
+                <a
+                  href="mixed-martial-arts.html"
+                  class="block w-full text-white"
+                  >Join Now</a
+                >
               </button>
             </div>
           </div>
@@ -333,10 +336,11 @@
                 <li>No Time Limit</li>
               </ul>
               <button
-                onclick="window.checkGuestUser() && (window.location.href='dance-studio.html')"
                 class="join-btn w-full bg-red-600 py-2 mb-5 mt-2 rounded-lg font-bold text-lg cursor-pointer hover:bg-red-800"
               >
-                Join Now
+                <a href="dance-studio.html" class="block w-full text-white"
+                  >Join Now</a
+                >
               </button>
             </div>
           </div>
@@ -369,8 +373,8 @@
                   <li>No Time Limit</li>
                 </ul>
                 <button
-                  onclick="window.checkGuestUser() && (window.location.href='gym-fitness.html')"
                   class="join-btn w-full bg-red-600 py-2 mb-5 mt-2 rounded-lg font-bold text-lg cursor-pointer hover:bg-red-800"
+                  onclick="window.location.href='gym-fitness.html'"
                 >
                   Join Now
                 </button>
@@ -388,8 +392,8 @@
                   <li>No Time Limit</li>
                 </ul>
                 <button
-                  onclick="window.checkGuestUser() && (window.location.href='mixed-martial-arts.html')"
                   class="join-btn w-full bg-red-600 py-2 mb-5 mt-2 rounded-lg font-bold text-lg cursor-pointer hover:bg-red-800"
+                  onclick="window.location.href='mixed-martial-arts.html'"
                 >
                   Join Now
                 </button>
@@ -407,8 +411,8 @@
                   <li>No Time Limit</li>
                 </ul>
                 <button
-                  onclick="window.checkGuestUser() && (window.location.href='dance-studio.html')"
                   class="join-btn w-full bg-red-600 py-2 mb-5 mt-2 rounded-lg font-bold text-lg cursor-pointer hover:bg-red-800"
+                  onclick="window.location.href='dance-studio.html'"
                 >
                   Join Now
                 </button>
@@ -452,16 +456,16 @@
         </a>
       </div>
     </section>
-
     <footer class="hidden md:block"></footer>
-    <script type="module" src="./scripts/navbar.js"></script>
-    <script type="module" src="./scripts/footer.js"></script>
-    <script type="module" src="./scripts/menu.js"></script>
+    <!-- Load scripts at the end of body -->
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
-    <script type="module" src="./scripts/swiper.js"></script>
     <script type="module" src="./scripts/auth-api.js"></script>
+    <script type="module" src="./scripts/auth-check.js"></script>
+    <script type="module" src="./scripts/menu.js"></script>
+    <script type="module" src="./scripts/footer.js"></script>
+    <script type="module" src="./scripts/swiper.js"></script>
+    <script type="module" src="./scripts/navbar.js"></script>
     <script type="module" src="./scripts/membership-notification.js"></script>
     <script type="module" src="./scripts/notification-drag.js"></script>
-    <script type="module" src="./scripts/auth-check.js"></script>
   </body>
 </html>

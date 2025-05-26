@@ -46,6 +46,14 @@ export default defineConfig({
         "user-schedule-zumba": resolve(__dirname, "user-schedule-zumba.html"),
         "zumba-payment-modal": resolve(__dirname, "zumba-payment-modal.html"),
       },
+      output: {
+        assetFileNames: (assetInfo) => {
+          if (assetInfo.name.endsWith(".css")) {
+            return "assets/[name][extname]";
+          }
+          return "assets/[name]-[hash][extname]";
+        },
+      },
     },
   },
   css: {
@@ -60,4 +68,6 @@ export default defineConfig({
     port: 5500,
     hot: true,
   },
+  publicDir: "assets",
+  base: "./",
 });

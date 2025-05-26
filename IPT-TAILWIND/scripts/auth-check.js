@@ -1,78 +1,115 @@
 // Guest user authentication check
-function checkGuestUser() {
-  // Check if user is logged in (has a token)
-  const userToken = localStorage.getItem("userToken");
-  if (!userToken) {
-    // Show alert and redirect to login page
-    alert("Please login or sign up first to access membership services.");
-    window.location.href = "login.html";
+export function checkTokenExpiration() {
+  const token = localStorage.getItem("token");
+  if (!token) return false;
+
+  try {
+    const payload = JSON.parse(atob(token.split(".")[1]));
+    const isExpired = Date.now() >= payload.exp * 1000;
+
+    if (isExpired) {
+      localStorage.removeItem("token");
+      return false;
+    }
+
+    return true;
+  } catch (error) {
+    console.error("Error checking token:", error);
     return false;
   }
-  return true;
 }
 
-// Add auth check to all membership/booking buttons
+// Make checkGuestUser available globally
+window.checkGuestUser = function () {
+  const token = localStorage.getItem("token");
+  const userEmail = localStorage.getItem("userEmail");
+
+  // List of pages that don't require authentication
+  const publicPages = [
+    "index.html",
+    "login.html",
+    "sign-up.html",
+    "",
+    "gym-fitness.html",
+    "mixed-martial-arts.html",
+    "dance-studio.html",
+    "learn-more.html",
+    "our-team.html",
+    "privacy-policy.html",
+  ];
+
+  // Get current page name
+  const currentPage = window.location.pathname.split("/").pop();
+
+  // Allow access to public pages without authentication
+  if (publicPages.includes(currentPage)) {
+    return true;
+  }
+
+  // For protected pages, check if user is logged in
+  if (token && userEmail) {
+    return true;
+  }
+
+  // If not authenticated and trying to access a protected page, redirect to login
+  window.location.href = "login.html";
+  return false;
+};
+
+// Check token on page load only for protected pages
+document.addEventListener("DOMContentLoaded", () => {
+  const publicPages = [
+    "index.html",
+    "login.html",
+    "sign-up.html",
+    "",
+    "gym-fitness.html",
+    "mixed-martial-arts.html",
+    "dance-studio.html",
+    "learn-more.html",
+    "our-team.html",
+    "privacy-policy.html",
+  ];
+  const currentPage = window.location.pathname.split("/").pop();
+
+  if (!publicPages.includes(currentPage)) {
+    if (!checkTokenExpiration()) {
+      window.location.href = "login.html";
+    }
+  }
+});
+
+// Handle navigation and service buttons
 document.addEventListener("DOMContentLoaded", function () {
-  // Get all price buttons (handles gym fitness popup buttons)
-  const priceButtons = document.querySelectorAll(
-    'button[onclick*="openPopup"]'
-  );
+  // Get all service buttons
+  const serviceButtons = document.querySelectorAll(".join-btn");
 
-  // Replace their onclick handlers with auth check
-  priceButtons.forEach((button) => {
+  serviceButtons.forEach((button) => {
     const originalOnclick = button.getAttribute("onclick");
-    const popupId = originalOnclick.match(/openPopup\(['"]([^'"]+)['"]\)/)?.[1];
-
-    button.onclick = function (e) {
-      e.preventDefault();
-      if (checkGuestUser() && popupId) {
-        // If authenticated, open the popup directly without using eval
-        window.openPopup?.(popupId);
+    if (originalOnclick) {
+      const href = originalOnclick.match(
+        /window\.location\.href='([^']+)'/
+      )?.[1];
+      if (href) {
+        button.onclick = function (e) {
+          e.preventDefault();
+          window.location.href = href;
+        };
       }
-    };
+    }
   });
 
-  // Handle direct link buttons (like in MMA and Dance Studio pages)
-  const serviceLinkButtons = document.querySelectorAll(
-    'a[href*="booking"], a[href*="calendar"]'
+  // Handle booking buttons that require authentication
+  const bookingButtons = document.querySelectorAll(
+    '[data-requires-auth="true"]'
   );
-  serviceLinkButtons.forEach((link) => {
-    const originalHref = link.getAttribute("href");
-    const button = link.querySelector("button") || link;
-
-    // Remove the href to prevent direct navigation
-    link.removeAttribute("href");
-
-    // Add click handler to the button or link
+  bookingButtons.forEach((button) => {
+    const originalOnclick = button.getAttribute("onclick");
     button.onclick = function (e) {
       e.preventDefault();
-      if (checkGuestUser()) {
-        window.location.href = originalHref;
-      }
-    };
-  });
-
-  // Handle Zumba buttons (specific to dance studio)
-  const zumbaButtons = document.querySelectorAll(
-    ".zumba-card button, #mobile_time_date_zumba + button"
-  );
-  zumbaButtons.forEach((button) => {
-    const originalOnclick = button.onclick;
-    button.onclick = function (e) {
-      e.preventDefault();
-      if (checkGuestUser()) {
+      if (window.checkGuestUser()) {
         if (originalOnclick) {
-          originalOnclick.call(this, e);
-        } else {
-          // Default behavior - show booking form or redirect
-          const selectedTime = document.querySelector(
-            "#selected_time_date_zumba, #mobile_time_date_zumba"
-          ).value;
-          if (selectedTime) {
-            window.location.href = "user-schedule-zumba.html";
-          } else {
-            alert("Please select a day and time first");
-          }
+          eval(originalOnclick);
         }
       }
     };

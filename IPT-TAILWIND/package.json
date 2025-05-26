@@ -15,11 +15,11 @@
     "vite": "^5.0.12"
   },
   "scripts": {
-    "css": "tailwindcss -i ./src/main.css -o ./dist/output.css",
-    "css:watch": "tailwindcss -i ./src/main.css -o ./dist/output.css --watch",
-    "dev": "npm run css && vite",
-    "build": "npm run css && cross-env NODE_ENV=production vite build",
-    "preview": "vite preview"
+    "dev": "vite",
+    "build": "vite build && npm run build:css",
+    "build:css": "tailwindcss -i ./src/tailwind.css -o ./dist/output.css --minify",
+    "preview": "vite preview",
+    "watch:css": "tailwindcss -i ./src/tailwind.css -o ./dist/output.css --watch"
   },
   "keywords": [],
   "author": "",
