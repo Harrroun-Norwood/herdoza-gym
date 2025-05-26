@@ -37,7 +37,8 @@
     "passport": "^0.6.0",
     "passport-google-oauth20": "^2.0.0",
     "serve": "^14.2.1"
-  },  "devDependencies": {
+  },
+  "devDependencies": {
     "@tailwindcss/forms": "^0.5.7",
     "@vitejs/plugin-react": "^4.2.1",
     "autoprefixer": "^10.4.17",

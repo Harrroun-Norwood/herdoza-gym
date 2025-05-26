@@ -1,9 +1,5 @@
 {
-  "name": "ipt-  "scripts": {
-    "dev": "npx vite",
-    "build": "npx vite build",
-    "preview": "npx vite preview"
-  },ind",
+  "name": "ipt-tailwind",
   "version": "1.0.0",
   "type": "module",
   "main": "tailwind.config.js",
@@ -20,12 +16,13 @@
     "vite": "^5.0.12"
   },
   "scripts": {
-    "dev": "vite",
+    "dev": "npx vite",
     "build": "npx vite build",
-    "preview": "vite preview"
+    "preview": "npx vite preview"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "description": ""
+}
 }
