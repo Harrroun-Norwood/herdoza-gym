@@ -1,11 +1,12 @@
-@import "./mystyles.css";
-
 /* Tailwind directives */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Custom styles */
+/* Import custom styles */
+@import "./style.css";
+
+/* Custom base styles */
 @layer base {
   html {
     scroll-behavior: smooth;

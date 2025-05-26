@@ -1,20 +1,14 @@
-/* Custom styles */
-@layer components {
-  html {
-    scroll-behavior: smooth;
-  }
+/* Custom component styles */
+.btn-primary {
+  @apply bg-primary text-white px-4 py-2 rounded transition-colors duration-200;
+}
+.btn-primary:hover {
+  @apply bg-red-700;
+}
 
-  .btn-primary {
-    @apply bg-primary text-white px-4 py-2 rounded transition-colors duration-200;
-  }
-  .btn-primary:hover {
-    @apply bg-red-700;
-  }
-
-  .btn-secondary {
-    @apply bg-secondary text-white px-4 py-2 rounded transition-colors duration-200;
-  }
-  .btn-secondary:hover {
-    @apply bg-gray-700;
-  }
+.btn-secondary {
+  @apply bg-secondary text-white px-4 py-2 rounded transition-colors duration-200;
+}
+.btn-secondary:hover {
+  @apply bg-gray-700;
 }

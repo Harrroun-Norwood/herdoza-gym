@@ -18,7 +18,7 @@
     "dev:admin": "cd admin && npx serve -s .",
     "build": "npm run install-all && npm run build-frontend && npm run build-admin && npm run copy-assets",
     "install-all": "cd backend && npm ci --no-audit && cd ../IPT-TAILWIND && npm ci --legacy-peer-deps && cd ../admin && npm ci --no-audit",
-    "build-frontend": "cd IPT-TAILWIND && cross-env NODE_ENV=production vite build",
+    "build-frontend": "cd IPT-TAILWIND && NODE_ENV=production npm run build:vite",
     "build-admin": "cd admin && npx tailwindcss -i ./style/tailwind.css -o ./style/output.css --minify && mkdir -p dist && cp -r assets dist/ && cp -r style dist/ && cp *.html dist/",
     "copy-assets": "node scripts/copy-assets.js",
     "start": "cd backend && node server.js",

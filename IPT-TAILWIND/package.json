@@ -20,6 +20,7 @@
     "css:watch": "tailwindcss -i ./src/main.css -o ./dist/output.css --watch",
     "dev": "npm run css && vite",
     "build": "npm run css && vite build",
+    "build:vite": "vite build",
     "preview": "vite preview"
   },
   "keywords": [],
