@@ -18,8 +18,7 @@ services:
       - key: CSRF_SECRET
         sync: false
       - key: JWT_SECRET
-        sync: false
-      - key: ADMIN_URL
-        value: "https://herdoza-fitness-gym.onrender.com/admin"
+        sync: false      - key: ADMIN_URL
+        value: "https://herdoza-fitness-api.onrender.com/admin"
       - key: FRONTEND_URL
-        value: "https://herdoza-fitness-gym.onrender.com"
+        value: "https://herdoza-fitness-api.onrender.com"

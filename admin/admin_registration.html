@@ -13,10 +13,16 @@
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/remixicon@4.5.0/fonts/remixicon.min.css"
       crossorigin="anonymous"
-    />
-    <script type="module" src="./javascript/admin-api.js"></script>
-    <script type="module" src="./javascript/general.js"></script>
-    <script type="module" src="./javascript/admin_registration.js"></script>
+    />    <!-- Import scripts -->
+    <script type="module">
+      import './javascript/admin-api.js';
+      import './javascript/general.js';
+      import { showTab, handleAction } from './javascript/admin_registration.js';
+      
+      // Make functions available globally
+      window.showTab = showTab;
+      window.handleAction = handleAction;
+    </script>
   </head>
   <body class="bg-gray-50">
     <div class="flex h-screen">

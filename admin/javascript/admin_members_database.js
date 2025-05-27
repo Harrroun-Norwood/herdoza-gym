@@ -1,8 +1,23 @@
 // Simple member management using localStorage
 let isEditing = false; // Track editing state
 
+// Ensure adminApi is available and initialized
+function ensureAdminApi() {
+  return new Promise((resolve) => {
+    const checkApi = () => {
+      if (window.adminApi) {
+        resolve();
+      } else {
+        setTimeout(checkApi, 100); // Check again in 100ms
+      }
+    };
+    checkApi();
+  });
+}
+
 // Load members when page loads
 document.addEventListener("DOMContentLoaded", async function () {
+  await ensureAdminApi(); // Wait for adminApi to be available
   // Get filter from URL parameters if present
   const urlParams = new URLSearchParams(window.location.search);
   const filterParam = urlParams.get("filter");
@@ -59,6 +74,9 @@ function setupAutoRefresh() {
 async function loadMembers(filter = "all") {
   try {
     showLoadingState();
+    if (!window.adminApi) {
+      throw new Error("Admin API not initialized. Please refresh the page.");
+    }
     let members = await window.adminApi.getMembers();
 
     // Validate member data structure and fix if necessary
@@ -378,18 +396,46 @@ async function removeMember(memberId) {
 }
 
 function showNotification(message, type = "success") {
+  // Remove any existing notifications first
+  const existingNotifications = document.querySelectorAll(
+    ".notification-toast"
+  );
+  existingNotifications.forEach((notification) => notification.remove());
+
   const notification = document.createElement("div");
-  notification.className = `fixed bottom-4 right-4 px-4 py-2 rounded-lg shadow-lg ${
+  notification.className = `notification-toast fixed bottom-4 right-4 px-6 py-3 rounded-lg shadow-lg flex items-center space-x-2 ${
     type === "success"
-      ? "bg-green-100 text-green-800"
-      : "bg-red-100 text-red-800"
+      ? "bg-green-100 text-green-800 border border-green-200"
+      : "bg-red-100 text-red-800 border border-red-200"
   }`;
-  notification.textContent = message;
+
+  // Add icon based on type
+  const icon = document.createElement("i");
+  icon.className =
+    type === "success" ? "ri-checkbox-circle-line" : "ri-error-warning-line";
+  notification.appendChild(icon);
+
+  // Add message in a span
+  const messageSpan = document.createElement("span");
+  messageSpan.textContent = message;
+  messageSpan.className = "ml-2";
+  notification.appendChild(messageSpan);
+
+  // Add close button
+  const closeButton = document.createElement("button");
+  closeButton.className = "ml-4 hover:text-opacity-75";
+  closeButton.innerHTML = '<i class="ri-close-line"></i>';
+  closeButton.onclick = () => notification.remove();
+  notification.appendChild(closeButton);
+
   document.body.appendChild(notification);
 
+  // Auto remove after 5 seconds
   setTimeout(() => {
-    notification.remove();
-  }, 3000);
+    if (document.body.contains(notification)) {
+      notification.remove();
+    }
+  }, 5000);
 }
 
 // Modal functions
@@ -466,6 +512,17 @@ async function handleMemberFormSubmit(e) {
     return;
   }
 
+  // Check for duplicate email before trying to add
+  const members = window.adminApi.getMembers();
+  if (members.some((m) => m.email.toLowerCase() === email.toLowerCase())) {
+    showNotification(
+      "A member with this email already exists. Please use a different email address.",
+      "error"
+    );
+    document.getElementById("memberEmail").focus();
+    return;
+  }
+
   const memberData = {
     name,
     email,
@@ -491,7 +548,15 @@ async function handleMemberFormSubmit(e) {
     showNotification("Member added successfully", "success");
   } catch (error) {
     console.error("Error adding member:", error);
-    const errorMessage = error.message || "Error adding member";
+    let errorMessage = error.message || "Error adding member";
+
+    // Make error message more user-friendly
+    if (errorMessage === "A member with this email already exists") {
+      errorMessage =
+        "A member with this email already exists. Please use a different email address.";
+      document.getElementById("memberEmail").focus();
+    }
+
     showNotification(errorMessage, "error");
   }
 }

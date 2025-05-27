@@ -16,7 +16,8 @@
     "dev:backend": "cd backend && nodemon server.js",
     "dev:frontend": "cd IPT-TAILWIND && vite",
     "dev:admin": "cd admin && npx serve -s .",
-    "build": "cd IPT-TAILWIND && npm install && npm run build && cd ../admin && npm install && npm run build && cd ../backend && npm install && node ../scripts/copy-assets.js",
+    "build": "cd IPT-TAILWIND && npm install && npm run build && cd ../admin && npm install && npm run build && cd .. && npm run copy-assets && cd backend && npm install",
+    "copy-assets": "node scripts/copy-assets.js",
     "start": "cd backend && node server.js"
   },
   "dependencies": {

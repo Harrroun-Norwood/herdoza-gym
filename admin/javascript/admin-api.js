@@ -275,8 +275,29 @@ const demoData = {
  * Get dashboard statistics with caching
  */
 async function getDashboardStats() {
-  // For presentation, always return demo data
-  return demoData.stats;
+  try {
+    // Check cache first
+    if (
+      CACHE.dashboardStats.data &&
+      Date.now() - CACHE.dashboardStats.timestamp < CACHE_DURATION
+    ) {
+      return CACHE.dashboardStats.data;
+    }
+
+    // For presentation, use demo data with proper error handling
+    const stats = demoData.stats;
+
+    // Update cache
+    CACHE.dashboardStats = {
+      data: stats,
+      timestamp: Date.now(),
+    };
+
+    return stats;
+  } catch (error) {
+    console.error("Error getting dashboard stats:", error);
+    throw new Error("Failed to get dashboard statistics");
+  }
 }
 
 /**
@@ -431,6 +452,8 @@ const adminApi = {
     ) {
       this.loadMockData();
     }
+
+    this.initializeDemoData();
   },
 
   loadMockData() {
@@ -465,6 +488,185 @@ const adminApi = {
     ];
     localStorage.setItem("members", JSON.stringify(mockMembers));
   },
+  getDashboardStats() {
+    const registrations = this.getRegistrations();
+    const members = this.getMembers();
+    const now = new Date();
+
+    return {
+      newMembers: members.filter((m) => {
+        const joinDate = new Date(m.dateJoined);
+        return (
+          joinDate.getMonth() === now.getMonth() &&
+          joinDate.getFullYear() === now.getFullYear()
+        );
+      }).length,
+      pendingApproval: registrations.filter((r) => r.status === "pending")
+        .length,
+      activeMembers: members.filter((m) => m.status === "active").length,
+      expiredMembers: members.filter((m) => m.status === "expired").length,
+    };
+  },
+
+  getRegistrations() {
+    const registrations = JSON.parse(
+      localStorage.getItem("registrations") || "[]"
+    );
+    return registrations.filter(
+      (reg) => reg && typeof reg === "object" && reg.id && reg.name
+    );
+  },
+
+  addRegistration(registrationData) {
+    const registrations = this.getRegistrations();
+    const newRegistration = {
+      id: Date.now().toString(),
+      ...registrationData,
+      status: "pending",
+      date: new Date().toISOString(),
+    };
+    registrations.push(newRegistration);
+    localStorage.setItem("registrations", JSON.stringify(registrations));
+    return newRegistration;
+  },
+
+  getRegistrationsByType(type) {
+    const registrations = this.getRegistrations();
+    return registrations.filter(
+      (reg) => reg.membershipType.toLowerCase() === type.toLowerCase()
+    );
+  },
+  handleRegistration(registrationId, action) {
+    const registrations = this.getRegistrations();
+    const registrationIndex = registrations.findIndex(
+      (r) => r.id === registrationId
+    );
+
+    if (registrationIndex === -1) {
+      throw new Error("Registration not found");
+    }
+
+    const registration = registrations[registrationIndex];
+
+    if (action === "approve") {
+      const members = this.getMembers();
+
+      // Check for existing member with same email
+      if (
+        members.some(
+          (m) => m.email.toLowerCase() === registration.email.toLowerCase()
+        )
+      ) {
+        throw new Error("A member with this email already exists");
+      }
+
+      // Create new member with proper data structure
+      const now = new Date();
+      const newMember = {
+        id: Date.now().toString(),
+        name: registration.name,
+        email: registration.email.toLowerCase(),
+        contact: registration.contact || "",
+        membershipType: registration.membershipType || "gym",
+        membershipDuration: registration.membershipDuration || "1",
+        dateOfMembership: now.toISOString(),
+        dateOfExpiration: this.calculateExpirationDate(
+          registration.membershipDuration || "1"
+        ),
+        status: "active",
+        paymentMethod: registration.paymentMethod || "Cash",
+        paymentStatus: "paid",
+      };
+
+      // Add to members and sync storage
+      members.push(newMember);
+      localStorage.setItem("members", JSON.stringify(members));
+
+      // Sync with other storage
+      this.syncMemberData(newMember);
+    }
+
+    // Remove from registrations
+    registrations.splice(registrationIndex, 1);
+    localStorage.setItem("registrations", JSON.stringify(registrations));
+    return true;
+  },
+
+  // Initialize demo data
+  initializeDemoData() {
+    // Demo registrations for different types
+    const demoRegistrations = [
+      {
+        id: "1",
+        name: "John Smith",
+        email: "john.smith@example.com",
+        contact: "0917-123-4567",
+        membershipType: "gym",
+        date: "2025-05-25T08:00:00",
+        status: "pending",
+      },
+      {
+        id: "2",
+        name: "Maria Garcia",
+        email: "maria.garcia@example.com",
+        contact: "0918-234-5678",
+        membershipType: "mma",
+        date: "2025-05-26T10:30:00",
+        status: "pending",
+      },
+      {
+        id: "3",
+        name: "Sarah Lee",
+        email: "sarah.lee@example.com",
+        contact: "0919-345-6789",
+        membershipType: "dance",
+        date: "2025-05-27T14:15:00",
+        status: "pending",
+      },
+    ];
+
+    // Demo members
+    const demoMembers = [
+      {
+        id: "101",
+        name: "David Wilson",
+        email: "david.wilson@example.com",
+        contact: "0915-111-2222",
+        membershipType: "gym",
+        dateOfMembership: "2025-04-27T00:00:00",
+        dateOfExpiration: "2025-05-27T00:00:00",
+        status: "active",
+      },
+      {
+        id: "102",
+        name: "Emma Davis",
+        email: "emma.davis@example.com",
+        contact: "0916-333-4444",
+        membershipType: "mma",
+        dateOfMembership: "2025-03-15T00:00:00",
+        dateOfExpiration: "2025-06-15T00:00:00",
+        status: "active",
+      },
+      {
+        id: "103",
+        name: "Michael Brown",
+        email: "michael.brown@example.com",
+        contact: "0917-555-6666",
+        membershipType: "dance",
+        dateOfMembership: "2025-02-01T00:00:00",
+        dateOfExpiration: "2025-05-01T00:00:00",
+        status: "expired",
+      },
+    ];
+
+    // Only initialize if data doesn't exist
+    if (!localStorage.getItem("registrations")) {
+      localStorage.setItem("registrations", JSON.stringify(demoRegistrations));
+    }
+    if (!localStorage.getItem("members")) {
+      localStorage.setItem("members", JSON.stringify(demoMembers));
+    }
+  },
 
   // Get all members
   getMembers() {
@@ -481,11 +683,17 @@ const adminApi = {
 
     // Validate required fields
     if (!memberData.name || !memberData.email || !memberData.contact) {
-      throw new Error("Missing required member information");
+      throw new Error(
+        "Please fill in all required fields: name, email, and contact"
+      );
     }
 
-    // Check for duplicate email
-    if (members.some((m) => m.email === memberData.email)) {
+    // Check for duplicate email (case-insensitive comparison)
+    if (
+      members.some(
+        (m) => m.email.toLowerCase() === memberData.email.toLowerCase()
+      )
+    ) {
       throw new Error("A member with this email already exists");
     }
 

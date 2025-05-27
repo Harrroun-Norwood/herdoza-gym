@@ -13,9 +13,23 @@
       crossorigin="anonymous"
     />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.5.0/echarts.min.js"></script>
+    <!-- Load API first -->
     <script type="module" src="./javascript/admin-api.js"></script>
+    <!-- Then load general utilities -->
     <script type="module" src="./javascript/general.js"></script>
+    <!-- Finally load page-specific code -->
     <script type="module" src="./javascript/admin_members_database.js"></script>
+    <!-- Add fallback for script loading errors -->
+    <script>
+      window.addEventListener("error", function (e) {
+        if (e.filename && e.filename.includes("admin-api.js")) {
+          console.error("Failed to load admin-api.js:", e);
+          alert(
+            "Failed to initialize the admin interface. Please refresh the page."
+          );
+        }
+      });
+    </script>
   </head>
   <body class="bg-gray-50">
     <div class="flex h-screen">

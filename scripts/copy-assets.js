@@ -30,7 +30,10 @@ async function copyAssets() {
     }
     console.log("✅ Frontend HTML files copied");
 
-    // Copy admin files
+    // Copy admin assets and files
+    await fs.ensureDir(path.join(__dirname, "../admin/dist"));
+
+    // Copy admin assets
     await fs.copy(
       path.join(__dirname, "../admin/assets"),
       path.join(__dirname, "../admin/dist/assets"),

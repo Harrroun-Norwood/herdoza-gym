@@ -30,6 +30,8 @@ app.use(
           "'unsafe-eval'",
           "cdnjs.cloudflare.com",
           "cdn.jsdelivr.net",
+          "cdn.remixicon.com",
+          "*.echarts.apache.org",
           "*",
         ],
         scriptSrcElem: [
@@ -100,6 +102,8 @@ const corsOptions = {
       "http://localhost:5173",
       "http://localhost:3000",
       "http://localhost:3001",
+      "http://127.0.0.1:5500",
+      "http://localhost:5500",
     ];
 
     if (!origin || allowedOrigins.includes(origin)) {

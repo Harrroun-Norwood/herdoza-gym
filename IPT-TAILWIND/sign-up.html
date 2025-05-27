@@ -657,11 +657,32 @@
             try {
               // Generate verification PIN and add to user data
               const verificationPin = generatePIN();
-              userData.pin = verificationPin;
-              userData.verified = false;
+              const registrationData = {
+                id: Date.now().toString(),
+                name: `${firstName} ${lastName}`,
+                email: email.toLowerCase(),
+                contact: contact,
+                firstName,
+                lastName,
+                membershipType: "gym",
+                membershipDuration: "1",
+                status: "pending",
+                dateOfMembership: new Date().toISOString(),
+                date: new Date().toISOString(),
+                paymentMethod: "Cash",
+                paymentStatus: "pending",
+                pin: verificationPin,
+                verified: false,
+                password,
+              };
+
+              // Get existing registrations
+              const registrations = JSON.parse(
+                localStorage.getItem("registrations") || "[]"
+              );
 
               // Add to registrations
-              registrations.push(userData);
+              registrations.push(registrationData);
               localStorage.setItem(
                 "registrations",
                 JSON.stringify(registrations)
